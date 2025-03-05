@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Post Servizio - HelpDigit</title>
+    <link rel="stylesheet" href="../public/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Riepilogo Post Servizio</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Servizi</a></li>
+                <li><a href="request.html">Invia Richiesta</a></li>
+                <li><a href="payment.html">Pagamento</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Grazie per aver utilizzato i nostri servizi!</h2>
+        <p>Il tuo servizio è stato completato con successo.</p>
+        <h3>Feedback</h3>
+        <form action="/submit-feedback" method="POST">
+            <label for="feedback">Lascia il tuo feedback:</label><br>
+            <textarea id="feedback" name="feedback" rows="4" cols="50" required></textarea><br>
+            <input type="submit" value="Invia Feedback">
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 HelpDigit. Tutti i diritti riservati.</p>
+    </footer>
+</body>
+</html>

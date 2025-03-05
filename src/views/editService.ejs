@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Modifica Servizio - HelpDigit</title>
+    <link rel="stylesheet" href="../public/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Modifica Servizio</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Servizi</a></li>
+                <li><a href="request.html">Invia Richiesta</a></li>
+                <li><a href="payment.html">Pagamento</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Dettagli Servizio</h2>
+        <form action="/services/edit" method="POST">
+            <label for="serviceName">Nome Servizio:</label>
+            <input type="text" id="serviceName" name="serviceName" required>
+
+            <label for="serviceDescription">Descrizione:</label>
+            <textarea id="serviceDescription" name="serviceDescription" required></textarea>
+
+            <label for="serviceStatus">Stato:</label>
+            <select id="serviceStatus" name="serviceStatus">
+                <option value="attivo">Attivo</option>
+                <option value="non attivo">Non Attivo</option>
+            </select>
+
+            <button type="submit">Salva Modifiche</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 HelpDigit. Tutti i diritti riservati.</p>
+    </footer>
+</body>
+</html>

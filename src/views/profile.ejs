@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilo Utente</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="/js/build.js" defer></script>
+</head>
+<body>
+    <main class="container mt-5">
+        <h1>Profilo Utente</h1>
+        <p>Benvenuto nella tua pagina profilo. Qui puoi visualizzare e aggiornare le tue informazioni personali.</p>
+        
+        <!-- Dettagli del profilo utente -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Informazioni Personali</h5>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <label for="username">Nome Utente</label>
+                        <input type="text" class="form-control" id="username" value="NomeUtente" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" value="utente@example.com" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">Nome</label>
+                        <input type="text" class="form-control" id="firstName" value="Nome">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Cognome</label>
+                        <input type="text" class="form-control" id="lastName" value="Cognome">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Aggiorna</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Altre sezioni del profilo possono essere aggiunte qui -->
+    </main>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servizi - HelpDigit</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- La navbar verrà inserita qui da build.js -->
+    
+    <main>
+        <!-- Hero Section -->
+        <section class="bg-primary text-white py-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-7">
+                        <h1 class="display-4 font-weight-bold mb-3">I Nostri Servizi</h1>
+                        <p class="lead">Soluzioni digitali professionali per privati e aziende. Scegli il servizio più adatto alle tue esigenze.</p>
+                    </div>
+                    <div class="col-lg-5">
+                        <img src="/img/services-hero.svg" alt="Servizi" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Filtri Servizi -->
+        <section class="py-4 bg-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <select class="form-control" id="categoryFilter">
+                            <option value="">Tutte le categorie</option>
+                            <option value="Grafica">Grafica</option>
+                            <option value="Web">Web</option>
+                            <option value="Supporto">Supporto</option>
+                            <option value="Digitalizzazione">Digitalizzazione</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Cerca servizi..." id="searchServices">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Elenco Servizi -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row" id="servicesContainer">
+                    <% if (services && services.length > 0) { %>
+                        <% services.forEach(function(service) { %>
+                            <div class="col-md-6 col-lg-4 mb-4 service-card" data-category="<%= service.category %>">
+                                <div class="card h-100 shadow-sm border-0 transition-hover">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                                                <i class="fas <%= service.icon || 'fa-cogs' %>"></i>
+                                            </div>
+                                            <h4 class="card-title mb-0"><%= service.name %></h4>
+                                        </div>
+                                        <p class="card-text text-muted"><%= service.description %></p>
+                                        <div class="d-flex justify-content-between align-items-center mt-4">
+                                            <h5 class="text-primary mb-0">€ <%= service.price.toFixed(2) %></h5>
+                                            <a href="/services/<%= service.id %>" class="btn btn-outline-primary">
+                                                Dettagli
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-white border-0">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-tag mr-1"></i> <%= service.category %>
+                                            </small>
+                                            <a href="/services/request/<%= service.id %>" class="btn btn-primary">
+                                                <i class="fas fa-shopping-cart mr-1"></i> Seleziona
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="col-12 text-center py-5">
+                            <div class="alert alert-info shadow-sm border-0">
+                                <i class="fas fa-info-circle fa-3x mb-3 text-primary"></i>
+                                <h4 class="alert-heading">Nessun servizio disponibile al momento</h4>
+                                <p>Ti preghiamo di riprovare più tardi o di contattarci per maggiori informazioni.</p>
+                                <a href="/contact" class="btn btn-primary mt-3">
+                                    <i class="fas fa-envelope mr-2"></i> Contattaci
+                                </a>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Servizio Personalizzato CTA -->
+                <div class="text-center mt-5 py-5 border-top">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <h3 class="mb-3">Hai bisogno di un servizio personalizzato?</h3>
+                            <p class="lead text-muted mb-4">Non trovi ciò che stai cercando? Contattaci per discutere delle tue esigenze specifiche e trovare insieme la soluzione migliore.</p>
+                            <a href="/contact" class="btn btn-lg btn-primary">
+                                <i class="fas fa-envelope mr-2"></i> Richiedi un preventivo gratuito
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Mappa responsiva con pulsante per Maps su mobile -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center mb-5">
+                        <h3 class="mb-3">Dove Trovarci</h3>
+                        <p class="lead text-muted">Vieni a trovarci presso la nostra sede per discutere di persona delle tue esigenze</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Versione desktop della mappa (visibile solo su tablet e desktop) -->
+                        <div class="card border-0 shadow-sm d-none d-md-block">
+                            <div class="card-body p-0">
+                                <div class="map-responsive">
+                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1263.779990940046!2d16.887317370913884!3d41.11722529847105!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1347e8407c7abe49%3A0x256a0d3fa2286550!2sIstituto%20Tecnico%20Tecnologico%20e%20Liceo%20Scientifico%20%22Guglielmo%20Marconi%20-%20Margherita%20Hack%22!5e0!3m2!1sit!2sit!4v1741186212754!5m2!1sit!2sit" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Versione mobile con pulsante per aprire Maps (visibile solo su smartphone) -->
+                        <div class="card border-0 shadow-sm d-md-none">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-map-marked-alt fa-4x text-primary mb-4"></i>
+                                <h4 class="mb-3">Naviga verso la nostra sede</h4>
+                                <p class="text-muted mb-4">Tocca il pulsante per aprire Google Maps e ottenere indicazioni stradali</p>
+                                <a href="https://maps.app.goo.gl/8n9T4GyEtmLkGosr7" target="_blank" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-directions mr-2"></i>Apri Google Maps
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-map-marker-alt fa-2x text-primary mb-3"></i>
+                                        <h5>Indirizzo</h5>
+                                        <p class="mb-0">Via Roma 123<br>20121 Milano (MI)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-phone-alt fa-2x text-primary mb-3"></i>
+                                        <h5>Telefono</h5>
+                                        <p class="mb-0">+39 123 456 7890<br>+39 098 765 4321</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="far fa-clock fa-2x text-primary mb-3"></i>
+                                        <h5>Orari</h5>
+                                        <p class="mb-0">Lun-Ven: 9:00 - 18:00<br>Sab: 9:00 - 12:00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- FAQ -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <h3 class="text-center mb-4">Domande Frequenti</h3>
+                
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="accordion" id="servicesFAQ">
+                            <div class="card border-0 shadow-sm mb-3">
+                                <div class="card-header bg-white" id="headingOne">
+                                    <h2 class="mb-0">
+                                        <button class="btn btn-link btn-block text-left text-decoration-none text-dark" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                            <i class="fas fa-question-circle text-primary mr-2"></i>
+                                            Quanto tempo ci vuole per completare un servizio?
+                                        </button>
+                                    </h2>
+                                </div>
+                                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#servicesFAQ">
+                                    <div class="card-body">
+                                        I tempi di completamento variano in base al tipo di servizio richiesto. Generalmente, i servizi di supporto vengono gestiti entro 24-48 ore, mentre i progetti di design o sviluppo web possono richiedere da 3 a 10 giorni lavorativi. Ti forniremo sempre una stima precisa dei tempi dopo aver valutato la tua richiesta.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card border-0 shadow-sm mb-3">
+                                <div class="card-header bg-white" id="headingTwo">
+                                    <h2 class="mb-0">
+                                        <button class="btn btn-link btn-block text-left text-decoration-none text-dark collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                            <i class="fas fa-question-circle text-primary mr-2"></i>
+                                            Posso richiedere modifiche dopo la consegna del servizio?
+                                        </button>
+                                    </h2>
+                                </div>
+                                <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#servicesFAQ">
+                                    <div class="card-body">
+                                        Sì, offriamo un ciclo di revisioni gratuite per ogni servizio. Dopo la consegna, hai 7 giorni per richiedere eventuali modifiche o aggiustamenti. Il nostro obiettivo è la tua completa soddisfazione.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-header bg-white" id="headingThree">
+                                    <h2 class="mb-0">
+                                        <button class="btn btn-link btn-block text-left text-decoration-none text-dark collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            <i class="fas fa-question-circle text-primary mr-2"></i>
+                                            Quali sono le modalità di pagamento accettate?
+                                        </button>
+                                    </h2>
+                                </div>
+                                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#servicesFAQ">
+                                    <div class="card-body">
+                                        Accettiamo diverse modalità di pagamento, tra cui carte di credito/debito, PayPal e bonifico bancario. Per progetti più grandi, offriamo anche la possibilità di pagamento rateizzato.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Il footer verrà inserito qui da build.js -->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+    
+    <script>
+        // Filtro per categoria
+        document.getElementById('categoryFilter').addEventListener('change', function() {
+            filterServices();
+        });
+        
+        // Ricerca servizi
+        document.getElementById('searchServices').addEventListener('keyup', function() {
+            filterServices();
+        });
+        
+        function filterServices() {
+            const category = document.getElementById('categoryFilter').value.toLowerCase();
+            const searchTerm = document.getElementById('searchServices').value.toLowerCase();
+            const serviceCards = document.querySelectorAll('.service-card');
+            
+            serviceCards.forEach(function(card) {
+                const cardCategory = card.dataset.category.toLowerCase();
+                const cardText = card.textContent.toLowerCase();
+                
+                // Verifica se la card soddisfa i criteri di filtro
+                const matchesCategory = category === '' || cardCategory === category;
+                const matchesSearch = searchTerm === '' || cardText.includes(searchTerm);
+                
+                // Mostra o nascondi la card in base ai filtri
+                if (matchesCategory && matchesSearch) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

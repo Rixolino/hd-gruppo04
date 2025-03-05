@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagamento - HelpDigit</title>
+    <link rel="stylesheet" href="../public/css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Pagamento del Servizio</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Servizi</a></li>
+                <li><a href="request.html">Richiesta</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Registrati</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Dettagli Pagamento</h2>
+        <form id="payment-form">
+            <label for="amount">Importo:</label>
+            <input type="text" id="amount" name="amount" required>
+            
+            <label for="payment-method">Metodo di Pagamento:</label>
+            <select id="payment-method" name="payment-method" required>
+                <option value="credit-card">Carta di Credito</option>
+                <option value="paypal">PayPal</option>
+                <option value="bank-transfer">Bonifico Bancario</option>
+            </select>
+            
+            <button type="submit">Procedi al Pagamento</button>
+        </form>
+        <div id="payment-status"></div>
+    </main>
+    <footer>
+        <p>&copy; 2025 HelpDigit. Tutti i diritti riservati.</p>
+    </footer>
+    <script src="../public/js/scripts.js"></script>
+</body>
+</html>
