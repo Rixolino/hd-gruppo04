@@ -1,28 +1,24 @@
 import { Sequelize } from 'sequelize';
-import dotenv from 'dotenv';
-import { createConnection } from 'mysql2/promise';
+import path from 'path';
 
-dotenv.config();
+const dbPath = path.resolve(__dirname, '../../database.sqlite');
 
-const createDatabase = async () => {
-    const connection = await createConnection({
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-    });
-
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
-    await connection.end();
-};
-
-const sequelize = new Sequelize(process.env.DB_NAME!, process.env.DB_USER!, process.env.DB_PASSWORD!, {
-    host: process.env.DB_HOST,
-    dialect: 'mysql',
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: dbPath,
+  logging: false
 });
 
-const initializeDatabase = async () => {
-    await createDatabase();
-    await sequelize.sync(); // Questo creerà le tabelle se non esistono
-};
+// Inizializzazione del database
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Connessione al database stabilita con successo.');
+    await sequelize.sync();
+    console.log('Modelli sincronizzati con il database.');
+  } catch (error) {
+    console.error('Impossibile connettersi al database:', error);
+  }
+})();
 
-export { sequelize, initializeDatabase };
+export default sequelize;

@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelize } from '../config/db'; // Assicurati di avere un file di configurazione per il database
+import sequelize from '../config/db'; // Assicurati di avere un file di configurazione per il database
 
 // Definisci l'interfaccia per il modello
 interface IServiceAttributes {

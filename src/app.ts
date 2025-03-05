@@ -3,12 +3,16 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import { initializeDatabase } from './config/db';
+import initializeDatabase from './config/db';
 import initializeUserModel from './models/userModel';
 import { authenticate } from './middleware/authMiddleware';
 import jwt from 'jsonwebtoken';
+import { Sequelize } from 'sequelize';
 
 dotenv.config();
+
+// Importa l'istanza di Sequelize già configurata
+import sequelize from './config/db';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -30,12 +34,22 @@ app.use('/services', authenticate, serviceRoutes);
 app.use('/payments', authenticate, paymentRoutes);
 
 // Database connection
-initializeDatabase()
+const initializeDatabaseConnection = async () => {
+    try {
+        await sequelize.authenticate();
+        await sequelize.sync();
+        console.log('Database connected and synchronized');
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
+};
+
+initializeDatabaseConnection()
     .then(() => {
         initializeUserModel(); // Inizializza il modello utente
         console.log('Database and tables created');
     })
-    .catch(err => console.log(err));
+    .catch((err: any) => console.log(err));
 
 // Home route - controlla se l'utente è autenticato
 app.get('/', (req: Request, res: Response) => {
