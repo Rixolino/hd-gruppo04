@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - HD Supporto</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .faq-section {
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .faq-section:last-child {
+            border-bottom: none;
+        }
+        .faq-title {
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        .card {
+            margin-bottom: 10px;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            cursor: pointer;
+            border: none;
+        }
+        .card-body {
+            padding: 20px;
+            background-color: #fff;
+        }
+        .btn-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            width: 100%;
+            text-align: left;
+        }
+        .btn-link:hover {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .btn-link:focus {
+            box-shadow: none;
+        }
+        .search-box {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container py-4">
+        <h1 class="mb-4">Domande Frequenti</h1>
+        
+        <!-- Barra di ricerca -->
+        <div class="search-box">
+            <div class="input-group">
+                <input type="text" class="form-control" id="faqSearch" placeholder="Cerca nelle FAQ...">
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sezione 1: Account e Registrazione -->
+        <div class="faq-section" id="account">
+            <h3 class="faq-title">Account e Registrazione</h3>
+            
+            <div class="accordion" id="accountFAQ">
+                <div class="card">
+                    <div class="card-header" id="headingOne">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne">
+                                Come posso registrarmi al servizio? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseOne" class="collapse" data-parent="#accountFAQ">
+                        <div class="card-body">
+                            Per registrarti, clicca sul pulsante "Registrati" nella homepage. Compila il modulo con i tuoi dati personali (nome, email e password) e clicca su "Invia". Riceverai una conferma di registrazione e potrai subito accedere ai nostri servizi.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingTwo">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwo">
+                                Ho dimenticato la mia password, cosa devo fare? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseTwo" class="collapse" data-parent="#accountFAQ">
+                        <div class="card-body">
+                            Nella pagina di login, clicca su "Password dimenticata". Inserisci l'email associata al tuo account e ti invieremo un link per reimpostare la password. Il link sarà valido per 24 ore.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingThree">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThree">
+                                Posso modificare i miei dati personali dopo la registrazione? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseThree" class="collapse" data-parent="#accountFAQ">
+                        <div class="card-body">
+                            Sì, puoi modificare i tuoi dati personali in qualsiasi momento. Accedi al tuo account, vai nella sezione "Profilo" e clicca su "Modifica dati". Aggiorna le informazioni desiderate e salva le modifiche.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sezione 2: Servizi -->
+        <div class="faq-section" id="services">
+            <h3 class="faq-title">Servizi Disponibili</h3>
+            
+            <div class="accordion" id="servicesFAQ">
+                <div class="card">
+                    <div class="card-header" id="headingFour">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFour">
+                                Quali servizi offrite? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseFour" class="collapse" data-parent="#servicesFAQ">
+                        <div class="card-body">
+                            Offriamo una vasta gamma di servizi digitali, tra cui:
+                            <ul>
+                                <li>Digitalizzazione documenti</li>
+                                <li>Creazione di volantini pubblicitari</li>
+                                <li>Supporto PC remoto</li>
+                                <li>Creazione siti web base</li>
+                                <li>Design di biglietti da visita</li>
+                                <li>Configurazione smartphone</li>
+                            </ul>
+                            Per ulteriori dettagli, visita la sezione "Servizi" sul nostro sito.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingFive">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFive">
+                                Quanto tempo richiede in media ciascun servizio? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseFive" class="collapse" data-parent="#servicesFAQ">
+                        <div class="card-body">
+                            I tempi di consegna variano in base al servizio richiesto:
+                            <ul>
+                                <li>Digitalizzazione documenti: 3-5 giorni lavorativi</li>
+                                <li>Creazione volantini: 3-4 giorni lavorativi</li>
+                                <li>Supporto PC remoto: 24-48 ore</li>
+                                <li>Sito web base: 7-10 giorni lavorativi</li>
+                                <li>Biglietti da visita: 2-3 giorni lavorativi</li>
+                                <li>Configurazione smartphone: 24 ore</li>
+                            </ul>
+                            I tempi esatti vengono comunicati al momento della conferma dell'ordine.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingSix">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSix">
+                                Posso richiedere servizi personalizzati? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseSix" class="collapse" data-parent="#servicesFAQ">
+                        <div class="card-body">
+                            Sì, siamo disponibili a valutare richieste di servizi personalizzati. Contattaci tramite la sezione "Contatti" specificando il tipo di servizio di cui hai bisogno. Ti risponderemo entro 48 ore con un preventivo e i dettagli sulla fattibilità della tua richiesta.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sezione 3: Richieste -->
+        <div class="faq-section" id="requests">
+            <h3 class="faq-title">Richieste di Servizio</h3>
+            
+            <div class="accordion" id="requestsFAQ">
+                <div class="card">
+                    <div class="card-header" id="headingSeven">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSeven">
+                                Come posso richiedere un servizio? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseSeven" class="collapse" data-parent="#requestsFAQ">
+                        <div class="card-body">
+                            Per richiedere un servizio, accedi al tuo account e vai alla dashboard. Naviga nella sezione "Servizi Disponibili" e clicca sul pulsante "Seleziona" accanto al servizio desiderato. Compila il modulo con i dettagli specifici della tua richiesta e clicca su "Invia richiesta". Riceverai una conferma immediata con il numero di riferimento della tua richiesta.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingEight">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseEight">
+                                Posso modificare una richiesta dopo averla inviata? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseEight" class="collapse" data-parent="#requestsFAQ">
+                        <div class="card-body">
+                            Puoi modificare una richiesta solo se lo stato è ancora "In attesa di elaborazione". Accedi alla tua dashboard, vai alla sezione "Richieste Attive", trova la richiesta che desideri modificare e clicca su "Dettagli". Se lo stato lo consente, vedrai un pulsante "Modifica". Se la richiesta è già in lavorazione, dovrai contattare il nostro team di supporto.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingNine">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseNine">
+                                Come faccio a sapere lo stato della mia richiesta? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseNine" class="collapse" data-parent="#requestsFAQ">
+                        <div class="card-body">
+                            Lo stato della tua richiesta è sempre visualizzato nella sezione "Richieste Attive" della tua dashboard. Inoltre, riceverai notifiche via email per ogni aggiornamento importante dello stato della tua richiesta (in lavorazione, completato, ecc.). Puoi anche attivare le notifiche push dal tuo profilo per ricevere aggiornamenti in tempo reale.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sezione 4: Pagamenti -->
+        <div class="faq-section" id="payments">
+            <h3 class="faq-title">Pagamenti</h3>
+            
+            <div class="accordion" id="paymentsFAQ">
+                <div class="card">
+                    <div class="card-header" id="headingTen">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTen">
+                                Quali metodi di pagamento accettate? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseTen" class="collapse" data-parent="#paymentsFAQ">
+                        <div class="card-body">
+                            Accettiamo diverse modalità di pagamento:
+                            <ul>
+                                <li>Carte di credito/debito (Visa, Mastercard, American Express)</li>
+                                <li>PayPal</li>
+                                <li>Bonifico bancario</li>
+                                <li>Punti fedeltà (per clienti già registrati)</li>
+                            </ul>
+                            Tutte le transazioni sono sicure e criptate.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingEleven">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseEleven">
+                                Quando viene effettuato l'addebito? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseEleven" class="collapse" data-parent="#paymentsFAQ">
+                        <div class="card-body">
+                            L'addebito viene effettuato al momento della conferma dell'ordine. Per alcuni servizi più complessi, potrebbe essere richiesto un acconto iniziale e il saldo alla consegna. I dettagli specifici del pagamento vengono sempre comunicati prima della conferma dell'ordine.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingTwelve">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseTwelve">
+                                Posso ottenere una fattura per il servizio? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseTwelve" class="collapse" data-parent="#paymentsFAQ">
+                        <div class="card-body">
+                            Sì, puoi richiedere una fattura per ogni servizio acquistato. Durante il processo di checkout, seleziona l'opzione "Richiedi fattura" e inserisci i dati di fatturazione. La fattura sarà inviata al tuo indirizzo email entro 24 ore dalla conferma del pagamento. Puoi anche scaricare tutte le tue fatture dalla sezione "Documenti" del tuo profilo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sezione 5: Consegna -->
+        <div class="faq-section" id="delivery">
+            <h3 class="faq-title">Elaborazione e Consegna</h3>
+            
+            <div class="accordion" id="deliveryFAQ">
+                <div class="card">
+                    <div class="card-header" id="headingThirteen">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseThirteen">
+                                Come vengo informato quando il servizio è completato? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseThirteen" class="collapse" data-parent="#deliveryFAQ">
+                        <div class="card-body">
+                            Quando il tuo servizio è completato, riceverai una notifica via email e, se attivate, notifiche push. Inoltre, lo stato della richiesta nella tua dashboard verrà aggiornato a "Completato" e potrai visualizzare un'anteprima del lavoro svolto.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingFourteen">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFourteen">
+                                Cosa succede se non sono soddisfatto del risultato? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseFourteen" class="collapse" data-parent="#deliveryFAQ">
+                        <div class="card-body">
+                            La soddisfazione del cliente è la nostra priorità. Se non sei soddisfatto del risultato, puoi richiedere modifiche gratuite entro i limiti specificati per ogni servizio (solitamente da 1 a 3 revisioni). Nella pagina di anteprima del lavoro completato, clicca su "Richiedi modifiche" e specifica i cambiamenti desiderati.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingFifteen">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseFifteen">
+                                Quante revisioni posso richiedere? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseFifteen" class="collapse" data-parent="#deliveryFAQ">
+                        <div class="card-body">
+                            Il numero di revisioni gratuite varia in base al servizio:
+                            <ul>
+                                <li>Digitalizzazione documenti: 1 revisione</li>
+                                <li>Creazione volantini: 2 revisioni</li>
+                                <li>Sito web base: 3 revisioni</li>
+                                <li>Biglietti da visita: 2 revisioni</li>
+                            </ul>
+                            Revisioni aggiuntive potrebbero comportare costi supplementari. I dettagli specifici sono indicati nella pagina di ciascun servizio.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sezione 6: Feedback e Fedeltà -->
+        <div class="faq-section" id="feedback">
+            <h3 class="faq-title">Feedback e Punti Fedeltà</h3>
+            
+            <div class="accordion" id="feedbackFAQ">
+                <div class="card">
+                    <div class="card-header" id="headingSixteen">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSixteen">
+                                Come funziona il sistema di punti fedeltà? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseSixteen" class="collapse" data-parent="#feedbackFAQ">
+                        <div class="card-body">
+                            Per ogni servizio completato, accumuli punti fedeltà in base al valore dell'ordine (1 punto ogni 10€ spesi). I punti possono essere utilizzati per ottenere sconti su futuri ordini o accedere a servizi esclusivi. Inoltre, ricevi punti bonus quando lasci un feedback o quando inviti amici che effettuano un ordine (50 punti per ogni amico).
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingSeventeen">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseSeventeen">
+                                Come posso lasciare un feedback? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseSeventeen" class="collapse" data-parent="#feedbackFAQ">
+                        <div class="card-body">
+                            Una volta completato il servizio e approvato il risultato finale, riceverai automaticamente un invito a lasciare un feedback. Puoi farlo anche manualmente accedendo alla sezione "Lavori Completati" nella tua dashboard e cliccando su "Lascia feedback" accanto al servizio pertinente. Puoi assegnare un punteggio da 1 a 5 stelle e lasciare un commento sulla tua esperienza.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header" id="headingEighteen">
+                        <h2 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseEighteen">
+                                Quali vantaggi offre il programma fedeltà? <i class="fas fa-chevron-down float-right"></i>
+                            </button>
+                        </h2>
+                    </div>
+                    <div id="collapseEighteen" class="collapse" data-parent="#feedbackFAQ">
+                        <div class="card-body">
+                            Il nostro programma fedeltà offre diversi vantaggi:
+                            <ul>
+                                <li>Sconti progressivi sui servizi (fino al 20%)</li>
+                                <li>Accesso anticipato a nuovi servizi</li>
+                                <li>Revisioni extra gratuite</li>
+                                <li>Tempi di consegna prioritari</li>
+                                <li>Consulenze personalizzate gratuite</li>
+                            </ul>
+                            I vantaggi aumentano con il tuo livello di fedeltà, che sale man mano che accumuli punti.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contattaci -->
+        <div class="mt-5 text-center">
+            <h4>Non hai trovato la risposta che cercavi?</h4>
+            <p>Il nostro team di supporto è a tua disposizione per qualsiasi domanda</p>
+            <a href="/contact" class="btn btn-primary">Contattaci</a>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+    
+    <script>
+        // Funzionalità di ricerca
+        $(document).ready(function() {
+            $("#faqSearch").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $(".card").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+                
+                // Mostra messaggio se nessun risultato
+                var visibleCards = $(".card:visible").length;
+                if (visibleCards === 0 && value.length > 0) {
+                    if ($("#noResults").length === 0) {
+                        $(".faq-section:last").after(
+                            '<div id="noResults" class="alert alert-info mt-3">' +
+                            'Nessun risultato trovato per "' + value + '". Prova con un\'altra ricerca o <a href="/contact">contattaci</a> direttamente.' +
+                            '</div>'
+                        );
+                    }
+                } else {
+                    $("#noResults").remove();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

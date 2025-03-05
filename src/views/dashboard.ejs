@@ -5,47 +5,261 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .service-card {
+            transition: transform 0.3s;
+            height: 100%;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+        .nav-tabs .nav-link.active {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    
-    <main class="container mt-5">
-        <h2>Benvenuto nella tua Dashboard</h2>
-        <p>Qui puoi accedere ai tuoi servizi e gestire le tue richieste.</p>
 
-        <!-- Sezione per visualizzare i servizi disponibili -->
-        <section id="services">
-            <h3>Servizi Disponibili</h3>
+    <main class="container mt-4">
+        <!-- Widget di benvenuto -->
+        <div class="jumbotron p-4">
             <div class="row">
-                <div class="col-md-4">
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Servizio 1</h5>
-                            <p class="card-text">Descrizione breve del servizio 1.</p>
-                            <a href="#" class="btn btn-primary">Seleziona</a>
-                        </div>
-                    </div>
+                <div class="col-md-8">
+                    <h2>Benvenuto nella tua Dashboard</h2>
+                    <p>Da qui puoi gestire i tuoi servizi, monitorare le richieste e visualizzare i tuoi punti fedeltà.</p>
                 </div>
-                <div class="col-md-4">
-                    <div class="card mb-4">
+                <div class="col-md-4 text-center">
+                    <div class="card bg-light">
                         <div class="card-body">
-                            <h5 class="card-title">Servizio 2</h5>
-                            <p class="card-text">Descrizione breve del servizio 2.</p>
-                            <a href="#" class="btn btn-primary">Seleziona</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Servizio 3</h5>
-                            <p class="card-text">Descrizione breve del servizio 3.</p>
-                            <a href="#" class="btn btn-primary">Seleziona</a>
+                            <h5>I tuoi punti fedeltà</h5>
+                            <h2 class="text-primary">120</h2>
+                            <a href="#" class="btn btn-sm btn-outline-primary">Vedi offerte</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
 
+        <!-- Schede di navigazione -->
+        <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="services-tab" data-toggle="tab" href="#services" role="tab">Servizi Disponibili</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="active-requests-tab" data-toggle="tab" href="#active-requests" role="tab">Richieste Attive <span class="badge badge-primary">2</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="completed-tab" data-toggle="tab" href="#completed" role="tab">Lavori Completati <span class="badge badge-success">1</span></a>
+            </li>
+        </ul>
+
+        <!-- Contenuto delle schede -->
+        <div class="tab-content" id="dashboardTabsContent">
+            <!-- Servizi Disponibili -->
+            <div class="tab-pane fade show active" id="services" role="tabpanel">
+                <h3 class="mb-3">Servizi Disponibili</h3>
+                <div class="row">
+                    <!-- Digitalizzazione -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card service-card">
+                            <div class="card-body text-center">
+                                <div class="card-icon">
+                                    <i class="fas fa-file-import"></i>
+                                </div>
+                                <h5 class="card-title">Digitalizzazione Documenti</h5>
+                                <p class="card-text">Trasformiamo i tuoi documenti cartacei in file digitali, organizzati e facilmente accessibili.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">€49.90</span>
+                                    <a href="/services/digitalizzazione" class="btn btn-outline-primary">Dettagli</a>
+                                    <a href="/services/request/digitalizzazione" class="btn btn-outline-primary">Seleziona</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Volantini -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card service-card">
+                            <div class="card-body text-center">
+                                <div class="card-icon">
+                                    <i class="fas fa-paint-brush"></i>
+                                </div>
+                                <h5 class="card-title">Creazione Volantini</h5>
+                                <p class="card-text">Design professionale di volantini pubblicitari per la tua attività.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">€39.90</span>
+                                    <a href="/services/volantini" class="btn btn-outline-primary">Dettagli</a>
+                                    <a href="/services/request/volantini" class="btn btn-outline-primary">Seleziona</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Supporto PC -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card service-card">
+                            <div class="card-body text-center">
+                                <div class="card-icon">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <h5 class="card-title">Supporto PC Remoto</h5>
+                                <p class="card-text">Assistenza tecnica a distanza per risolvere problemi informatici.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">€29.90</span>
+                                    <a href="/services/supporto" class="btn btn-outline-primary">Dettagli</a>
+                                    <a href="/services/request/supporto" class="btn btn-outline-primary">Seleziona</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Altri servizi -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card service-card">
+                            <div class="card-body text-center">
+                                <div class="card-icon">
+                                    <i class="fas fa-laptop-code"></i>
+                                </div>
+                                <h5 class="card-title">Sito Web Base</h5>
+                                <p class="card-text">Creazione di un sito web professionale fino a 5 pagine.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">€299.90</span>
+                                    <a href="/services/sitobase" class="btn btn-outline-primary">Dettagli</a>
+                                    <a href="/services/request/sitobase" class="btn btn-outline-primary">Seleziona</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card service-card">
+                            <div class="card-body text-center">
+                                <div class="card-icon">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+                                <h5 class="card-title">Biglietti da Visita</h5>
+                                <p class="card-text">Design professionale di biglietti da visita personalizzati.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">€24.90</span>
+                                    <a href="/services/biglietti" class="btn btn-outline-primary">Dettagli</a>
+                                    <a href="/services/request/biglietti" class="btn btn-outline-primary">Seleziona</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card service-card">
+                            <div class="card-body text-center">
+                                <div class="card-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <h5 class="card-title">Configurazione Smartphone</h5>
+                                <p class="card-text">Assistenza per la configurazione completa del tuo nuovo smartphone.</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">€34.90</span>
+                                    <a href="/services/smartphone" class="btn btn-outline-primary">Dettagli</a>
+                                    <a href="/services/request/smartphone" class="btn btn-outline-primary">Seleziona</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Richieste Attive -->
+            <div class="tab-pane fade" id="active-requests" role="tabpanel">
+                <h3 class="mb-3">Le tue richieste in corso</h3>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <span class="badge badge-warning status-badge">In lavorazione</span>
+                                <h5 class="card-title">Digitalizzazione Documenti</h5>
+                                <p class="card-text">Richiesta inviata il 01/03/2025</p>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" role="progressbar" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span class="text-muted">Consegna prevista: 07/03/2025</span>
+                                    <a href="#" class="btn btn-sm btn-outline-primary">Dettagli</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <span class="badge badge-info status-badge">Pagamento in attesa</span>
+                                <h5 class="card-title">Creazione Volantini</h5>
+                                <p class="card-text">Richiesta inviata il 03/03/2025</p>
+                                <div class="mt-3">
+                                    <a href="#" class="btn btn-primary">Procedi al pagamento</a>
+                                    <a href="#" class="btn btn-link">Dettagli</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lavori Completati -->
+            <div class="tab-pane fade" id="completed" role="tabpanel">
+                <h3 class="mb-3">Lavori completati</h3>
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <span class="badge badge-success status-badge">Completato</span>
+                                <h5 class="card-title">Supporto PC Remoto</h5>
+                                <p class="card-text">Servizio completato il 28/02/2025</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="mb-0 small">Non hai ancora lasciato un feedback</p>
+                                    </div>
+                                    <div>
+                                        <a href="#" class="btn btn-sm btn-outline-success">Lascia feedback</a>
+                                        <a href="#" class="btn btn-sm btn-outline-secondary">Dettagli</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sezione offerte speciali -->
+        <div class="card mt-4 mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="m-0">Offerte speciali per te</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="alert alert-info mb-0">
+                            <h5>Sconto del 15%</h5>
+                            <p>Su tutti i servizi di grafica fino al 31 marzo 2025.</p>
+                            <button class="btn btn-sm btn-info">Scopri di più</button>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert alert-warning mb-0">
+                            <h5>Servizio aggiuntivo gratuito</h5>
+                            <p>Ottieni una consulenza gratuita con il tuo prossimo ordine!</p>
+                            <button class="btn btn-sm btn-warning">Attiva offerta</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Richiedi <%= service.name %> - HelpDigit</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- La navbar verrà inserita qui da build.js -->
+    
+    <main>
+        <!-- Hero Section -->
+        <section class="bg-primary text-white py-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb bg-transparent p-0">
+                                <li class="breadcrumb-item"><a href="/" class="text-white">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/services" class="text-white">Servizi</a></li>
+                                <li class="breadcrumb-item"><a href="/services/<%= service.id %>" class="text-white"><%= service.name %></a></li>
+                                <li class="breadcrumb-item active text-white-50" aria-current="page">Richiedi servizio</li>
+                            </ol>
+                        </nav>
+                        <h1 class="display-4 font-weight-bold mb-3">Richiedi <%= service.name %></h1>
+                        <p class="lead">Compila il modulo con i dettagli della tua richiesta. Ti risponderemo entro 24 ore lavorative.</p>
+                    </div>
+                    <div class="col-lg-4 text-center d-none d-lg-block">
+                        <img src="/img/service-request.svg" alt="Richiedi servizio" class="img-fluid" style="max-height: 200px;">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Form Richiesta -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body p-4 p-md-5">
+                                <h2 class="mb-4">Dettagli della richiesta</h2>
+                                <form id="serviceRequestForm" action="/services/request/<%= service.id %>" method="POST" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label for="requestTitle">Titolo del progetto <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="requestTitle" name="requestTitle" placeholder="Es: Logo per la mia azienda" required>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="requestDescription">Descrizione dettagliata <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="requestDescription" name="requestDescription" rows="5" placeholder="Descrivi in dettaglio cosa ti serve..." required></textarea>
+                                        <small class="form-text text-muted">Più dettagli fornisci, meglio possiamo soddisfare le tue esigenze.</small>
+                                    </div>
+                                    
+                                    <% if (service.category === "Grafica") { %>
+                                        <div class="form-group">
+                                            <label for="colorScheme">Schema di colori preferito</label>
+                                            <input type="text" class="form-control" id="colorScheme" name="colorScheme" placeholder="Es: Blu e bianco, colori aziendali, ecc.">
+                                        </div>
+                                    <% } %>
+                                    
+                                    <% if (service.category === "Web") { %>
+                                        <div class="form-group">
+                                            <label>Funzionalità richieste</label>
+                                            <div class="custom-control custom-checkbox mb-2">
+                                                <input type="checkbox" class="custom-control-input" id="contactForm" name="features[]" value="contactForm">
+                                                <label class="custom-control-label" for="contactForm">Form di contatto</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox mb-2">
+                                                <input type="checkbox" class="custom-control-input" id="gallery" name="features[]" value="gallery">
+                                                <label class="custom-control-label" for="gallery">Galleria fotografica</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox mb-2">
+                                                <input type="checkbox" class="custom-control-input" id="blog" name="features[]" value="blog">
+                                                <label class="custom-control-label" for="blog">Blog/News</label>
+                                            </div>
+                                            <div class="custom-control custom-checkbox mb-2">
+                                                <input type="checkbox" class="custom-control-input" id="ecommerce" name="features[]" value="ecommerce">
+                                                <label class="custom-control-label" for="ecommerce">E-commerce (supplemento)</label>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <div class="form-group">
+                                        <label for="attachments">File di riferimento (opzionale)</label>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="attachments" name="attachments" multiple>
+                                            <label class="custom-file-label" for="attachments">Scegli file</label>
+                                        </div>
+                                        <small class="form-text text-muted">Puoi caricare esempi, loghi, o altri materiali di riferimento (max 10MB).</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="deadline">Data di consegna desiderata (opzionale)</label>
+                                        <input type="date" class="form-control" id="deadline" name="deadline">
+                                        <small class="form-text text-muted">Faremo il possibile per rispettare la tua scadenza.</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="additionalNotes">Note aggiuntive (opzionale)</label>
+                                        <textarea class="form-control" id="additionalNotes" name="additionalNotes" rows="3" placeholder="Qualsiasi altra informazione che ritieni utile..."></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group form-check">
+                                        <input type="checkbox" class="form-check-input" id="termsAgree" required>
+                                        <label class="form-check-label" for="termsAgree">Accetto i <a href="/terms" target="_blank">termini e condizioni</a> e l'<a href="/privacy" target="_blank">informativa sulla privacy</a> <span class="text-danger">*</span></label>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-paper-plane mr-2"></i>Invia richiesta
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4 mt-4 mt-lg-0">
+                        <div class="card border-0 shadow-sm mb-4 sticky-top" style="top: 100px; z-index: 999;">
+                            <div class="card-body">
+                                <h4 class="mb-3">Riepilogo servizio</h4>
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 40px; height: 40px; min-width: 40px;">
+                                        <i class="fas <%= service.icon || 'fa-cogs' %>"></i>
+                                    </div>
+                                    <h5 class="mb-0"><%= service.name %></h5>
+                                </div>
+                                <ul class="list-group list-group-flush mb-4">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span>Prezzo:</span>
+                                        <span class="font-weight-bold">€ <%= service.price.toFixed(2) %></span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span>Tempo di consegna:</span>
+                                        <span><%= service.deliveryTime %></span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                        <span>Revisioni incluse:</span>
+                                        <span><%= service.revisions %></span>
+                                    </li>
+                                </ul>
+                                
+                                <hr>
+                                
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    Dopo l'invio della richiesta, riceverai un link per effettuare il pagamento.
+                                </div>
+                                
+                                <p class="mb-0 small text-muted">
+                                    <i class="fas fa-lock mr-1"></i>
+                                    I tuoi dati sono protetti e trasmessi in modo sicuro.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Il footer verrà inserito qui da build.js -->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+    
+    <script>
+        // Nome del file nella custom file input
+        document.querySelector('.custom-file-input').addEventListener('change', function(e) {
+            var files = Array.from(this.files);
+            var label = this.nextElementSibling;
+            
+            if (files.length > 1) {
+                label.textContent = files.length + ' file selezionati';
+            } else if (files.length === 1) {
+                label.textContent = files[0].name;
+            } else {
+                label.textContent = 'Scegli file';
+            }
+        });
+    </script>
+</body>
+</html>

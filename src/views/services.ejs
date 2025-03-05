@@ -90,14 +90,184 @@
                             </div>
                         <% }); %>
                     <% } else { %>
-                        <div class="col-12 text-center py-5">
-                            <div class="alert alert-info shadow-sm border-0">
-                                <i class="fas fa-info-circle fa-3x mb-3 text-primary"></i>
-                                <h4 class="alert-heading">Nessun servizio disponibile al momento</h4>
-                                <p>Ti preghiamo di riprovare più tardi o di contattarci per maggiori informazioni.</p>
-                                <a href="/contact" class="btn btn-primary mt-3">
-                                    <i class="fas fa-envelope mr-2"></i> Contattaci
-                                </a>
+                        <!-- Quando non ci sono servizi dal database, mostra questi esempi statici -->
+                        <div class="col-md-6 col-lg-4 mb-4 service-card" data-category="Digitalizzazione">
+                            <div class="card h-100 shadow-sm border-0 transition-hover">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-file-import"></i>
+                                        </div>
+                                        <h4 class="card-title mb-0">Digitalizzazione Documenti</h4>
+                                    </div>
+                                    <p class="card-text text-muted">Trasformiamo i tuoi documenti cartacei in file digitali, organizzati e facilmente accessibili. Ideale per archiviazione e gestione documentale.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <h5 class="text-primary mb-0">€ 49,90</h5>
+                                        <a href="/services/digitalizzazione" class="btn btn-outline-primary">
+                                            Dettagli
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag mr-1"></i> Digitalizzazione
+                                        </small>
+                                        <a href="/services/request/digitalizzazione" class="btn btn-primary">
+                                            <i class="fas fa-shopping-cart mr-1"></i> Seleziona
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4 mb-4 service-card" data-category="Grafica">
+                            <div class="card h-100 shadow-sm border-0 transition-hover">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-paint-brush"></i>
+                                        </div>
+                                        <h4 class="card-title mb-0">Creazione Volantini</h4>
+                                    </div>
+                                    <p class="card-text text-muted">Design professionale di volantini pubblicitari per la tua attività. Format digitale e pronti per la stampa con possibilità di revisioni.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <h5 class="text-primary mb-0">€ 39,90</h5>
+                                        <a href="/services/volantini" class="btn btn-outline-primary">
+                                            Dettagli
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag mr-1"></i> Grafica
+                                        </small>
+                                        <a href="/services/request/volantini" class="btn btn-primary">
+                                            <i class="fas fa-shopping-cart mr-1"></i> Seleziona
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4 mb-4 service-card" data-category="Supporto">
+                            <div class="card h-100 shadow-sm border-0 transition-hover">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-headset"></i>
+                                        </div>
+                                        <h4 class="card-title mb-0">Supporto PC Remoto</h4>
+                                    </div>
+                                    <p class="card-text text-muted">Assistenza tecnica a distanza per risolvere problemi informatici. I nostri esperti si collegano al tuo dispositivo e risolvono rapidamente.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <h5 class="text-primary mb-0">€ 29,90</h5>
+                                        <a href="/services/supporto" class="btn btn-outline-primary">
+                                            Dettagli
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag mr-1"></i> Supporto
+                                        </small>
+                                        <a href="/services/request/supporto" class="btn btn-primary">
+                                            <i class="fas fa-shopping-cart mr-1"></i> Seleziona
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4 mb-4 service-card" data-category="Web">
+                            <div class="card h-100 shadow-sm border-0 transition-hover">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-laptop-code"></i>
+                                        </div>
+                                        <h4 class="card-title mb-0">Sito Web Base</h4>
+                                    </div>
+                                    <p class="card-text text-muted">Creazione di un sito web professionale fino a 5 pagine, responsive e ottimizzato per i motori di ricerca. Include dominio e hosting per 1 anno.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <h5 class="text-primary mb-0">€ 299,90</h5>
+                                        <a href="/services/sitobase" class="btn btn-outline-primary">
+                                            Dettagli
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag mr-1"></i> Web
+                                        </small>
+                                        <a href="/services/request/sitobase" class="btn btn-primary">
+                                            <i class="fas fa-shopping-cart mr-1"></i> Seleziona
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4 mb-4 service-card" data-category="Grafica">
+                            <div class="card h-100 shadow-sm border-0 transition-hover">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                                            <i class="far fa-id-card"></i>
+                                        </div>
+                                        <h4 class="card-title mb-0">Biglietti da Visita</h4>
+                                    </div>
+                                    <p class="card-text text-muted">Design professionale di biglietti da visita personalizzati per la tua attività, comprensivi di file per la stampa e versioni digitali.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <h5 class="text-primary mb-0">€ 24,90</h5>
+                                        <a href="/services/biglietti" class="btn btn-outline-primary">
+                                            Dettagli
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag mr-1"></i> Grafica
+                                        </small>
+                                        <a href="/services/request/biglietti" class="btn btn-primary">
+                                            <i class="fas fa-shopping-cart mr-1"></i> Seleziona
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-4 mb-4 service-card" data-category="Supporto">
+                            <div class="card h-100 shadow-sm border-0 transition-hover">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                                            <i class="fas fa-mobile-alt"></i>
+                                        </div>
+                                        <h4 class="card-title mb-0">Configurazione Smartphone</h4>
+                                    </div>
+                                    <p class="card-text text-muted">Assistenza per la configurazione completa del tuo nuovo smartphone, trasferimento dati e installazione delle app essenziali.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <h5 class="text-primary mb-0">€ 34,90</h5>
+                                        <a href="/services/smartphone" class="btn btn-outline-primary">
+                                            Dettagli
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-tag mr-1"></i> Supporto
+                                        </small>
+                                        <a href="/services/request/smartphone" class="btn btn-primary">
+                                            <i class="fas fa-shopping-cart mr-1"></i> Seleziona
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     <% } %>

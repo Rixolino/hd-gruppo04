@@ -23,10 +23,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (isAuthenticated) {
         // Links per utenti autenticati
         navbarLinks = `
-            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a></li>
-              <li class="nav-item"><a class="nav-link" href="/about"><i class="fas fa-info-circle"></i> Chi Siamo</a></li>
-            <li class="nav-item"><a class="nav-link" href="/services"><i class="fas fa-cogs"></i> I Miei Servizi</a></li>
             <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+              <li class="nav-item"><a class="nav-link" href="/about"><i class="fas fa-info-circle"></i> Chi Siamo</a></li>
+            <li class="nav-item"><a class="nav-link" href="/services"><i class="fas fa-cogs"></i> Servizi</a></li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-user-circle"></i> Account

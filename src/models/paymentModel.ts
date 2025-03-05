@@ -1,5 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../config/db';
+import { sequelize } from '../config/db';
 
 // Definisci l'interfaccia per il modello
 interface IPaymentAttributes {

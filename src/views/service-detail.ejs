@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= service.name %> - HelpDigit</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- La navbar verrà inserita qui da build.js -->
+    
+    <main>
+        <!-- Hero Section -->
+        <section class="bg-primary text-white py-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb bg-transparent p-0">
+                                <li class="breadcrumb-item"><a href="/" class="text-white">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/services" class="text-white">Servizi</a></li>
+                                <li class="breadcrumb-item active text-white-50" aria-current="page"><%= service.name %></li>
+                            </ol>
+                        </nav>
+                        <h1 class="display-4 font-weight-bold mb-3"><%= service.name %></h1>
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge badge-light mr-2"><%= service.category %></span>
+                            <div class="text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                                <span class="text-white ml-1">4.5/5</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <div class="bg-white rounded-lg p-4 text-dark shadow">
+                            <h3 class="text-primary font-weight-bold mb-0">€ <%= service.price.toFixed(2) %></h3>
+                            <p class="text-muted mb-3">IVA inclusa</p>
+                            <a href="/services/request/<%= service.id %>" class="btn btn-primary btn-lg btn-block">
+                                <i class="fas fa-shopping-cart mr-2"></i>Seleziona Servizio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Dettagli del servizio -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="mb-5">
+                            <h2 class="mb-4">Descrizione del servizio</h2>
+                            <p class="lead"><%= service.description %></p>
+                            <div class="mt-4">
+                                <%= service.longDescription %>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-5">
+                            <h2 class="mb-4">Cosa include</h2>
+                            <% if (service.includes && service.includes.length > 0) { %>
+                                <ul class="list-group list-group-flush">
+                                    <% service.includes.forEach(function(item) { %>
+                                        <li class="list-group-item d-flex align-items-center border-0 px-0">
+                                            <i class="fas fa-check-circle text-success mr-3"></i>
+                                            <%= item %>
+                                        </li>
+                                    <% }); %>
+                                </ul>
+                            <% } else { %>
+                                <p class="text-muted">Nessun dettaglio disponibile.</p>
+                            <% } %>
+                        </div>
+                        
+                        <div class="mb-5">
+                            <h2 class="mb-4">Procedura</h2>
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary">1</div>
+                                    <div class="timeline-content">
+                                        <h4>Richiesta servizio</h4>
+                                        <p>Compila il modulo di richiesta con i dettagli specifici del tuo progetto</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary">2</div>
+                                    <div class="timeline-content">
+                                        <h4>Pagamento</h4>
+                                        <p>Effettua il pagamento sicuro tramite uno dei nostri metodi accettati</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary">3</div>
+                                    <div class="timeline-content">
+                                        <h4>Lavorazione</h4>
+                                        <p>Il nostro team lavora sul tuo servizio secondo le specifiche fornite</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary">4</div>
+                                    <div class="timeline-content">
+                                        <h4>Anteprima e approvazione</h4>
+                                        <p>Ricevi un'anteprima del lavoro e puoi richiedere modifiche se necessario</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary">5</div>
+                                    <div class="timeline-content">
+                                        <h4>Consegna finale</h4>
+                                        <p>Ricevi il prodotto finito e completato secondo le tue esigenze</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- FAQ -->
+                        <div class="mb-5">
+                            <h2 class="mb-4">Domande frequenti</h2>
+                            <% if (service.faqs && service.faqs.length > 0) { %>
+                                <div class="accordion" id="faqAccordion">
+                                    <% service.faqs.forEach(function(faq, index) { %>
+                                        <div class="card border-0 shadow-sm mb-3">
+                                            <div class="card-header bg-white" id="heading<%= index %>">
+                                                <h5 class="mb-0">
+                                                    <button class="btn btn-link btn-block text-left text-decoration-none text-dark" type="button" data-toggle="collapse" data-target="#collapse<%= index %>" aria-expanded="<%= index === 0 ? 'true' : 'false' %>" aria-controls="collapse<%= index %>">
+                                                        <i class="fas fa-question-circle text-primary mr-2"></i>
+                                                        <%= faq.question %>
+                                                    </button>
+                                                </h5>
+                                            </div>
+                                            <div id="collapse<%= index %>" class="collapse <%= index === 0 ? 'show' : '' %>" aria-labelledby="heading<%= index %>" data-parent="#faqAccordion">
+                                                <div class="card-body">
+                                                    <%= faq.answer %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } else { %>
+                                <p class="text-muted">Nessuna FAQ disponibile.</p>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm mb-4 sticky-top" style="top: 100px; z-index: 999;">
+                            <div class="card-body">
+                                <h4 class="mb-3">Dettagli del servizio</h4>
+                                <ul class="list-unstyled">
+                                    <li class="mb-3 d-flex">
+                                        <i class="fas fa-clock text-primary mr-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Tempo di consegna</h6>
+                                            <p class="text-muted mb-0"><%= service.deliveryTime %></p>
+                                        </div>
+                                    </li>
+                                    <li class="mb-3 d-flex">
+                                        <i class="fas fa-sync-alt text-primary mr-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Revisioni</h6>
+                                            <p class="text-muted mb-0"><%= service.revisions %></p>
+                                        </div>
+                                    </li>
+                                    <li class="mb-3 d-flex">
+                                        <i class="fas fa-file-download text-primary mr-3 mt-1"></i>
+                                        <div>
+                                            <h6 class="mb-1">Formato file</h6>
+                                            <p class="text-muted mb-0"><%= service.fileFormats %></p>
+                                        </div>
+                                    </li>
+                                </ul>
+                                
+                                <hr class="my-4">
+                                
+                                <h4 class="mb-3">Hai domande?</h4>
+                                <p class="text-muted">Contattaci per qualsiasi chiarimento su questo servizio</p>
+                                <a href="/contact" class="btn btn-outline-primary btn-block">
+                                    <i class="fas fa-envelope mr-2"></i>Contattaci
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Altri servizi -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <h2 class="text-center mb-5">Altri servizi che potrebbero interessarti</h2>
+                <div class="row">
+                    <% relatedServices.forEach(function(relatedService) { %>
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm border-0 transition-hover">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 50px; height: 50px;">
+                                            <i class="fas <%= relatedService.icon || 'fa-cogs' %>"></i>
+                                        </div>
+                                        <h4 class="card-title mb-0"><%= relatedService.name %></h4>
+                                    </div>
+                                    <p class="card-text text-muted"><%= relatedService.description %></p>
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <h5 class="text-primary mb-0">€ <%= relatedService.price.toFixed(2) %></h5>
+                                        <a href="/services/<%= relatedService.id %>" class="btn btn-outline-primary">
+                                            Dettagli
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Il footer verrà inserito qui da build.js -->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+    
+    <style>
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 40px;
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-marker {
+            position: absolute;
+            left: -30px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            font-weight: bold;
+        }
+        .timeline-content {
+            border-left: 2px solid #e9ecef;
+            padding-left: 20px;
+        }
+        .timeline-item:last-child .timeline-content {
+            border-left: none;
+        }
+    </style>
+</body>
+</html>
