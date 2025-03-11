@@ -1,0 +1,31 @@
+{
+    "version": 2,
+    "builds": [
+      {
+        "src": "src/app.ts",
+        "use": "@vercel/node"
+      },
+      {
+        "src": "public/**",
+        "use": "@vercel/static"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/css/(.*)",
+        "dest": "/public/css/$1"
+      },
+      {
+        "src": "/js/(.*)",
+        "dest": "/public/js/$1"
+      },
+      {
+        "src": "/img/(.*)",
+        "dest": "/src/img/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/src/app.ts"
+      }
+    ]
+  }

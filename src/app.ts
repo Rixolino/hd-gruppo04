@@ -32,14 +32,13 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(cookieParser());
 app.use('/img', express.static(path.join(__dirname, 'img')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Applica il middleware di impostazioni solo dopo l'autenticazione
+// Applica il middleware di impostazioni solo una volta
 app.use(loadUserSettings);
 
 // Routes
@@ -51,15 +50,8 @@ app.use('/auth', authRoutes);
 app.use('/services', serviceRoutes);  // Rimosso authenticate per permettere a tutti di vedere i servizi
 app.use('/payments', authenticate, paymentRoutes);
 
-// Aggiungi questo al file app.js o a dove registri le tue route
+// Usa solo una volta le routes per settings
 app.use('/settings', authenticate, settingsRoutes);
-
-// Aggiungi questo al file app.js
-const settingsMiddleware = require('./middleware/settingsMiddleware');
-app.use(settingsMiddleware.loadUserSettings);
-
-// Applica il middleware dopo l'inizializzazione della sessione e di passport
-app.use(settingsMiddleware.loadUserSettings);
 
 // Database connection
 initializeDatabase()
@@ -95,7 +87,7 @@ app.get('/', async (req: Request, res: Response) => {
     }
 });
 
-// Dashboard route - UNICA CORRETTA, RIMUOVI LE ALTRE DUE
+// Dashboard route
 app.get('/dashboard', authenticate, dashboardController.getDashboard);
 
 // Profile routes
