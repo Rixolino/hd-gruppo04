@@ -1,26 +1,31 @@
+require('dotenv').config();
+
 module.exports = {
   development: {
-    dialect: 'mysql',
-    username: 'root', // Cambia con il tuo username
-    password: '', // Cambia con la tua password
-    database: 'HD-Gruppo04',
-    host: '127.0.0.1',
-    logging: false,
-  },
-  test: {
-    dialect: 'mysql',
-    username: 'root',
-    password: '',
-    database: 'HD-Gruppo04_test',
-    host: '127.0.0.1',
-    logging: false,
-  },
-  production: {
-    dialect: 'mysql',
-    username: process.env.DB_USERNAME,
+    username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     host: process.env.DB_HOST,
-    logging: false,
+    port: process.env.DB_PORT || 3307,
+    dialect: 'mysql',
+    dialectModule: require('mysql2')
+  },
+  test: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 3307,
+    dialect: 'mysql',
+    dialectModule: require('mysql2')
+  },
+  production: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 3307,
+    dialect: 'mysql',
+    dialectModule: require('mysql2')
   }
 };

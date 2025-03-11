@@ -17,22 +17,46 @@ const sequelize_1 = require("sequelize");
 const dotenv_1 = __importDefault(require("dotenv"));
 const promise_1 = require("mysql2/promise");
 dotenv_1.default.config();
+
 const createDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     const connection = yield (0, promise_1.createConnection)({
         host: process.env.DB_HOST,
+        port: parseInt(process.env.DB_PORT || '3307'),
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
     });
     yield connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
     yield connection.end();
 });
-const sequelize = new sequelize_1.Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-    host: process.env.DB_HOST,
-    dialect: 'mysql',
-});
+
+// Usa direttamente i parametri dal file .env invece di DATABASE_URL
+const sequelize = new sequelize_1.Sequelize(
+    process.env.DB_NAME, 
+    process.env.DB_USER, 
+    process.env.DB_PASSWORD, 
+    {
+        host: process.env.DB_HOST,
+        port: parseInt(process.env.DB_PORT || '3307'),
+        dialect: 'mysql',
+        dialectOptions: {
+            // Rimuoviamo le opzioni SSL che potrebbero causare problemi
+        },
+        logging: console.log
+    }
+);
 exports.sequelize = sequelize;
+
 const initializeDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield createDatabase();
-    yield sequelize.sync(); // Questo creerà le tabelle se non esistono
+    try {
+        // Verifica la connessione
+        yield sequelize.authenticate();
+        console.log('Connessione al database stabilita con successo.');
+        
+        // Sincronizza i modelli con il database
+        yield sequelize.sync();
+        console.log('Tabelle create o aggiornate con successo.');
+    } catch (error) {
+        console.error('Impossibile connettersi al database:', error);
+    }
 });
 exports.initializeDatabase = initializeDatabase;
