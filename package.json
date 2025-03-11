@@ -1,12 +1,9 @@
 {
   "name": "hd-gruppo04",
   "version": "1.0.0",
-  "main": "dist/app.js",
+  "main": "src/app.ts",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/app.js",
-    "dev": "ts-node src/app.ts",
-    "vercel-build": "tsc && node dist/scripts/migrate.js"
+    "start": "ts-node src/app.ts"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
