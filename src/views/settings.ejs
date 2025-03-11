@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostazioni - HelpDigit</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Rimuovi la riga problematica -->
+</head>
+<body>
+    <!-- Aggiungi questo elemento nascosto con i dati utente -->
+    <div id="userSettingsData" style="display:none;" 
+         data-settings="<%= user && user.settings ? encodeURIComponent(JSON.stringify(user.settings)) : '{}' %>">
+    </div>
+    
+    <!-- La navbar verrà inserita qui da build.js -->
+    
+    <main class="container py-5">
+        <h1 class="mb-4">Impostazioni</h1>
+        
+        <% if (typeof successMessage !== 'undefined') { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= successMessage %>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Chiudi">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <% } %>
+        
+        <% if (typeof errorMessage !== 'undefined') { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= errorMessage %>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Chiudi">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <% } %>
+        
+        <div class="row">
+            <!-- Navigazione laterale -->
+            <div class="col-md-3 mb-4">
+                <div class="list-group sticky-top" style="top: 2rem;">
+                    <a href="#accessibilita" class="list-group-item list-group-item-action" data-toggle="list">
+                        <i class="fas fa-universal-access mr-2"></i> Accessibilità
+                    </a>
+                    <a href="#personalizzazione" class="list-group-item list-group-item-action" data-toggle="list">
+                        <i class="fas fa-paint-brush mr-2"></i> Personalizzazione
+                    </a>
+                    <a href="#notifiche" class="list-group-item list-group-item-action" data-toggle="list">
+                        <i class="fas fa-bell mr-2"></i> Notifiche
+                    </a>
+                    <a href="#privacy" class="list-group-item list-group-item-action" data-toggle="list">
+                        <i class="fas fa-user-shield mr-2"></i> Privacy
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Contenuto principale -->
+            <div class="col-md-9">
+                <div class="tab-content">
+                    <!-- Sezione Accessibilità -->
+                    <div class="tab-pane fade show active" id="accessibilita">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-universal-access mr-2 text-primary"></i>Impostazioni di Accessibilità</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="/settings/accessibility" method="POST">
+                                    <div class="form-group">
+                                        <label>Dimensione testo</label>
+                                        <div class="d-flex align-items-center">
+                                            <span class="mr-2">A</span>
+                                            <input type="range" class="custom-range" min="1" max="3" step="1" id="fontSize" name="fontSize" value="<%= user && user.settings ? user.settings.fontSize || 1 : 1 %>">
+                                            <span class="ml-2">A<sup>+</sup></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="highContrast" name="highContrast" <%= user && user.settings && user.settings.highContrast ? 'checked' : '' %>>
+                                            <label class="custom-control-label" for="highContrast">Contrasto elevato</label>
+                                        </div>
+                                        <small class="form-text text-muted">Aumenta il contrasto per migliorare la leggibilità</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="reduceAnimations" name="reduceAnimations" <%= user && user.settings && user.settings.reduceAnimations ? 'checked' : '' %>>
+                                            <label class="custom-control-label" for="reduceAnimations">Riduci animazioni</label>
+                                        </div>
+                                        <small class="form-text text-muted">Riduci o elimina le animazioni del sito</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="colorBlindMode">Modalità daltonismo</label>
+                                        <select class="custom-select" id="colorBlindMode" name="colorBlindMode">
+                                            <option value="none" <%= user && user.settings && user.settings.colorBlindMode === 'none' ? 'selected' : '' %>>Nessuna</option>
+                                            <option value="protanopia" <%= user && user.settings && user.settings.colorBlindMode === 'protanopia' ? 'selected' : '' %>>Protanopia (rosso)</option>
+                                            <option value="deuteranopia" <%= user && user.settings && user.settings.colorBlindMode === 'deuteranopia' ? 'selected' : '' %>>Deuteranopia (verde)</option>
+                                            <option value="tritanopia" <%= user && user.settings && user.settings.colorBlindMode === 'tritanopia' ? 'selected' : '' %>>Tritanopia (blu)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary">Salva impostazioni di accessibilità</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sezione Personalizzazione -->
+                    <div class="tab-pane fade" id="personalizzazione">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-paint-brush mr-2 text-primary"></i>Personalizzazione</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="/settings/personalization" method="POST">
+                                    <div class="form-group">
+                                        <label>Tema</label>
+                                        <div class="d-flex mt-2">
+                                            <div class="custom-control custom-radio custom-control-inline">
+                                                <input type="radio" id="lightTheme" name="theme" value="light" class="custom-control-input" <%= !user || !user.settings || user.settings.theme !== 'dark' ? 'checked' : '' %>>
+                                                <label class="custom-control-label" for="lightTheme">Chiaro</label>
+                                            </div>
+                                            <div class="custom-control custom-radio custom-control-inline">
+                                                <input type="radio" id="darkTheme" name="theme" value="dark" class="custom-control-input" <%= user && user.settings && user.settings.theme === 'dark' ? 'checked' : '' %>>
+                                                <label class="custom-control-label" for="darkTheme">Scuro</label>
+                                            </div>
+                                            <div class="custom-control custom-radio custom-control-inline">
+                                                <input type="radio" id="autoTheme" name="theme" value="auto" class="custom-control-input" <%= user && user.settings && user.settings.theme === 'auto' ? 'checked' : '' %>>
+                                                <label class="custom-control-label" for="autoTheme">Automatico (basato su sistema)</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Colore principale</label>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="d-flex flex-wrap">
+                                                    <div class="custom-control custom-radio mr-3 mb-3">
+                                                        <input type="radio" id="colorDefault" name="primaryColor" value="default" class="custom-control-input" <%= !user || !user.settings || !user.settings.primaryColor || user.settings.primaryColor === 'default' ? 'checked' : '' %>>
+                                                        <label class="custom-control-label" for="colorDefault">
+                                                            <span class="color-swatch" style="background-color: #2563eb; width: 30px; height: 30px; display: inline-block; border-radius: 50%;"></span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio mr-3 mb-3">
+                                                        <input type="radio" id="colorRed" name="primaryColor" value="red" class="custom-control-input" <%= user && user.settings && user.settings.primaryColor === 'red' ? 'checked' : '' %>>
+                                                        <label class="custom-control-label" for="colorRed">
+                                                            <span class="color-swatch" style="background-color: #dc3545; width: 30px; height: 30px; display: inline-block; border-radius: 50%;"></span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio mr-3 mb-3">
+                                                        <input type="radio" id="colorGreen" name="primaryColor" value="green" class="custom-control-input" <%= user && user.settings && user.settings.primaryColor === 'green' ? 'checked' : '' %>>
+                                                        <label class="custom-control-label" for="colorGreen">
+                                                            <span class="color-swatch" style="background-color: #28a745; width: 30px; height: 30px; display: inline-block; border-radius: 50%;"></span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="custom-control custom-radio mr-3 mb-3">
+                                                        <input type="radio" id="colorPurple" name="primaryColor" value="purple" class="custom-control-input" <%= user && user.settings && user.settings.primaryColor === 'purple' ? 'checked' : '' %>>
+                                                        <label class="custom-control-label" for="colorPurple">
+                                                            <span class="color-swatch" style="background-color: #6f42c1; width: 30px; height: 30px; display: inline-block; border-radius: 50%;"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Layout della dashboard</label>
+                                        <div class="d-flex mt-2">
+                                            <div class="custom-control custom-radio custom-control-inline">
+                                                <input type="radio" id="layoutDefault" name="layout" value="default" class="custom-control-input" <%= !user || !user.settings || !user.settings.layout || user.settings.layout === 'default' ? 'checked' : '' %>>
+                                                <label class="custom-control-label" for="layoutDefault">Standard</label>
+                                            </div>
+                                            <div class="custom-control custom-radio custom-control-inline">
+                                                <input type="radio" id="layoutCompact" name="layout" value="compact" class="custom-control-input" <%= user && user.settings && user.settings.layout === 'compact' ? 'checked' : '' %>>
+                                                <label class="custom-control-label" for="layoutCompact">Compatto</label>
+                                            </div>
+                                            <div class="custom-control custom-radio custom-control-inline">
+                                                <input type="radio" id="layoutWide" name="layout" value="wide" class="custom-control-input" <%= user && user.settings && user.settings.layout === 'wide' ? 'checked' : '' %>>
+                                                <label class="custom-control-label" for="layoutWide">Ampio</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary">Salva personalizzazione</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sezione Notifiche -->
+                    <div class="tab-pane fade" id="notifiche">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-bell mr-2 text-primary"></i>Impostazioni Notifiche</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="/settings/notifications" method="POST">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="emailNotifications" name="emailNotifications" <%= user && user.settings && user.settings.emailNotifications ? 'checked' : '' %>>
+                                            <label class="custom-control-label" for="emailNotifications">Notifiche via email</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="orderUpdates" name="orderUpdates" <%= user && user.settings && user.settings.orderUpdates ? 'checked' : '' %>>
+                                            <label class="custom-control-label" for="orderUpdates">Aggiornamenti sugli ordini</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="promotions" name="promotions" <%= user && user.settings && user.settings.promotions ? 'checked' : '' %>>
+                                            <label class="custom-control-label" for="promotions">Promozioni e offerte speciali</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="newsletter" name="newsletter" <%= user && user.settings && user.settings.newsletter ? 'checked' : '' %>>
+                                            <label class="custom-control-label" for="newsletter">Newsletter</label>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary">Salva impostazioni notifiche</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sezione Privacy -->
+                    <div class="tab-pane fade" id="privacy">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-user-shield mr-2 text-primary"></i>Impostazioni Privacy</h5>
+                            </div>
+                            <div class="card-body">
+                                <form action="/settings/privacy" method="POST">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="dataTelemetry" name="dataTelemetry" <%= user && user.settings && user.settings.dataTelemetry ? 'checked' : '' %>>
+                                            <label class="custom-control-label" for="dataTelemetry">Condividi dati di utilizzo anonimi</label>
+                                        </div>
+                                        <small class="form-text text-muted">Aiutaci a migliorare i nostri servizi condividendo dati anonimi sul tuo utilizzo della piattaforma</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="cookies" name="cookies" <%= user && user.settings && user.settings.cookies ? 'checked' : '' %>>
+                                            <label class="custom-control-label" for="cookies">Accetta cookies non essenziali</label>
+                                        </div>
+                                        <small class="form-text text-muted">Consente cookie per funzionalità e analisi avanzate</small>
+                                    </div>
+                                    
+                                    <hr>
+                                    
+                                    <h6>I tuoi dati</h6>
+                                    <p>Puoi richiedere una copia dei tuoi dati personali o chiederne la cancellazione.</p>
+                                    
+                                    <div class="d-flex">
+                                        <a href="/user/download-data" class="btn btn-outline-primary mr-3">
+                                            <i class="fas fa-download mr-1"></i> Scarica i tuoi dati
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteAccountModal">
+                                            <i class="fas fa-user-times mr-1"></i> Richiedi cancellazione account
+                                        </button>
+                                    </div>
+                                    
+                                    <hr>
+                                    
+                                    <button type="submit" class="btn btn-primary">Salva impostazioni privacy</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modal per la cancellazione dell'account -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">Conferma cancellazione account</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Sei sicuro di voler richiedere la cancellazione del tuo account?</p>
+                    <p class="text-danger">Questa operazione è irreversibile. Tutti i tuoi dati verranno eliminati definitivamente.</p>
+                    <form id="deleteAccountForm" action="/user/delete-account" method="POST">
+                        <div class="form-group">
+                            <label for="password">Inserisci la tua password per confermare</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                    <button type="submit" form="deleteAccountForm" class="btn btn-danger">Conferma cancellazione</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Aggiungi questo dopo il resto del contenuto ma prima degli script -->
+
+    <div class="modal fade" id="testSettingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Test Impostazioni</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="testSettingsForm" action="/test-settings" method="POST">
+                        <div class="form-group">
+                            <label for="testValue">Valore di test</label>
+                            <input type="text" class="form-control" id="testValue" name="testValue" value="test-value">
+                        </div>
+                        <div id="testSettingsResult" class="mt-3"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                    <button type="submit" form="testSettingsForm" class="btn btn-primary">Test Salvataggio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-info fixed-bottom ml-3 mb-3" data-toggle="modal" data-target="#testSettingsModal">
+        Test Impostazioni
+    </button>
+
+    <script>
+        $(document).ready(function() {
+            // Invia il form di test tramite AJAX
+            $('#testSettingsForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                $('#testSettingsResult').html('<div class="alert alert-info">Invio in corso...</div>');
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '/test-settings',
+                    data: $(this).serialize(),
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.success) {
+                            $('#testSettingsResult').html(
+                                '<div class="alert alert-success">Successo!<br>Valore salvato.</div>' +
+                                '<pre>' + JSON.stringify(data, null, 2) + '</pre>'
+                            );
+                        } else {
+                            $('#testSettingsResult').html(
+                                '<div class="alert alert-danger">Errore nel salvataggio</div>' +
+                                '<pre>' + JSON.stringify(data, null, 2) + '</pre>'
+                            );
+                        }
+                    },
+                    error: function() {
+                        $('#testSettingsResult').html('<div class="alert alert-danger">Errore nella richiesta</div>');
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <!-- Il footer verrà inserito qui da build.js -->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+    
+    <script>
+        // Script per attivare il tab corretto al caricamento della pagina
+        $(document).ready(function() {
+            // Leggi l'hash dall'URL e attiva il tab corrispondente
+            var hash = window.location.hash;
+            if (hash) {
+                $('.list-group a[href="' + hash + '"]').tab('show');
+            } else {
+                // Attiva il primo tab se non c'è hash
+                $('.list-group a:first').tab('show');
+            }
+            
+            // Aggiorna l'hash quando viene selezionato un tab
+            $('.list-group a').on('click', function (e) {
+                history.pushState(null, null, $(this).attr('href'));
+            });
+            
+            // Anteprima del tema in tempo reale
+            $('input[name="theme"]').change(function() {
+                if ($(this).val() === 'dark') {
+                    $('body').addClass('dark-theme');
+                } else {
+                    $('body').removeClass('dark-theme');
+                }
+            });
+            
+            // Anteprima della dimensione del testo
+            $('#fontSize').change(function() {
+                const fontSize = $(this).val();
+                if (fontSize == 1) {
+                    $('body').css('font-size', '1rem');
+                } else if (fontSize == 2) {
+                    $('body').css('font-size', '1.1rem');
+                } else {
+                    $('body').css('font-size', '1.2rem');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+Installare le dipendenze dalla lista
+Il file dependencies.txt che hai generato non può essere utilizzato direttamente per l'installazione, perché è solo un output informativo. Ecco come procedere per installare tutte le dipendenze su un nuovo PC:
+
+Metodo 1: Utilizzando il file package.json originale (consigliato)
+# Copia il file package.json sul nuovo PC
+# Poi nella cartella del progetto esegui:
+npm install
+
+Metodo 2: Installazione manuale basata sulla lista
+Se non hai accesso al file package.json originale, puoi usare il file dependencies.txt per creare un comando di installazione:
+# Crea un comando npm install con tutte le dipendenze dal file
+$dependencies = Get-Content -Path "dependencies.txt" | 
+  Where-Object { $_ -match "ÔöÇÔöÇ (.*?)@" } | 
+  ForEach-Object { $matches[1] }
+
+$installCommand = "npm install " + ($dependencies -join " ")
+
+# Esegui il comando (o copialo e incollalo nel terminale)
+Invoke-Expression $installCommand
+
+Metodo 3: Creare un nuovo package.json e installare
+La soluzione migliore è sempre usare il file package.json originale, perché include anche le versioni specifiche di ogni pacchetto che sono state testate con il tuo progetto.
+# Nel nuovo PC, crea un nuovo progetto
+mkdir hd-gruppo04
+cd hd-gruppo04
+npm init -y
+
+# Installa le dipendenze (copia-incolla questo comando completo)
+npm install @types/bcrypt @types/bcryptjs @types/body-parser @types/cookie-parser @types/express @types/jsonwebtoken @types/node bcrypt bcryptjs body-parser cookie-parser dotenv ejs express jsonwebtoken mysql2 sequelize-cli sequelize ts-node typescript

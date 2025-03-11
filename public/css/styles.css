@@ -1,43 +1,329 @@
+:root {
+    /* Variabili colori tema chiaro (default) */
+    --bg-color: #f8f9fa;
+    --text-color: #212529;
+    --primary-color: #2563eb;
+    --secondary-color: #6c757d;
+    --card-bg: #ffffff;
+    --header-bg: #ffffff;
+    --border-color: #dee2e6;
+    --focus-color: rgba(37, 99, 235, 0.25);
+    --hover-color: #1d4ed8;
+}
+
+/* Tema scuro */
+body.dark-theme {
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --primary-color: #3b82f6;
+    --secondary-color: #9ca3af;
+    --card-bg: #1e1e1e;
+    --header-bg: #1a1a1a;
+    --border-color: #2d2d2d;
+    --focus-color: rgba(59, 130, 246, 0.5);
+    --hover-color: #60a5fa;
+}
+
+/* Colori primari personalizzati */
+body[data-primary-color="red"] {
+    --primary-color: #dc3545;
+    --hover-color: #c82333;
+    --focus-color: rgba(220, 53, 69, 0.25);
+}
+
+body[data-primary-color="green"] {
+    --primary-color: #28a745;
+    --hover-color: #218838;
+    --focus-color: rgba(40, 167, 69, 0.25);
+}
+
+body[data-primary-color="purple"] {
+    --primary-color: #6f42c1;
+    --hover-color: #5a32a3;
+    --focus-color: rgba(111, 66, 193, 0.25);
+}
+
+/* Stili di layout */
+body[data-layout="compact"] {
+    --container-max-width: 960px;
+    --card-padding: 0.75rem;
+    --element-spacing: 0.75rem;
+}
+
+body[data-layout="default"] {
+    --container-max-width: 1140px;
+    --card-padding: 1.25rem;
+    --element-spacing: 1rem;
+}
+
+body[data-layout="wide"] {
+    --container-max-width: 1320px;
+    --card-padding: 1.5rem;
+    --element-spacing: 1.25rem;
+}
+
+/* Stili di accessibilità */
+body[data-font-size="1"] {
+    font-size: 1rem;
+}
+
+body[data-font-size="2"] {
+    font-size: 1.1rem;
+}
+
+body[data-font-size="3"] {
+    font-size: 1.2rem;
+}
+
+body[data-high-contrast="true"] {
+    --text-color: #000000;
+    --bg-color: #ffffff;
+    --border-color: #000000;
+}
+
+/* Stili base */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-}
-
-header h1 {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
     margin: 0;
-    font-size: 24px;
+    padding: 0;
 }
 
-main {
-    background: #ffffff;
-    margin: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+.container {
+    max-width: var(--container-max-width, 1140px);
 }
 
+/* Cards e componenti UI */
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: var(--element-spacing);
+    transition: box-shadow 0.3s;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: var(--header-bg);
+    border-color: var(--border-color);
+    padding: var(--card-padding);
+}
+
+.card-body {
+    padding: var(--card-padding);
+}
+
+/* Bottoni ed elementi interattivi */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--hover-color);
+    border-color: var(--hover-color);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem var(--focus-color);
+}
+
+/* Animazioni - ridotte se necessario */
+body[data-reduce-animations="true"] * {
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Navbar */
+.navbar {
+    background-color: var(--card-bg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--text-color);
+}
+
+.navbar-light .navbar-nav .nav-link:hover {
+    color: var(--primary-color);
+}
+
+/* Footer */
 footer {
-    padding: 10px 0;
+    background-color: var(--header-bg);
+    color: var(--text-color);
+    border-top: 1px solid var(--border-color);
+    padding: 2rem 0;
 }
 
-h2 {
-    color: #35424a;
+/* Daltonismo */
+body[data-color-blind="protanopia"] {
+    filter: url('#protanopia-filter');
 }
 
-p {
-    line-height: 1.6;
+body[data-color-blind="deuteranopia"] {
+    filter: url('#deuteranopia-filter');
 }
 
-button {
-    background: #35424a;
-    color: #ffffff;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.3s;
+body[data-color-blind="tritanopia"] {
+    filter: url('#tritanopia-filter');
 }
 
-button:hover {
-    background: #45a049;
+/* SVG filters per daltonismo */
+.svg-filters {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+/* Stili di supporto per il tema scuro */
+.text-light-theme {
+    color: #e6e6e6 !important;
+}
+
+.link-light-theme {
+    color: #3b82f6 !important;
+}
+
+.link-light-theme:hover {
+    color: #60a5fa !important;
+    text-decoration: none;
+}
+
+.card-dark {
+    background-color: #1e1e1e !important;
+    border-color: rgba(255, 255, 255, 0.125) !important;
+}
+
+.form-control-dark {
+    background-color: #2d2d2d !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+.input-group-text-dark {
+    background-color: #333 !important;
+    border-color: #444 !important;
+    color: #e0e0e0 !important;
+}
+
+.custom-control-label-dark::before {
+    background-color: #2d2d2d !important;
+    border-color: #444 !important;
+}
+
+.modal-dark {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+.dropdown-menu-dark {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+.dropdown-menu-dark .dropdown-item {
+    color: #e0e0e0 !important;
+}
+
+.dropdown-menu-dark .dropdown-item:hover {
+    background-color: #333 !important;
+}
+
+.accordion-dark {
+    background-color: #1e1e1e !important;
+}
+
+.badge-dark-theme {
+    background-color: #333 !important;
+    color: #e0e0e0 !important;
+}
+
+.border-dark-theme {
+    border-color: #444 !important;
+}
+
+.bg-dark-theme {
+    background-color: #121212 !important;
+    color: #e6e6e6 !important;
+}
+
+.shadow-dark-theme {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
+}
+
+.faq-card-dark .card-header {
+    background-color: #333 !important;
+}
+
+.faq-card-dark .btn-link {
+    color: #e0e0e0 !important;
+}
+
+.service-card-dark {
+    background-color: #1e1e1e !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-code {
+    background-color: #2d2d2d !important;
+    color: #e0e0e0 !important;
+}
+
+/* Nascondi il focus outline nei temi scuri per evitare outline luminosi */
+.dark-theme *:focus {
+    outline-color: rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Selezione diretta via CSS senza JavaScript */
+body:not(.dark-theme) .jumbotron.p-4.bg-dark-subtle {
+    background-color: #e9ecef !important;
+    color: #212529 !important;
+}
+
+body.dark-theme .jumbotron.p-4.bg-dark-subtle {
+    background-color: #212529 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Per elementi con bg-dark-subtle in generale */
+body.dark-theme .bg-dark-subtle {
+    background-color: #343a40 !important;
+    color: #e0e0e0 !important;
+    border-color: #444 !important;
+}
+
+/* Assicurati che i link all'interno del jumbotron siano visibili */
+body.dark-theme .jumbotron.p-4.bg-dark-subtle a:not(.btn) {
+    color: #6ea8fe !important;
+}
+
+body.dark-theme .jumbotron.p-4.bg-dark-subtle a:not(.btn):hover {
+    color: #9ec5fe !important;
+    text-decoration: underline;
 }

@@ -3,20 +3,392 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HelpDigit</title>
+    <title>HelpDigit - Soluzioni Digitali Professionali</title>
+    <meta name="description" content="Soluzioni digitali personalizzate per privati e aziende. Digitalizzazione, supporto tecnico e consulenza informatica a Bari.">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
     
-    <main class="container mt-5">
-        <h2>Scopri i nostri servizi</h2>
-        <p>Offriamo soluzioni digitali personalizzate per le tue esigenze. Registrati o accedi per iniziare.</p>
-    </main>
+    <!-- Hero Section -->
+    <section class="hero-section py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
+                    <h1 class="display-4 font-weight-bold mb-4">Trasforma la tua esperienza digitale</h1>
+                    <p class="lead mb-4">Soluzioni digitali professionali per privati e aziende. Servizi personalizzati per ogni esigenza tecnologica.</p>
+                    <div class="d-flex flex-wrap">
+                        <a href="/services" class="btn btn-primary btn-lg mr-3 mb-3">Scopri i Servizi</a>
+                        <a href="/contact" class="btn btn-outline-secondary btn-lg mb-3">Contattaci</a>
+                    </div>
+                </div>
+                <div class="col-lg-6" data-aos="fade-left">
+                    <img src="/images/hero-image.svg" alt="Soluzioni digitali" class="img-fluid rounded shadow-lg">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servizi in Evidenza -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="h1 font-weight-bold">I Nostri Servizi</h2>
+                <p class="lead text-muted">Soluzioni personalizzate per ogni esigenza digitale</p>
+            </div>
+            <div class="row" id="servicesContainer">
+                <!-- I servizi verranno caricati dinamicamente qui -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Caricamento...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Caricamento servizi...</p>
+                </div>
+            </div>
+            <div class="text-center mt-4" data-aos="fade-up">
+                <a href="/services" class="btn btn-primary btn-lg">Tutti i Servizi</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Perché Sceglierci -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="h1 font-weight-bold">Perché Scegliere HelpDigit</h2>
+                <p class="lead text-muted">Il partner ideale per le tue esigenze tecnologiche</p>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-user-tie fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 font-weight-bold">Professionisti Qualificati</h3>
+                        <p class="text-muted">Esperti del settore con anni di esperienza</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-rocket fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 font-weight-bold">Rapidità</h3>
+                        <p class="text-muted">Servizi rapidi con tempi di consegna garantiti</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-euro-sign fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 font-weight-bold">Prezzi Competitivi</h3>
+                        <p class="text-muted">Tariffe chiare e trasparenti senza sorprese</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="fas fa-headset fa-3x text-primary"></i>
+                        </div>
+                        <h3 class="h5 font-weight-bold">Supporto Costante</h3>
+                        <p class="text-muted">Assistenza continua per ogni tua esigenza</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonianze -->
+    <section class="bg-light py-5">
+        <div class="container">
+            <div class="text-center mb-5" data-aos="fade-up">
+                <h2 class="h1 font-weight-bold">Cosa Dicono i Nostri Clienti</h2>
+                <p class="lead text-muted">La soddisfazione dei clienti è la nostra priorità</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="text-warning mr-2">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <small class="text-muted">5.0/5</small>
+                            </div>
+                            <p class="font-italic mb-3">"Servizio eccellente, hanno digitalizzato il nostro archivio in tempi record. Professionalità e competenza al top."</p>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 40px; height: 40px;">
+                                    <span>MS</span>
+                                </div>
+                                <div>
+                                    <h4 class="h6 font-weight-bold mb-0">Marco Santoro</h4>
+                                    <small class="text-muted">Studio Legale Associato</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="text-warning mr-2">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <small class="text-muted">5.0/5</small>
+                            </div>
+                            <p class="font-italic mb-3">"Il supporto remoto ha risolto il mio problema in meno di 30 minuti. Personale cordiale e molto preparato."</p>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 40px; height: 40px;">
+                                    <span>LR</span>
+                                </div>
+                                <div>
+                                    <h4 class="h6 font-weight-bold mb-0">Laura Rossi</h4>
+                                    <small class="text-muted">Cliente Privato</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="text-warning mr-2">
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-star-half-alt"></i>
+                                </div>
+                                <small class="text-muted">4.5/5</small>
+                            </div>
+                            <p class="font-italic mb-3">"I volantini creati da HelpDigit hanno aumentato notevolmente l'affluenza nel nostro negozio. Design moderno e accattivante!"</p>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 40px; height: 40px;">
+                                    <span>GF</span>
+                                </div>
+                                <div>
+                                    <h4 class="h6 font-weight-bold mb-0">Giovanni Ferrari</h4>
+                                    <small class="text-muted">Negozio di Elettronica</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-5 bg-primary text-white">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mb-4 mb-lg-0">
+                    <h2 class="font-weight-bold mb-0">Pronto a trasformare la tua esperienza digitale?</h2>
+                    <p class="lead mb-0">Contattaci oggi per una consulenza gratuita!</p>
+                </div>
+                <div class="col-lg-4 text-lg-right">
+                    <a href="/auth/register" class="btn btn-light btn-lg mr-3 mb-3">Registrati</a>
+                    <a href="/contact" class="btn btn-outline-light btn-lg mb-3">Contattaci</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .hero-section {
+            background-color: #f8f9fa;
+            padding-top: 6rem;
+            padding-bottom: 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-image: url('/images/bg-pattern.svg');
+            background-size: cover;
+            opacity: 0.05;
+            z-index: 0;
+        }
+        
+        .hero-section .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,.1) !important;
+        }
+        
+        .btn-primary, .bg-primary {
+            background-color: #143D80 !important;
+            border-color: #143D80 !important;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0A2558 !important;
+            border-color: #0A2558 !important;
+        }
+        
+        .text-primary {
+            color: #143D80 !important;
+        }
+        
+        @media (max-width: 767px) {
+            .hero-section {
+                padding-top: 4rem;
+                padding-bottom: 4rem;
+            }
+        }
+    </style>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/js/build.js"></script>
+    <script>
+    // Funzione per recuperare i servizi dal database
+    async function fetchServices() {
+        try {
+            // Recupera i servizi tramite API
+            const response = await fetch('/api/services?limit=3');
+            if (!response.ok) {
+                throw new Error('Errore nel caricamento dei servizi');
+            }
+            
+            const services = await response.json();
+            if (services && services.length > 0) {
+                // Elemento contenitore dei servizi
+                const servicesContainer = document.querySelector('#servicesContainer');
+                if (!servicesContainer) return;
+                
+                // Pulisce il contenitore esistente
+                servicesContainer.innerHTML = '';
+                
+                // Crea HTML per ogni servizio
+                services.forEach((service, index) => {
+                    const delay = 100 + (index * 100);
+                    const serviceCard = document.createElement('div');
+                    serviceCard.className = 'col-md-4 mb-4';
+                    serviceCard.setAttribute('data-aos', 'fade-up');
+                    serviceCard.setAttribute('data-aos-delay', delay);
+                    
+                    serviceCard.innerHTML = `
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center p-4">
+                                <div class="rounded-circle bg-primary text-white mx-auto mb-4 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                                    <i class="fas ${service.icon || 'fa-cogs'} fa-2x"></i>
+                                </div>
+                                <h3 class="h4 mb-3">${service.name}</h3>
+                                <p class="text-muted">${service.description}</p>
+                                <button onclick="showServiceDetails('${service.id}')" class="btn btn-outline-primary mt-2">Scopri di più</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    servicesContainer.appendChild(serviceCard);
+                });
+                
+                // Inizializza AOS per le nuove card
+                if (typeof AOS !== 'undefined') {
+                    AOS.refresh();
+                }
+            }
+        } catch (error) {
+            console.error('Errore durante il recupero dei servizi:', error);
+        }
+    }
+    
+    // Funzione per mostrare i dettagli del servizio
+    function showServiceDetails(serviceId) {
+        // Costruisci un modale con i dettagli del servizio
+        fetch(`/api/services/${serviceId}`)
+            .then(response => response.json())
+            .then(service => {
+                const modalHTML = `
+                    <div class="modal fade" id="serviceModal" tabindex="-1" role="dialog" aria-labelledby="serviceModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title" id="serviceModalLabel">${service.name}</h5>
+                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                                            <div class="rounded-circle bg-primary text-white mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                                <i class="fas ${service.icon || 'fa-cogs'} fa-3x"></i>
+                                            </div>
+                                            <h4 class="h5 font-weight-bold">€${parseFloat(service.price).toFixed(2)}</h4>
+                                            <p><small class="text-muted">Consegna: ${service.deliveryTime}</small></p>
+                                            <p><small class="text-muted">Revisioni: ${service.revisions}</small></p>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <h4 class="h5 font-weight-bold mb-3">Descrizione</h4>
+                                            <p>${service.description}</p>
+                                            <p class="badge badge-primary">${service.category}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                                    <a href="/auth/login" class="btn btn-primary">Richiedi questo servizio</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Aggiungi il modale al documento
+                const modalContainer = document.createElement('div');
+                modalContainer.innerHTML = modalHTML;
+                document.body.appendChild(modalContainer);
+                
+                // Mostra il modale
+                $('#serviceModal').modal('show');
+                
+                // Rimuovi il modale dal DOM quando viene chiuso
+                $('#serviceModal').on('hidden.bs.modal', function() {
+                    document.body.removeChild(modalContainer);
+                });
+            })
+            .catch(error => console.error('Errore durante il recupero del servizio:', error));
+    }
+    
+    // Esegui la funzione quando il documento è completamente caricato
+    document.addEventListener('DOMContentLoaded', function() {
+        // Aggiungi un contenitore per i servizi se non esiste già
+        const servicesSection = document.querySelector('.bg-light.py-5 .container .row');
+        if (servicesSection) {
+            servicesSection.id = 'servicesContainer';
+        }
+        
+        // Recupera i servizi
+        fetchServices();
+    });
+</script>
 </body>
 </html>

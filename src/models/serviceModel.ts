@@ -1,55 +1,67 @@
-import { DataTypes, Model, Optional } from 'sequelize';
-import { sequelize } from '../config/db'; // Assicurati di avere un file di configurazione per il database
+import { Model, DataTypes } from 'sequelize';
+import { sequelize } from '../config/db';
 
-// Definisci l'interfaccia per il modello
-interface IServiceAttributes {
-    userId: string;
-    serviceId: string;
-    details: string;
-    status: string;
+class Service extends Model {
+  public id!: string;
+  public name!: string;
+  public description!: string;
+  public price!: number;
+  public category!: string;
+  public icon!: string;
+  public deliveryTime!: string;
+  public revisions!: string;
+  
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+  
+  // Getter che assicura che price sia sempre un numero
+  get formattedPrice() {
+    return parseFloat(this.getDataValue('price'));
+  }
 }
 
-// Definisci l'interfaccia per la creazione del modello
-interface IServiceCreationAttributes extends Optional<IServiceAttributes, 'serviceId'> {}
-
-// Definisci il modello
-class Service extends Model<IServiceAttributes, IServiceCreationAttributes> implements IServiceAttributes {
-    public userId!: string;
-    public serviceId!: string;
-    public details!: string;
-    public status!: string;
-
-    // Timestamps
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-}
-
-// Inizializza il modello
-Service.init(
-    {
-        userId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        serviceId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            primaryKey: true,
-        },
-        details: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        status: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-    },
-    {
-        sequelize,
-        tableName: 'services',
-        timestamps: true,
+Service.init({
+  id: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    primaryKey: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    get() {
+      const value = this.getDataValue('price');
+      return value === null ? null : parseFloat(value);
     }
-);
+  },
+  category: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  icon: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  deliveryTime: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  revisions: {
+    type: DataTypes.STRING,
+    allowNull: false
+  }
+}, {
+  sequelize,
+  tableName: 'services',
+  timestamps: true
+});
 
 export default Service;

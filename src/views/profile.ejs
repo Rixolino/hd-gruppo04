@@ -16,35 +16,94 @@
         <h1>Profilo Utente</h1>
         <p>Benvenuto nella tua pagina profilo. Qui puoi visualizzare e aggiornare le tue informazioni personali.</p>
         
+        <% if (locals.successMessage) { %>
+            <div class="alert alert-success">
+                <%= successMessage %>
+            </div>
+        <% } %>
+        
+        <% if (locals.errorMessage) { %>
+            <div class="alert alert-danger">
+                <%= errorMessage %>
+            </div>
+        <% } %>
+        
         <!-- Dettagli del profilo utente -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5>Informazioni Personali</h5>
             </div>
             <div class="card-body">
-                <form>
-                    <div class="form-group">
-                        <label for="username">Nome Utente</label>
-                        <input type="text" class="form-control" id="username" value="NomeUtente" readonly>
-                    </div>
+                <form action="/profile/update" method="POST">
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" class="form-control" id="email" value="utente@example.com" readonly>
+                        <input type="email" class="form-control" id="email" name="email" value="<%= user.email %>" required>
                     </div>
                     <div class="form-group">
-                        <label for="firstName">Nome</label>
-                        <input type="text" class="form-control" id="firstName" value="Nome">
+                        <label for="nome">Nome</label>
+                        <input type="text" class="form-control" id="nome" name="nome" value="<%= user.nome %>" required>
                     </div>
                     <div class="form-group">
-                        <label for="lastName">Cognome</label>
-                        <input type="text" class="form-control" id="lastName" value="Cognome">
+                        <label for="cognome">Cognome</label>
+                        <input type="text" class="form-control" id="cognome" name="cognome" value="<%= user.cognome %>" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Aggiorna</button>
+                    <div class="form-group">
+                        <label for="telefono">Telefono</label>
+                        <input type="text" class="form-control" id="telefono" name="telefono" value="<%= user.telefono || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label for="indirizzo">Indirizzo</label>
+                        <input type="text" class="form-control" id="indirizzo" name="indirizzo" value="<%= user.indirizzo || '' %>">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Aggiorna Profilo</button>
                 </form>
             </div>
         </div>
         
-        <!-- Altre sezioni del profilo possono essere aggiunte qui -->
+        <!-- Sezione Punti Fedeltà -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Punti Fedeltà</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <h2 class="display-4 text-primary"><%= user.puntifedelta %></h2>
+                    <p class="lead">Punti accumulati</p>
+                    <p>Accumuli 1 punto per ogni euro speso sui nostri servizi.</p>
+                    <% if (user.puntifedelta >= 100) { %>
+                        <div class="alert alert-success">
+                            <i class="fas fa-gift mr-2"></i>
+                            Hai punti sufficienti per riscattare uno sconto!
+                            <a href="/rewards" class="btn btn-sm btn-success ml-3">Riscatta Ora</a>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sezione Cambio Password -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Cambia Password</h5>
+            </div>
+            <div class="card-body">
+                <form action="/profile/change-password" method="POST">
+                    <div class="form-group">
+                        <label for="currentPassword">Password Attuale</label>
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Nuova Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Conferma Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-warning">Cambia Password</button>
+                </form>
+            </div>
+        </div>
     </main>
 </body>
 </html>

@@ -1,13 +1,7 @@
 import { Request, Response } from 'express';
-import initializeUserModel from '../models/userModel';
+import UserModel from '../models/userModel';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-
-let User: any;
-
-initializeUserModel().then((model) => {
-    User = model;
-});
 
 export const getLogin = (req: Request, res: Response) => {
     res.render('login');
@@ -15,11 +9,21 @@ export const getLogin = (req: Request, res: Response) => {
 
 export const postLogin = async (req: Request, res: Response) => {
     const { email, password } = req.body;
-    const user = await User.findOne({ where: { email } });
+    const user = await UserModel.findOne({ where: { email } });
 
     if (user && await bcrypt.compare(password, user.password)) {
-        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-        res.cookie('token', token, { httpOnly: false }); // Rimuovi HttpOnly per consentire l'accesso dal client
+        const token = jwt.sign(
+            { 
+                userId: user.id,  // Assicurati che questo campo sia presente
+                nome: user.nome,
+                cognome: user.cognome,
+                isAdmin: user.isAdmin,
+                puntifedelta: user.puntifedelta
+            }, 
+            process.env.JWT_SECRET!, 
+            { expiresIn: '1h' }
+        );
+        res.cookie('token', token, { httpOnly: false });
         res.redirect('/dashboard');
     } else {
         res.redirect('/auth/login');
@@ -31,17 +35,32 @@ export const getRegister = (req: Request, res: Response) => {
 };
 
 export const postRegister = async (req: Request, res: Response) => {
-    const { name, email, password } = req.body;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Log per debug
+    console.log('Dati di registrazione:', req.body);
+
+    // Usa i nomi dei campi esattamente come sono nel form HTML
+    const { nome, cognome, email, password, telefono, indirizzo } = req.body;
+    
     try {
-        await User.create({ name, email, password: hashedPassword });
-        res.redirect('/auth/login');
+        await UserModel.create({ 
+            nome,
+            cognome,
+            email, 
+            password,
+            telefono: telefono || null,
+            indirizzo: indirizzo || null,
+            isAdmin: false,
+            puntifedelta: 0,
+            isDeleted: false  // Aggiungi questa proprietà
+        });
+        
+        res.redirect('/auth/login?success=true');
     } catch (error) {
-        res.status(400).send('Errore durante la registrazione');
+        console.error('Errore durante la registrazione:', error);
+        res.redirect('/auth/register?error=true');
     }
 };
 
-// Aggiunta della funzione di logout
 export const getLogout = (req: Request, res: Response) => {
     res.clearCookie('token');
     res.redirect('/');
