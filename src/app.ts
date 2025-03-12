@@ -32,11 +32,20 @@ const port = process.env.PORT || 3000;
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Rimuovi la duplicazione
+// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(cookieParser());
-app.use('/img', express.static(path.join(__dirname, '../src/img')));
-app.use('/img', express.static(path.join(__dirname, 'img')));
+
+// Modifica questi percorsi per le immagini
+// Rimuovi le linee esistenti per /img
+// app.use('/img', express.static(path.join(__dirname, '../src/img')));
+// app.use('/img', express.static(path.join(__dirname, 'img')));
+
+// Usa un unico percorso assoluto compatibile con Vercel
+app.use('/img', express.static(path.resolve(__dirname, 'img')));
+app.use('/images', express.static(path.resolve(__dirname, 'img'))); // Percorso alternativo
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 

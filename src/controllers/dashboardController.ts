@@ -24,8 +24,12 @@ export const getDashboard = async (req: Request, res: Response): Promise<void> =
         const user = await UserModel.findByPk(userId);
         
         if (!user) {
-            res.status(404).send('Utente non trovato');
-            return;
+            // Invece di mandare solo un messaggio di errore, renderizza una pagina di errore
+            return res.render('error', { 
+                user: req.user,
+                errorMessage: 'Utente non trovato',
+                showLogout: true
+            });
         }
 
         // Recupera gli ordini attivi dell'utente
@@ -56,6 +60,11 @@ export const getDashboard = async (req: Request, res: Response): Promise<void> =
         });
     } catch (error) {
         console.error('Errore nel caricamento della dashboard:', error);
-        res.status(500).send('Errore nel caricamento della dashboard');
+        // Renderizza una pagina di errore invece di inviare solo un messaggio
+        res.status(500).render('error', { 
+            user: req.user,
+            errorMessage: 'Si è verificato un errore nel caricamento della dashboard',
+            showLogout: true
+        });
     }
 };

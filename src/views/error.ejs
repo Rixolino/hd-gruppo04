@@ -1,3 +1,4 @@
+/error.ejs -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -22,13 +23,18 @@
                         <h1 class="h3 mb-3">Si è verificato un errore</h1>
                         <p class="lead mb-4"><%= message %></p>
                         
-                        <div class="d-flex justify-content-center">
-                            <a href="javascript:history.back()" class="btn btn-outline-secondary mr-3">
+                        <div class="d-flex justify-content-center flex-wrap">
+                            <a href="javascript:history.back()" class="btn btn-outline-secondary mr-3 mb-2">
                                 <i class="fas fa-arrow-left mr-2"></i>Torna indietro
                             </a>
-                            <a href="/" class="btn btn-primary">
+                            <a href="/" class="btn btn-primary mr-3 mb-2">
                                 <i class="fas fa-home mr-2"></i>Vai alla home
                             </a>
+                            <% if (locals.user) { %>
+                                <a href="/auth/logout" class="btn btn-danger mb-2">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            <% } %>
                         </div>
                         
                         <% if (process.env.NODE_ENV !== 'production' && error) { %>
