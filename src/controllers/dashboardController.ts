@@ -63,7 +63,8 @@ export const getDashboard = async (req: Request, res: Response): Promise<void> =
         // Renderizza una pagina di errore invece di inviare solo un messaggio
         res.status(500).render('error', { 
             user: req.user,
-            errorMessage: 'Si è verificato un errore nel caricamento della dashboard',
+            message: 'Si è verificato un errore nel caricamento della dashboard', // cambiato da errorMessage a message
+            error: error, // includi anche l'errore per i dettagli tecnici
             showLogout: true
         });
     }
