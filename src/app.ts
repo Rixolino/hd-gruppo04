@@ -37,14 +37,30 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(cookieParser());
 
-// Modifica questi percorsi per le immagini
-// Rimuovi le linee esistenti per /img
-// app.use('/img', express.static(path.join(__dirname, '../src/img')));
-// app.use('/img', express.static(path.join(__dirname, 'img')));
+// Sostituisci le righe esistenti per i percorsi delle immagini con questo codice
 
-// Usa un unico percorso assoluto compatibile con Vercel
-app.use('/img', express.static(path.resolve(__dirname, 'img')));
-app.use('/images', express.static(path.resolve(__dirname, 'img'))); // Percorso alternativo
+// Gestione dei percorsi delle immagini per ambiente di sviluppo e Vercel
+const isVercel = process.env.VERCEL === '1';
+
+if (isVercel) {
+  // In ambiente Vercel, le immagini sono in /public/img
+  app.use('/img', express.static(path.join(process.cwd(), 'public', 'img')));
+  app.use('/images', express.static(path.join(process.cwd(), 'public', 'img'))); // Percorso alternativo
+} else {
+  // In ambiente di sviluppo locale, le immagini sono in più posizioni
+  // Prova tutti i percorsi possibili per garantire la compatibilità
+  app.use('/img', express.static(path.join(__dirname, '../public/img'))); // Prima opzione
+  app.use('/img', express.static(path.join(__dirname, 'img'))); // Seconda opzione
+  app.use('/img', express.static(path.join(process.cwd(), 'public', 'img'))); // Terza opzione
+  app.use('/images', express.static(path.join(__dirname, '../public/img'))); // Alias alternativo
+}
+
+// Aggiungi questo per debug
+console.log('Percorsi immagini configurati:', {
+  dirname: __dirname,
+  cwd: process.cwd(),
+  isVercel: isVercel
+});
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -707,7 +723,33 @@ app.post('/api/user/settings', authenticate, async (req: Request, res: Response)
   }
 });
 
-// Aggiungi alla fine delle route, prima dell'avvio del server
+// Aggiungi questo prima della gestione 404 ma dopo tutte le altre route
+
+// Middleware per la gestione degli errori 500
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('Errore server:', err);
+  
+  // Verifica se c'è un utente autenticato
+  const token = req.cookies.token;
+  let user = null;
+  
+  if (token) {
+    try {
+      user = jwt.verify(token, process.env.JWT_SECRET!);
+    } catch (err) {
+      // Token non valido, user rimane null
+    }
+  }
+  
+  // Rendering della pagina 500.ejs con le informazioni necessarie
+  res.status(500).render('500', {
+    user: user,
+    message: err.message || 'Si è verificato un errore interno del server',
+    error: process.env.NODE_ENV === 'development' ? err : undefined,
+    showLogout: !!user  // Mostra il pulsante logout se l'utente è autenticato
+  });
+});
+
 // Gestione pagina 404 - deve essere sempre l'ultima route
 app.use((req, res) => {
   res.status(404).render('404');

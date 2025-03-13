@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/css/styles.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <title>Termini e Condizioni - HelpDigit</title>
+        <style>
+            /* Stili base per il tema chiaro */
+            .terms-section {
+                margin-bottom: 2.5rem;
+                padding-bottom: 1.5rem;
+                border-bottom: 1px solid rgba(0,0,0,0.08);
+            }
+            
+            .terms-section:last-child {
+                border-bottom: none;
+            }
+            
+            .terms-section h3 {
+                color: var(--primary-color);
+                font-weight: 600;
+                margin-bottom: 1rem;
+            }
+            
+            .terms-date {
+                font-style: italic;
+                margin-bottom: 2rem;
+                color: #6c757d;
+            }
+            
+            .terms-container {
+                max-width: 900px;
+                margin: 0 auto;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+                padding: 3rem;
+                transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            }
+            
+            /* Stili per tema scuro */
+            body.dark-theme .terms-container {
+                background-color: #1e1e1e;
+                box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+                color: #e0e0e0;
+            }
+            
+            body.dark-theme .terms-section {
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+            }
+            
+            body.dark-theme .terms-date {
+                color: #a0aec0;
+            }
+            
+            body.dark-theme .terms-section h3 {
+                color: var(--accent-color, #47a3ff);
+            }
+            
+            body.dark-theme a {
+                color: #4da3ff;
+            }
+            
+            body.dark-theme a:hover {
+                color: #6cb3ff;
+            }
+            
+            /* Stili migliorati per il pulsante home in tema scuro */
+            body.dark-theme .btn-primary {
+                background-color: var(--accent-color, #2B99FF) !important;
+                border-color: var(--accent-color, #2B99FF) !important;
+                color: #fff !important;
+            }
+            
+            body.dark-theme .btn-primary:hover {
+                background-color: var(--highlight-color, #47a3ff) !important;
+                border-color: var(--highlight-color, #47a3ff) !important;
+                box-shadow: 0 0 10px rgba(75, 163, 255, 0.4) !important;
+            }
+            
+            /* Stili per alto contrasto */
+            body.high-contrast .terms-container {
+                background-color: #000;
+                border: 1px solid #fff;
+                box-shadow: none;
+                color: #fff;
+            }
+            
+            body.high-contrast .terms-section {
+                border-bottom: 1px solid rgba(255,255,255,0.5);
+            }
+            
+            body.high-contrast .terms-date {
+                color: #fff;
+            }
+            
+            body.high-contrast .terms-section h3 {
+                color: #00a1ff;
+            }
+            
+            /* Pulsante in alto contrasto */
+            body.high-contrast .btn-primary {
+                background-color: #00a1ff !important;
+                border: 2px solid #fff !important;
+                color: #fff !important;
+                font-weight: bold !important;
+                text-shadow: 0 0 2px #000 !important;
+            }
+            
+            body.high-contrast .btn-primary:hover {
+                background-color: #fff !important;
+                color: #000 !important;
+                border-color: #00a1ff !important;
+                text-shadow: none !important;
+            }
+            
+            /* Stili per daltonici */
+            body[class*="colorblind-"] .terms-section h3 {
+                text-decoration: underline;
+            }
+            
+            /* Pulsanti specifici per daltonici */
+            body.colorblind-deuteranopia .btn-primary {
+                background-color: #0056b3 !important;
+                border-color: #004085 !important;
+            }
+            
+            body.colorblind-protanopia .btn-primary {
+                background-color: #0074aa !important;
+                border-color: #005b85 !important;
+            }
+            
+            body.colorblind-tritanopia .btn-primary {
+                background-color: #8800aa !important;
+                border-color: #6a0084 !important;
+            }
+            
+            /* Stili per il pulsante home - generale */
+            .home-button {
+                font-weight: 500;
+                padding: 10px 20px;
+                border-radius: 5px;
+                transition: all 0.3s ease;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .home-button i {
+                margin-right: 8px;
+            }
+            
+            @media (max-width: 768px) {
+                .terms-container {
+                    padding: 2rem;
+                }
+            }
+            
+            .terms-section ul {
+                padding-left: 1.5rem;
+            }
+            
+            .terms-section li {
+                margin-bottom: 0.5rem;
+            }
+            
+            .terms-header {
+                text-align: center;
+                margin-bottom: 3rem;
+            }
+            
+            .terms-section p {
+                line-height: 1.7;
+            }
+        </style>
+    </head>
+<body>
+    <!-- Navbar viene gestita da build.js o dai partial -->
+
+    <div class="container py-5">
+        <div class="terms-container">
+            <div class="terms-header">
+                <h1 class="display-5">Termini e Condizioni</h1>
+                <p class="terms-date">Ultimo aggiornamento: <%= new Date().toLocaleDateString('it-IT', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+            </div>
+
+            <div class="terms-section">
+                <h3>1. Introduzione</h3>
+                <p>Benvenuti su HelpDigit. I presenti Termini e Condizioni ("Termini") regolano l'utilizzo del nostro sito web, dei servizi, delle funzionalità, del software e di tutti i contenuti correlati (collettivamente il "Servizio"). Leggendo questi Termini e utilizzando il nostro Servizio, accetti di essere vincolato da questi Termini. Se non accetti questi Termini, ti preghiamo di non utilizzare il nostro Servizio.</p>
+                <p>HelpDigit si riserva il diritto di modificare questi Termini in qualsiasi momento. Le modifiche entreranno in vigore non appena pubblicate sul sito. È responsabilità dell'utente controllare periodicamente i Termini per eventuali aggiornamenti.</p>
+            </div>
+
+            <div class="terms-section">
+                <h3>2. Accesso al Servizio</h3>
+                <p>Per accedere e utilizzare alcuni servizi di HelpDigit, potrebbe essere necessario registrarsi e creare un account. Durante la registrazione, ti impegni a fornire informazioni accurate, complete e aggiornate. Il mancato rispetto di questo obbligo costituisce una violazione dei Termini e potrebbe comportare la chiusura immediata dell'account.</p>
+                <p>Sei responsabile della sicurezza del tuo account e della password. HelpDigit non sarà responsabile per eventuali perdite o danni derivanti dalla mancata osservanza di questi requisiti di sicurezza.</p>
+                <p>Ci riserviamo il diritto di rifiutare l'accesso al Servizio, chiudere account, rimuovere o modificare contenuti a nostra esclusiva discrezione.</p>
+            </div>
+
+            <div class="terms-section">
+                <h3>3. Utilizzo del Servizio</h3>
+                <p>Utilizzando il nostro Servizio, accetti di rispettare le seguenti regole:</p>
+                <ul>
+                    <li>Non utilizzare il Servizio per scopi illegali o non autorizzati.</li>
+                    <li>Non violare leggi, regolamenti o diritti di terzi applicabili alla tua giurisdizione.</li>
+                    <li>Non interferire o danneggiare il funzionamento del Servizio o dei server e delle reti ad esso connessi.</li>
+                    <li>Non raccogliere o conservare dati personali di altri utenti senza il loro consenso.</li>
+                    <li>Non utilizzare metodi automatizzati per accedere o utilizzare il Servizio.</li>
+                </ul>
+                <p>La violazione di una qualsiasi di queste regole può comportare la sospensione o la chiusura dell'account e persino azioni legali.</p>
+            </div>
+
+            <div class="terms-section">
+                <h3>4. Contenuti e Proprietà Intellettuale</h3>
+                <p>Il Servizio e tutti i suoi contenuti originali, caratteristiche e funzionalità sono e rimarranno di proprietà esclusiva di HelpDigit e dei suoi licenziatari. Il Servizio è protetto da copyright, marchi commerciali e altre leggi nazionali e internazionali sulla proprietà intellettuale.</p>
+                <p>I contenuti generati dagli utenti rimangono di proprietà degli utenti che li creano. Tuttavia, caricando, pubblicando o condividendo contenuti attraverso il nostro Servizio, ci concedi una licenza non esclusiva, mondiale, royalty-free per utilizzare, riprodurre, modificare, pubblicare, tradurre e distribuire tali contenuti in qualsiasi formato esistente o sviluppato in futuro.</p>
+            </div>
+
+            <div class="terms-section">
+                <h3>5. Privacy</h3>
+                <p>L'utilizzo del nostro Servizio è soggetto alla nostra Privacy Policy, che regola la raccolta, l'utilizzo e la divulgazione delle informazioni personali. Utilizzando il Servizio, acconsenti alla raccolta e all'utilizzo delle informazioni in conformità con la nostra Privacy Policy.</p>
+            </div>
+
+            <div class="terms-section">
+                <h3>6. Limitazione di Responsabilità</h3>
+                <p>In nessun caso HelpDigit, i suoi amministratori, dipendenti o affiliati saranno responsabili per qualsiasi danno diretto, indiretto, incidentale, speciale, consequenziale o punitivo derivante da:</p>
+                <ul>
+                    <li>L'utilizzo o l'impossibilità di utilizzare il Servizio.</li>
+                    <li>Accesso non autorizzato o alterazione delle trasmissioni o dei dati dell'utente.</li>
+                    <li>Dichiarazioni o comportamenti di terzi sul Servizio.</li>
+                    <li>Errori, imprecisioni o omissioni nei contenuti.</li>
+                    <li>Virus o altri codici dannosi che possono essere trasmessi attraverso il Servizio.</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h3>7. Indennizzo</h3>
+                <p>Accetti di difendere, indennizzare e manlevare HelpDigit da e contro qualsiasi rivendicazione, responsabilità, danno, perdita e spesa, comprese, senza limitazione, ragionevoli spese legali e contabili, derivanti da o in qualsiasi modo connesse a:</p>
+                <ul>
+                    <li>L'utilizzo del Servizio.</li>
+                    <li>La violazione dei presenti Termini.</li>
+                    <li>La violazione di diritti di terzi, inclusi, senza limitazione, diritti di proprietà intellettuale o diritti alla privacy.</li>
+                </ul>
+            </div>
+
+            <div class="terms-section">
+                <h3>8. Risoluzione</h3>
+                <p>Possiamo terminare o sospendere l'accesso al nostro Servizio immediatamente, senza preavviso o responsabilità, per qualsiasi motivo, incluso, senza limitazione, la violazione dei Termini.</p>
+                <p>Tutte le disposizioni dei Termini che per loro natura dovrebbero sopravvivere alla risoluzione sopravviveranno alla risoluzione, incluse, senza limitazione, le disposizioni sulla proprietà, le esclusioni di garanzia, l'indennizzo e le limitazioni di responsabilità.</p>
+            </div>
+
+            <div class="terms-section">
+                <h3>9. Legge Applicabile</h3>
+                <p>Questi Termini saranno regolati e interpretati in conformità con le leggi italiane, senza riguardo ai conflitti di principi legali.</p>
+                <p>La nostra incapacità di far rispettare qualsiasi diritto o disposizione dei presenti Termini non sarà considerata una rinuncia a tali diritti. Se una qualsiasi disposizione di questi Termini è ritenuta non valida o inapplicabile da un tribunale, le restanti disposizioni dei Termini rimarranno in vigore.</p>
+            </div>
+
+            <div class="terms-section">
+                <h3>10. Modifiche ai Termini</h3>
+                <p>Ci riserviamo il diritto, a nostra esclusiva discrezione, di modificare o sostituire questi Termini in qualsiasi momento. Le modifiche sostanziali ai Termini entreranno in vigore 30 giorni dopo la pubblicazione di tali modifiche sul nostro sito web. Il tuo uso continuato del Servizio dopo tale periodo costituisce l'accettazione dei nuovi Termini.</p>
+            </div>
+
+            <div class="terms-section">
+                <h3>11. Contatti</h3>
+                <p>Per qualsiasi domanda sui presenti Termini, si prega di contattarci all'indirizzo <a href="mailto:info@helpdigit.com">info@helpdigit.com</a>.</p>
+            </div>
+            
+            <div class="mt-5 text-center">
+                <a href="/" class="btn btn-primary">Torna alla Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer viene gestito da build.js o dai partial -->
+    
+    <!-- Includi le librerie JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+</body>
+</html>

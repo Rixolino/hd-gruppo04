@@ -10,17 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(newViewportMeta);
     }
 
-    // Aggiungi preloader per migliorare la percezione di caricamento
-    const preloader = document.createElement('div');
-    preloader.className = 'preloader';
-    preloader.innerHTML = `
-        <div class="spinner">
-            <i class="fas fa-laptop-code fa-spin"></i>
-            <p class="mt-2">HelpDigit</p>
-        </div>
-    `;
-    document.body.appendChild(preloader);
-
     // Verifica se l'utente è autenticato (controlla se esiste un cookie di autenticazione)
     const isAuthenticated = document.cookie.split(';').some((item) => item.trim().startsWith('token='));
     
@@ -1165,11 +1154,51 @@ const footer = `
                 
                 /* Preloader più professionale */
                 .preloader {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
                     background: rgba(10, 26, 47, 0.98);
+                    z-index: 10000;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    flex-direction: column;
+                    transition: opacity 0.8s ease;
                 }
-                
+
+                .spinner {
+                    text-align: center;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                }
+
                 .spinner i {
-                    color: var(--accent-color);
+                    font-size: 3.5rem;
+                    color: var(--accent-color, #3b82f6);
+                    margin-bottom: 1rem;
+                }
+
+                .spinner p {
+                    color: white;
+                    font-size: 1.2rem;
+                    font-weight: 500;
+                    letter-spacing: 1px;
+                    margin-top: 0.5rem;
+                }
+
+                /* Animazione pulsante per lo spinner */
+                @keyframes pulse {
+                    0% { transform: scale(1); opacity: 1; }
+                    50% { transform: scale(1.1); opacity: 0.8; }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+
+                .spinner i {
+                    animation: pulse 1.5s infinite ease-in-out, fa-spin 2s infinite linear;
                 }
                 
                 /* Animazioni delle card */

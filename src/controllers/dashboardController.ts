@@ -60,12 +60,11 @@ export const getDashboard = async (req: Request, res: Response, next: NextFuncti
         });
     } catch (error) {
         console.error('Errore nel caricamento della dashboard:', error);
-        // Gestione dell'errore con reindirizzamento alla pagina di errore
-        res.status(500).render('error', { 
-            title: 'Errore Dashboard',
+        // Renderizza la pagina 500.ejs invece di error.ejs
+        res.status(500).render('500', { 
             user: req.user || null,
-            message: 'Si è verificato un errore nel caricamento della dashboard',
-            error: process.env.NODE_ENV === 'development' ? error : {},
+            message: 'Si è verificato un errore durante il caricamento della dashboard.',
+            error: process.env.NODE_ENV === 'development' ? error : undefined,
             showLogout: true
         });
     }
