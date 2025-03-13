@@ -43,17 +43,12 @@ app.use(cookieParser());
 const isVercel = process.env.VERCEL === '1';
 
 if (isVercel) {
-  // In ambiente Vercel, le immagini sono in /public/img
   app.use('/img', express.static(path.join(process.cwd(), 'public', 'img')));
-  app.use('/images', express.static(path.join(process.cwd(), 'public', 'img'))); // Percorso alternativo
-} else {
+ } else {
   // In ambiente di sviluppo locale, le immagini sono in più posizioni
   // Prova tutti i percorsi possibili per garantire la compatibilità
-  app.use('/img', express.static(path.join(__dirname, '../public/img'))); // Prima opzione
   app.use('/img', express.static(path.join(__dirname, 'img'))); // Seconda opzione
-  app.use('/img', express.static(path.join(process.cwd(), 'public', 'img'))); // Terza opzione
-  app.use('/images', express.static(path.join(__dirname, '../public/img'))); // Alias alternativo
-}
+ }
 
 // Aggiungi questo per debug
 console.log('Percorsi immagini configurati:', {
