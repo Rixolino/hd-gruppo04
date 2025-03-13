@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Applica il tema con effetto di transizione
         document.body.classList.add('theme-transition');
         
+        // TEMA
         if (settings.theme === 'dark') {
             document.body.classList.add('dark-theme');
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -54,12 +55,77 @@ document.addEventListener('DOMContentLoaded', function() {
             updateElementsForLightTheme();
         }
         
+        // DIMENSIONE FONT
+        // Prima rimuovi tutte le classi di dimensione del font
+        document.body.classList.remove('font-size-1', 'font-size-2', 'font-size-3');
+        // Poi aggiungi la classe appropriata
+        if (settings.fontSize) {
+            document.body.classList.add('font-size-' + settings.fontSize);
+            console.log('Dimensione font impostata:', settings.fontSize);
+        } else {
+            // Valore predefinito se non specificato
+            document.body.classList.add('font-size-1');
+        }
+        
+        // CONTRASTO ELEVATO
+        if (settings.highContrast) {
+            document.body.classList.add('high-contrast');
+            console.log('Contrasto elevato attivato');
+        } else {
+            document.body.classList.remove('high-contrast');
+        }
+        
+        // RIDUZIONE ANIMAZIONI
+        if (settings.reduceAnimations) {
+            document.body.classList.add('reduce-animations');
+            // Disabilita anche la libreria AOS se presente
+            if (window.AOS) {
+                window.AOS.init({ disable: true });
+            }
+            console.log('Animazioni ridotte attivate');
+        } else {
+            document.body.classList.remove('reduce-animations');
+            // Riattiva AOS se presente
+            if (window.AOS) {
+                window.AOS.init({
+                    duration: 800,
+                    easing: 'ease-in-out',
+                    once: true
+                });
+            }
+        }
+        
+        // MODALITÀ DALTONICO
+        // Rimuovi prima tutte le classi di daltonismo
+        document.body.classList.remove('colorblind-deuteranopia', 'colorblind-protanopia', 'colorblind-tritanopia');
+        if (settings.colorBlindMode && settings.colorBlindMode !== 'none') {
+            document.body.classList.add('colorblind-' + settings.colorBlindMode);
+            console.log('Modalità daltonico attivata:', settings.colorBlindMode);
+        }
+        
+        // COLORE PRIMARIO
+        // Rimuovi prima tutte le classi di colore
+        document.body.classList.remove('color-blue', 'color-green', 'color-purple', 'color-orange', 'color-red');
+        if (settings.primaryColor && settings.primaryColor !== 'default') {
+            document.body.classList.add('color-' + settings.primaryColor);
+            document.documentElement.style.setProperty('--primary-color', getColorValue(settings.primaryColor));
+            console.log('Colore primario impostato:', settings.primaryColor);
+        } else {
+            document.documentElement.style.setProperty('--primary-color', getColorValue('default'));
+        }
+        
+        // LAYOUT
+        // Rimuovi prima tutte le classi di layout
+        document.body.classList.remove('layout-compact', 'layout-comfortable', 'layout-spacious');
+        if (settings.layout && settings.layout !== 'default') {
+            document.body.classList.add('layout-' + settings.layout);
+            console.log('Layout impostato:', settings.layout);
+        }
+        
         // Rimuovi la classe di transizione dopo che l'animazione è completata
         setTimeout(() => {
             document.body.classList.remove('theme-transition');
         }, 300);
-        
-        // Resto del codice per applicare altre impostazioni...
         
         // Forza il ridisegno di componenti specifici che potrebbero richiedere aggiornamenti
         updateComponentsForTheme(settings.theme);
@@ -764,6 +830,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const primaryColor = userSettings.primaryColor !== 'default' ? 
             `style="--primary-color: ${getColorValue(userSettings.primaryColor)}"` : '';
         
+        // Determina la visualizzazione iniziale dell'indicatore daltonismo
+        const colorBlindMode = userSettings.colorBlindMode;
+        const indicatorVisibility = (colorBlindMode && colorBlindMode !== 'none') ? '' : 'd-none';
+        const indicatorTitle = colorBlindMode ? `Modalità daltonismo: ${colorBlindMode}` : 'Modalità daltonismo';
+        const indicatorDataMode = colorBlindMode || 'none';
+
         const navbar = `
             <header>
                 <nav class="navbar navbar-expand-lg ${themeClass} smart-navbar fixed-top" ${primaryColor}>
@@ -772,9 +844,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="fas fa-laptop-code mr-2 text-accent logo-icon"></i>
                             <span class="font-weight-bold">Help<span class="text-accent brand-highlight">Digit</span></span>
                         </a>
+                        
+                        <!-- Indicatore modalità daltonismo (ora esplicitamente prima del toggler) -->
+                        <div id="colorblind-indicator" class="colorblind-indicator ${indicatorVisibility}" 
+                             title="${indicatorTitle}" data-mode="${indicatorDataMode}">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        
+                        <!-- Assicurati che il pulsante hamburger abbia sempre una buona visibilità -->
                         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
                         </button>
+                        
                         <div class="collapse navbar-collapse" id="navbarNav">
                             <ul class="navbar-nav ml-auto">
                                 ${navbarLinks}
@@ -1293,6 +1374,75 @@ const footer = `
                         margin-top: 1rem;
                     }
                 }
+
+                /* Stile per l'indicatore di modalità daltonismo nella navbar */
+                .colorblind-indicator {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-left: 10px;
+                    background-color: rgba(255, 255, 255, 0.1);
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    cursor: help;
+                    transition: all 0.3s ease;
+                    position: relative;
+                }
+
+                .colorblind-indicator:hover {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    transform: scale(1.1);
+                }
+
+                .colorblind-indicator i {
+                    color: #fff;
+                    font-size: 16px;
+                }
+
+                /* Stili specifici per ciascun tipo di daltonismo */
+                .colorblind-indicator[data-mode="deuteranopia"] i {
+                    color: #9747FF;
+                }
+
+                .colorblind-indicator[data-mode="protanopia"] i {
+                    color: #00a5c2;
+                }
+
+                .colorblind-indicator[data-mode="tritanopia"] i {
+                    color: #d4aa00;
+                }
+
+               /* Per schermi piccoli, posiziona l'indicatore daltonismo in modo corretto */
+                @media (max-width: 576px) {
+                    /* Posiziona il pulsante hamburger sempre in primo piano e ben visibile */
+                    .navbar-toggler {
+                        position: relative;
+                        z-index: 2000 !important; /* Z-index molto alto per garantire che sia in cima */
+                        background-color: rgba(21, 61, 128, 0.2); /* Leggero sfondo per migliorare la visibilità */
+                    }
+                    
+                    /* Posiziona l'indicatore daltonismo in modo che non interferisca */
+                    .colorblind-indicator {
+                        position: absolute;
+                        top: 17px;
+                        right: 70px; /* Aumentato lo spazio dal bordo destro */
+                        width: 30px;
+                        height: 30px;
+                        margin-left: 0;
+                        z-index: 1010; /* Z-index inferiore al pulsante navbar-toggler */
+                    }
+                    
+                    .colorblind-indicator i {
+                        font-size: 14px;
+                    }
+                    
+                    /* Assicurati che il logo non interferisca */
+                    .navbar-brand {
+                        max-width: 60%;
+                        overflow: hidden;
+                    }
+                }
             </style>
         `;
 
@@ -1653,6 +1803,260 @@ const footer = `
                 background-color: #000;
                 border-color: #fff;
             }
+
+            /* Modalità daltonismo - Versione avanzata */
+            body.colorblind-deuteranopia,
+            body.colorblind-protanopia,
+            body.colorblind-tritanopia {
+                /* Applica transizioni per cambi fluidi */
+                transition: all 0.3s ease-in-out;
+            }
+
+            /* DEUTERANOPIA - Difficoltà con il verde */
+            body.colorblind-deuteranopia {
+                --primary-color: #0056b3;       /* Blu più intenso */
+                --accent-color: #0078d7;        /* Blu medio */
+                --highlight-color: #0099ff;     /* Blu chiaro */
+                --success-color: #9747FF;       /* Viola al posto del verde */
+                --danger-color: #d91919;        /* Rosso più intenso */
+                --warning-color: #f6d12e;       /* Giallo intenso */
+                --info-color: #00b8e6;          /* Ciano */
+            }
+
+            body.colorblind-deuteranopia .btn-success {
+                background-color: #9747FF !important;
+                border-color: #8a35ea !important;
+            }
+
+            body.colorblind-deuteranopia .btn-danger {
+                background-color: #d91919 !important;
+                border-color: #c01616 !important;
+            }
+
+            body.colorblind-deuteranopia .text-success {
+                color: #9747FF !important;
+            }
+
+            body.colorblind-deuteranopia .text-danger {
+                color: #d91919 !important;
+            }
+
+            body.colorblind-deuteranopia .badge-success {
+                background-color: #9747FF !important;
+            }
+
+            /* PROTANOPIA - Difficoltà con il rosso */
+            body.colorblind-protanopia {
+                --primary-color: #0074aa;       /* Blu scuro */
+                --accent-color: #00a0e9;        /* Blu chiaro */
+                --highlight-color: #30c7ff;     /* Ciano */
+                --success-color: #00a5c2;       /* Turchese al posto del verde */
+                --danger-color: #e69100;        /* Arancione al posto del rosso */
+                --warning-color: #fdda25;       /* Giallo intenso */
+                --info-color: #80d8ff;          /* Ciano chiaro */
+            }
+
+            body.colorblind-protanopia .btn-success {
+                background-color: #00a5c2 !important;
+                border-color: #0090aa !important;
+            }
+
+            body.colorblind-protanopia .btn-danger {
+                background-color: #e69100 !important;
+                border-color: #cc8000 !important;
+            }
+
+            body.colorblind-protanopia .text-success {
+                color: #00a5c2 !important;
+            }
+
+            body.colorblind-protanopia .text-danger {
+                color: #e69100 !important;
+            }
+
+            body.colorblind-protanopia .badge-danger {
+                background-color: #e69100 !important;
+            }
+
+            /* TRITANOPIA - Difficoltà con il blu */
+            body.colorblind-tritanopia {
+                --primary-color: #8800aa;       /* Viola */
+                --accent-color: #aa00d4;        /* Viola intenso */
+                --highlight-color: #cc00ff;     /* Magenta */
+                --success-color: #d4aa00;       /* Oro anziché verde */
+                --danger-color: #d4002d;        /* Rosso magenta */
+                --warning-color: #d47500;       /* Arancione */
+                --info-color: #aa557f;          /* Rosa medio */
+            }
+
+            body.colorblind-tritanopia .btn-primary {
+                background-color: #8800aa !important;
+                border-color: #7a0096 !important;
+            }
+
+            body.colorblind-tritanopia .btn-success {
+                background-color: #d4aa00 !important;
+                border-color: #b89200 !important;
+            }
+
+            body.colorblind-tritanopia .btn-info {
+                background-color: #aa557f !important;
+                border-color: #964670 !important;
+            }
+
+            /* Regolazioni comuni per grafici e visualizzazioni di dati */
+            body[class*="colorblind-"] .chart-area {
+                border: 2px dashed var(--accent-color);
+                padding: 5px;
+            }
+
+            body[class*="colorblind-"] .chart-label {
+                font-weight: bold;
+                text-decoration: underline;
+            }
+
+            /* Indicatori speciali per elementi importanti */
+            body[class*="colorblind-"] .btn,
+            body[class*="colorblind-"] .alert,
+            body[class*="colorblind-"] .badge {
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Aggiunge pattern per aiutare a distinguere meglio le aree colorate */
+            body.colorblind-deuteranopia .navbar::before,
+            body.colorblind-protanopia .navbar::before,
+            body.colorblind-tritanopia .navbar::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
+                background-size: 10px 10px;
+                pointer-events: none;
+                z-index: 1;
+                opacity: 0.3;
+            }
+
+            /* Aggiunge icone per aiutare a distinguere pulsanti importanti */
+            body[class*="colorblind-"] .btn-success::after {
+                content: "✓";
+                margin-left: 5px;
+            }
+
+            body[class*="colorblind-"] .btn-danger::after {
+                content: "✗";
+                margin-left: 5px;
+            }
+
+            /* Miglioramenti per i link nei modelli daltonici */
+            body[class*="colorblind-"] a:not(.btn):not(.nav-link) {
+                text-decoration: underline;
+                font-weight: 500;
+            }
+
+            /* Aggiunge bordi per migliorare il contrasto di elementi importanti */
+            body[class*="colorblind-"] .card,
+            body[class*="colorblind-"] .alert,
+            body[class*="colorblind-"] .list-group-item.active {
+                border-width: 2px;
+            }
+
+            /* Indicatore di focus più evidente per accessibilità */
+            body[class*="colorblind-"] *:focus {
+                outline: 3px solid var(--accent-color) !important;
+                outline-offset: 2px !important;
+            }
+
+            /* Impostazioni specifiche per le tabelle */
+            body[class*="colorblind-"] .table th {
+                border-bottom: 2px solid var(--accent-color);
+                font-weight: 700;
+            }
+
+            body[class*="colorblind-"] .table-striped tbody tr:nth-of-type(odd) {
+                background-color: rgba(0, 0, 0, 0.08);
+            }
+
+            body.dark-theme[class*="colorblind-"] .table-striped tbody tr:nth-of-type(odd) {
+                background-color: rgba(255, 255, 255, 0.08);
+            }
+
+            /* Notifica per il cambio modalità daltonico */
+            .color-mode-notification {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: var(--primary-color);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 30px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                transition: opacity 0.5s ease;
+            }
+
+            .notification-content {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .notification-content i {
+                font-size: 1.2rem;
+            }
+
+            /* Correggi posizione e visibilità dell'icona hamburger su mobile */
+           /* Garantisci visibilità icona hamburger in qualsiasi modalità */
+            @media (max-width: 576px) {
+                .navbar-toggler {
+                    position: absolute !important;
+                    right: 15px !important;
+                    top: 15px !important;
+                    z-index: 5000 !important;
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                    display: flex !important; /* Cambiato da block a flex */
+                    align-items: center !important; /* Centratura verticale */
+                    justify-content: center !important; /* Centratura orizzontale */
+                    background-color: transparent !important;
+                    width: 40px !important;
+                    height: 38px !important;
+                    outline: none !important;
+                    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                    padding: 0 !important; /* Rimuove padding che potrebbe influenzare la centratura */
+                }
+                
+                /* Forza la visibilità dell'icona con stile di default più visibile */
+                .navbar-toggler .navbar-toggler-icon {
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.95)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+                    display: block !important;
+                    width: 24px !important; /* Dimensione esplicita */
+                    height: 24px !important; /* Dimensione esplicita */
+                    margin: 0 !important; /* Rimuove margini che potrebbero influenzare la centratura */
+                }
+                
+                /* Assicura che anche in modalità daltonismo l'icona sia visibile */
+                body[class*="colorblind-"] .navbar-toggler .navbar-toggler-icon {
+                    filter: brightness(1.3) !important;
+                }
+                
+                /* Posiziona l'indicatore daltonismo in modo che non interferisca */
+                .colorblind-indicator {
+                    position: absolute;
+                    top: 17px;
+                    right: 80px !important;
+                    width: 30px;
+                    height: 30px;
+                    margin-left: 0;
+                    z-index: 1010;
+                }
+            }
         </style>
     `;
     
@@ -1662,6 +2066,8 @@ const footer = `
     // Avvia il processo di caricamento delle impostazioni e creazione dell'interfaccia
     loadUserSettings();
 });
+
+
 
 // Aggiungi questa funzione al tuo file build.js
 window.changeTheme = function(theme) {
@@ -1690,4 +2096,73 @@ window.changeTheme = function(theme) {
         });
     }
     // Per utenti non autenticati, non salvare nulla
+};
+
+// Funzione per impostare la modalità daltonico
+window.setColorblindMode = function(mode) {
+    // Rimuovi tutte le classi daltonismo esistenti
+    document.body.classList.remove('colorblind-deuteranopia', 'colorblind-protanopia', 'colorblind-tritanopia');
+    
+    // Gestione dell'indicatore nel navbar
+    const navbarIndicator = document.getElementById('colorblind-indicator');
+    
+    // Aggiungi la classe corretta se richiesta
+    if (mode && mode !== 'none') {
+        document.body.classList.add('colorblind-' + mode);
+        console.log('Modalità daltonico attivata:', mode);
+        
+        // Mostra l'indicatore nella navbar
+        if (navbarIndicator) {
+            navbarIndicator.classList.remove('d-none');
+            navbarIndicator.setAttribute('title', 'Modalità daltonismo: ' + mode);
+            navbarIndicator.setAttribute('data-mode', mode);
+        }
+        
+        // Mostra una notifica all'utente
+        const notification = document.createElement('div');
+        notification.className = 'color-mode-notification';
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-eye"></i>
+                <span>Modalità daltonismo <strong>${mode}</strong> attivata</span>
+            </div>
+        `;
+        document.body.appendChild(notification);
+        
+        // Nascondi la notifica dopo alcuni secondi
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    } else {
+        // Nascondi l'indicatore nella navbar
+        if (navbarIndicator) {
+            navbarIndicator.classList.add('d-none');
+        }
+    }
+    
+    // Aggiorna le impostazioni utente
+    if (window.userSettings) {
+        window.userSettings.colorBlindMode = mode;
+        
+        // Salva solo se autenticato
+        if (isAuthenticated) {
+            const cachedSettings = localStorage.getItem('userSettings');
+            let settings = cachedSettings ? JSON.parse(cachedSettings) : {};
+            settings.colorBlindMode = mode;
+            localStorage.setItem('userSettings', JSON.stringify(settings));
+            localStorage.setItem('userSettingsTimestamp', new Date().getTime().toString());
+            
+            fetch('/api/user/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({ colorBlindMode: mode })
+            }).catch(error => {
+                console.error('Errore nel salvataggio della modalità daltonico:', error);
+            });
+        }
+    }
 };
