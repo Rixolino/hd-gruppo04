@@ -37,25 +37,21 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(cookieParser());
 
-// Sostituisci le righe esistenti per i percorsi delle immagini con questo codice
+// Sostituisci o aggiungi questa parte dopo la definizione di express
 
-// Gestione dei percorsi delle immagini per ambiente di sviluppo e Vercel
-const isVercel = process.env.VERCEL === '1';
+// Configura i percorsi statici per le immagini
+app.use(express.static(path.join(__dirname, '../public'))); // Serve i file dalla cartella public
 
-if (isVercel) {
-  app.use('/img', express.static(path.join(process.cwd(), 'public', 'img')));
- } else {
-  // In ambiente di sviluppo locale, le immagini sono in più posizioni
-  // Prova tutti i percorsi possibili per garantire la compatibilità
-  app.use('/img', express.static(path.join(__dirname, 'img'))); // Seconda opzione
- }
+// Configura percorsi aggiuntivi per le immagini - supporto sia per sviluppo che per Vercel
+app.use('/img', express.static(path.join(__dirname, '../public/img'))); // Prima opzione (sviluppo)
+app.use('/img', express.static(path.join(__dirname, 'img'))); // Seconda opzione (se immagini sono in src/img)
+app.use('/img', express.static(path.join(process.cwd(), 'public', 'img'))); // Terza opzione (Vercel)
 
-// Aggiungi questo per debug
-console.log('Percorsi immagini configurati:', {
-  dirname: __dirname,
-  cwd: process.cwd(),
-  isVercel: isVercel
-});
+// Log per debug
+console.log('Directory immagini configurate:');
+console.log('- Path 1:', path.join(__dirname, '../public/img'));
+console.log('- Path 2:', path.join(__dirname, 'img'));
+console.log('- Path 3:', path.join(process.cwd(), 'public', 'img'));
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
