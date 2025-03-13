@@ -52,7 +52,13 @@ const getDashboard = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
     catch (error) {
         console.error('Errore nel caricamento della dashboard:', error);
-        res.status(500).send('Errore nel caricamento della dashboard');
+        // Sostituisco il semplice invio di un messaggio con il rendering della pagina di errore
+        res.status(500).render('error', { 
+            user: req.user,
+            message: 'Si è verificato un errore nel caricamento della dashboard', 
+            error: error,
+            showLogout: true // Flag per mostrare il pulsante di logout
+        });
     }
 });
 exports.getDashboard = getDashboard;

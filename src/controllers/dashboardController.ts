@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import UserModel from '../models/userModel';
 import OrderModel from '../models/orderModel';
 import jwt from 'jsonwebtoken';
@@ -15,7 +15,7 @@ interface AuthenticatedRequest extends Request {
     user: UserJwtPayload;
 }
 
-export const getDashboard = async (req: Request, res: Response): Promise<void> => {
+export const getDashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         // Ottieni l'ID utente dal token JWT decodificato nell'autenticazione
         const userId = (req as AuthenticatedRequest).user.userId;
@@ -60,11 +60,12 @@ export const getDashboard = async (req: Request, res: Response): Promise<void> =
         });
     } catch (error) {
         console.error('Errore nel caricamento della dashboard:', error);
-        // Renderizza una pagina di errore invece di inviare solo un messaggio
+        // Gestione dell'errore con reindirizzamento alla pagina di errore
         res.status(500).render('error', { 
-            user: req.user,
-            message: 'Si è verificato un errore nel caricamento della dashboard', // cambiato da errorMessage a message
-            error: error, // includi anche l'errore per i dettagli tecnici
+            title: 'Errore Dashboard',
+            user: req.user || null,
+            message: 'Si è verificato un errore nel caricamento della dashboard',
+            error: process.env.NODE_ENV === 'development' ? error : {},
             showLogout: true
         });
     }

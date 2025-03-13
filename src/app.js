@@ -612,6 +612,28 @@ app.post('/api/user/settings', authMiddleware_1.authenticate, (req, res) => __aw
         });
     }
 }));
+// O dovunque sia definito il middleware di gestione degli errori
+// Middleware per la gestione degli errori 404
+app.use((req, res, next) => {
+    res.status(404).render('error', {
+        title: 'Pagina non trovata',
+        message: 'La pagina richiesta non esiste',
+        error: {},
+        showLogout: req.isAuthenticated() // Mostra logout se l'utente è autenticato
+    });
+});
+// Middleware per la gestione degli errori generici
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    console.error(err);
+    res.status(statusCode).render('error', {
+        title: 'Errore',
+        message: err.message || 'Si è verificato un errore imprevisto',
+        error: process.env.NODE_ENV === 'development' ? err : {},
+        user: req.user || null,
+        showLogout: req.isAuthenticated() // Mostra logout se l'utente è autenticato
+    });
+});
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
