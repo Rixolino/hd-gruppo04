@@ -152,7 +152,31 @@
                                     <i class="fas fa-info-circle mr-2"></i>
                                     Dopo l'invio della richiesta, riceverai un link per effettuare il pagamento.
                                 </div>
-                                
+
+                                <!-- Aggiungi informazioni sui punti fedeltà -->
+                                <div class="alert alert-success mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-gift mr-2"></i>
+                                        <div>
+                                            <strong>Punti Fedeltà:</strong> 
+                                            <span>Guadagnerai <%= Math.floor(service.price) %> punti con questo acquisto!</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Aggiungi controlli di accessibilità inline -->
+                                <div class="card mb-3 border-0 bg-light">
+                                    <div class="card-body py-2">
+                                        <h6 class="mb-2"><i class="fas fa-universal-access mr-1"></i> Accessibilità</h6>
+                                        <div class="btn-group btn-group-sm mb-2" role="group" aria-label="Modalità daltonismo">
+                                            <button type="button" class="btn btn-outline-secondary" onclick="setColorblindMode('none')">Standard</button>
+                                            <button type="button" class="btn btn-outline-secondary" onclick="setColorblindMode('protanopia')">Protanopia</button>
+                                            <button type="button" class="btn btn-outline-secondary" onclick="setColorblindMode('deuteranopia')">Deuteranopia</button>
+                                            <button type="button" class="btn btn-outline-secondary" onclick="setColorblindMode('tritanopia')">Tritanopia</button>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <p class="mb-0 small text-muted">
                                     <i class="fas fa-lock mr-1"></i>
                                     I tuoi dati sono protetti e trasmessi in modo sicuro.

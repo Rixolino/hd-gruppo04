@@ -5,12 +5,6 @@ import dotenv from 'dotenv';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import { Op } from 'sequelize';
-
-// Declare global variable type
-declare global {
-  var databaseAvailable: boolean;
-}
-
 import { initializeDatabase } from './config/db';
 import UserModel from './models/userModel';
 import { authenticate } from './middleware/authMiddleware';
@@ -22,7 +16,6 @@ import ServiceModel from './models/serviceModel'; // Assicurati di avere il mode
 import { loadUserSettings } from './middleware/settingsMiddleware';
 import SettingsModel from './models/settingsModel';
 import settingsRoutes from './routes/settingsRoutes';
-import { catchDatabaseErrors, handleDbError, isDbError } from './utils/errorHandlers';
 
 // Sincronizza il modello con il database (aggiunge le colonne mancanti)
 SettingsModel.sync({ alter: true }).then(() => {
@@ -85,32 +78,15 @@ app.use(settingsMiddleware.loadUserSettings);
 // Applica il middleware dopo l'inizializzazione della sessione e di passport
 app.use(settingsMiddleware.loadUserSettings);
 
-// Modifica l'inizializzazione del database (mantieni solo questa)
+// Database connection
 initializeDatabase()
     .then(() => {
         console.log('Database and tables created');
-        global.databaseAvailable = true;
     })
-    .catch(err => {
-        console.error('Errore di connessione al database:', err);
-        // Non possiamo reindirizzare qui perché non siamo in un contesto di richiesta/risposta
-        // Ma possiamo impostare una variabile globale per indicare che il database non è disponibile
-        global.databaseAvailable = false;
-    });
-
-// Aggiungi un middleware per controllare la disponibilità del database
-app.use((req: Request, res: Response, next: NextFunction) => {
-    if (global.databaseAvailable === false) {
-        // Se il database non è disponibile, mostra subito la pagina di errore
-        return handleDbError({ 
-            message: 'Database non disponibile' 
-        }, req, res);
-    }
-    next();
-});
+    .catch(err => console.log(err));
 
 // Home route - controlla se l'utente è autenticato
-app.get('/', catchDatabaseErrors(async (req: Request, res: Response) => {
+app.get('/', async (req: Request, res: Response) => {
     const token = req.cookies.token;
     
     if (token) {
@@ -134,10 +110,10 @@ app.get('/', catchDatabaseErrors(async (req: Request, res: Response) => {
         console.error('Errore nel recupero dei servizi:', error);
         res.render('index', { services: [] });
     }
-}));
+});
 
 // Dashboard route - UNICA CORRETTA, RIMUOVI LE ALTRE DUE
-app.get('/dashboard', authenticate, catchDatabaseErrors(dashboardController.getDashboard));
+app.get('/dashboard', authenticate, dashboardController.getDashboard);
 
 // Profile routes
 app.get('/profile', authenticate, profileController.getProfile);
@@ -145,160 +121,198 @@ app.post('/profile/update', authenticate, profileController.updateProfile);
 app.post('/profile/change-password', authenticate, profileController.changePassword);
 
 // Settings route
-app.get('/settings', authenticate, catchDatabaseErrors(async (req: Request, res: Response) => {
-    const userId = req.user.userId;
-    const user = await UserModel.findByPk(userId);
-    
-    if (!user) {
-        return res.redirect('/auth/login');
+app.get('/settings', authenticate, async (req: Request, res: Response) => {
+    try {
+        const userId = req.user.userId;
+        const user = await UserModel.findByPk(userId);
+        
+        if (!user) {
+            return res.redirect('/auth/login');
+        }
+        
+        res.render('settings', { 
+            user: user,
+            // Non c'è bisogno di passare userSettings separatamente
+            successMessage: req.query.success ? 'Impostazioni salvate con successo!' : undefined,
+            errorMessage: req.query.error || undefined
+        });
+    } catch (error) {
+        console.error('Errore nel caricamento delle impostazioni:', error);
+        res.status(500).send('Errore nel caricamento delle impostazioni');
     }
-    
-    res.render('settings', { 
-        user: user,
-        successMessage: req.query.success ? 'Impostazioni salvate con successo!' : undefined,
-        errorMessage: req.query.error || undefined
-    });
-}));
+});
 
 // Gestione impostazioni di accessibilità
-app.post('/settings/accessibility', authenticate, catchDatabaseErrors(async (req: Request, res: Response) => {
-    console.log('Body ricevuto:', req.body);
-    const userId = req.user.userId;
-    const { fontSize, highContrast, reduceAnimations, colorBlindMode } = req.body;
-    
-    console.log('Ricerca utente con ID:', userId);
-    const user = await UserModel.findByPk(userId);
-    
-    if (!user) {
-        console.log('Utente non trovato');
-        return res.redirect('/settings?error=Utente non trovato');
+app.post('/settings/accessibility', authenticate, async (req: Request, res: Response) => {
+    try {
+        console.log('Body ricevuto:', req.body);
+        const userId = req.user.userId;
+        const { fontSize, highContrast, reduceAnimations, colorBlindMode } = req.body;
+        
+        console.log('Ricerca utente con ID:', userId);
+        const user = await UserModel.findByPk(userId);
+        
+        if (!user) {
+            console.log('Utente non trovato');
+            return res.redirect('/settings?error=Utente non trovato');
+        }
+        
+        // Assicurati che settings esista o inizializzalo
+        let settings = user.settings || {};
+        
+        console.log('Impostazioni attuali:', settings);
+        
+        // Aggiorna le impostazioni
+        settings = {
+            ...settings,
+            fontSize: parseInt(fontSize) || 1,
+            highContrast: highContrast === 'on',
+            reduceAnimations: reduceAnimations === 'on',
+            colorBlindMode: colorBlindMode || 'none'
+        };
+        
+        console.log('Nuove impostazioni:', settings);
+        
+        // Aggiorna l'utente
+        user.settings = settings;
+        await user.save();
+        
+        console.log('Impostazioni salvate con successo');
+        res.redirect('/settings?success=Impostazioni di accessibilità salvate con successo#accessibilita');
+    } catch (error) {
+        console.error('Errore nel salvataggio delle impostazioni:', error);
+        res.redirect('/settings?error=Errore nel salvataggio delle impostazioni#accessibilita');
     }
-    
-    // Assicurati che settings esista o inizializzalo
-    let settings = user.settings || {};
-    
-    // Aggiorna le impostazioni
-    settings = {
-        ...settings,
-        fontSize: parseInt(fontSize) || 1,
-        highContrast: highContrast === 'on',
-        reduceAnimations: reduceAnimations === 'on',
-        colorBlindMode: colorBlindMode || 'none'
-    };
-    
-    // Aggiorna l'utente
-    user.settings = settings;
-    await user.save();
-    
-    res.redirect('/settings?success=Impostazioni di accessibilità salvate con successo#accessibilita');
-}));
+});
 
 // Gestione impostazioni di personalizzazione
-app.post('/settings/personalization', authenticate, catchDatabaseErrors(async (req: Request, res: Response) => {
-    console.log('Body ricevuto:', req.body);
-    const userId = req.user.userId;
-    const { theme, primaryColor, layout } = req.body;
-    
-    const user = await UserModel.findByPk(userId);
-    
-    if (!user) {
-        return res.redirect('/settings?error=Utente non trovato');
+app.post('/settings/personalization', authenticate, async (req: Request, res: Response) => {
+    try {
+        console.log('Body ricevuto:', req.body);
+        const userId = req.user.userId;
+        const { theme, primaryColor, layout } = req.body;
+        
+        const user = await UserModel.findByPk(userId);
+        
+        if (!user) {
+            return res.redirect('/settings?error=Utente non trovato');
+        }
+        
+        let settings = user.settings || {};
+        settings = {
+            ...settings,
+            theme: theme || 'light',
+            primaryColor: primaryColor || 'default',
+            layout: layout || 'default'
+        };
+        
+        user.settings = settings;
+        await user.save();
+        
+        res.redirect('/settings?success=Personalizzazione salvata con successo#personalizzazione');
+    } catch (error) {
+        console.error('Errore nel salvataggio delle impostazioni:', error);
+        res.redirect('/settings?error=Errore nel salvataggio delle impostazioni#personalizzazione');
     }
-    
-    let settings = user.settings || {};
-    settings = {
-        ...settings,
-        theme: theme || 'light',
-        primaryColor: primaryColor || 'default',
-        layout: layout || 'default'
-    };
-    
-    user.settings = settings;
-    await user.save();
-    
-    res.redirect('/settings?success=Personalizzazione salvata con successo#personalizzazione');
-}));
+});
 
 // Gestione impostazioni delle notifiche
-app.post('/settings/notifications', authenticate, catchDatabaseErrors(async (req: Request, res: Response) => {
-    console.log('Body ricevuto:', req.body);
-    const userId = req.user.userId;
-    const { emailNotifications, orderUpdates, promotions, newsletter } = req.body;
-    
-    const user = await UserModel.findByPk(userId);
-    
-    if (!user) {
-        return res.redirect('/settings?error=Utente non trovato');
+app.post('/settings/notifications', authenticate, async (req: Request, res: Response) => {
+    try {
+        console.log('Body ricevuto:', req.body);
+        const userId = req.user.userId;
+        const { emailNotifications, orderUpdates, promotions, newsletter } = req.body;
+        
+        const user = await UserModel.findByPk(userId);
+        
+        if (!user) {
+            return res.redirect('/settings?error=Utente non trovato');
+        }
+        
+        let settings = user.settings || {};
+        settings = {
+            ...settings,
+            emailNotifications: emailNotifications === 'on',
+            orderUpdates: orderUpdates === 'on',
+            promotions: promotions === 'on',
+            newsletter: newsletter === 'on'
+        };
+        
+        user.settings = settings;
+        await user.save();
+        
+        res.redirect('/settings?success=Impostazioni notifiche salvate con successo#notifiche');
+    } catch (error) {
+        console.error('Errore nel salvataggio delle impostazioni:', error);
+        res.redirect('/settings?error=Errore nel salvataggio delle impostazioni#notifiche');
     }
-    
-    let settings = user.settings || {};
-    settings = {
-        ...settings,
-        emailNotifications: emailNotifications === 'on',
-        orderUpdates: orderUpdates === 'on',
-        promotions: promotions === 'on',
-        newsletter: newsletter === 'on'
-    };
-    
-    user.settings = settings;
-    await user.save();
-    
-    res.redirect('/settings?success=Impostazioni notifiche salvate con successo#notifiche');
-}));
+});
 
 // Gestione impostazioni della privacy
-app.post('/settings/privacy', authenticate, catchDatabaseErrors(async (req: Request, res: Response) => {
-    console.log('Body ricevuto:', req.body);
-    const userId = req.user.userId;
-    const { dataTelemetry, cookies } = req.body;
-    
-    const user = await UserModel.findByPk(userId);
-    
-    if (!user) {
-        return res.redirect('/settings?error=Utente non trovato');
+app.post('/settings/privacy', authenticate, async (req: Request, res: Response) => {
+    try {
+        console.log('Body ricevuto:', req.body);
+        const userId = req.user.userId;
+        const { dataTelemetry, cookies } = req.body;
+        
+        const user = await UserModel.findByPk(userId);
+        
+        if (!user) {
+            return res.redirect('/settings?error=Utente non trovato');
+        }
+        
+        let settings = user.settings || {};
+        settings = {
+            ...settings,
+            dataTelemetry: dataTelemetry === 'on',
+            cookies: cookies === 'on'
+        };
+        
+        user.settings = settings;
+        await user.save();
+        
+        res.redirect('/settings?success=Impostazioni privacy salvate con successo#privacy');
+    } catch (error) {
+        console.error('Errore nel salvataggio delle impostazioni:', error);
+        res.redirect('/settings?error=Errore nel salvataggio delle impostazioni#privacy');
     }
-    
-    let settings = user.settings || {};
-    settings = {
-        ...settings,
-        dataTelemetry: dataTelemetry === 'on',
-        cookies: cookies === 'on'
-    };
-    
-    user.settings = settings;
-    await user.save();
-    
-    res.redirect('/settings?success=Impostazioni privacy salvate con successo#privacy');
-}));
+});
 
 // Download dei dati utente
-app.get('/user/download-data', authenticate, catchDatabaseErrors(async (req: Request, res: Response) => {
-    const userId = req.user.userId;
-    const user = await UserModel.findByPk(userId);
-    
-    if (!user) {
-        res.status(404).send('Utente non trovato');
-        return;
-    }
-    
-    // Crea un oggetto JSON con tutti i dati dell'utente
-    const userData = {
-        userInfo: {
-            id: user.id,
-            nome: user.nome,
-            cognome: user.cognome,
-            email: user.email,
-            telefono: user.telefono,
-            createdAt: user.createdAt,
-            settings: user.settings || {}
+app.get('/user/download-data', authenticate, async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.user.userId;
+        const user = await UserModel.findByPk(userId);
+        
+        if (!user) {
+            res.status(404).send('Utente non trovato');
+            return;
         }
-    };
-    
-    // Imposta gli header per il download del file
-    res.setHeader('Content-disposition', 'attachment; filename=i-miei-dati.json');
-    res.setHeader('Content-type', 'application/json');
-    res.send(JSON.stringify(userData, null, 2));
-}));
+        
+        // Crea un oggetto JSON con tutti i dati dell'utente
+        const userData = {
+            userInfo: {
+                id: user.id,
+                nome: user.nome,
+                cognome: user.cognome,
+                email: user.email,
+                telefono: user.telefono,
+                createdAt: user.createdAt,
+                settings: user.settings || {}
+            },
+            // Aggiungi qui altri dati come ordini, pagamenti ecc.
+        };
+        
+        // Imposta gli header per il download del file
+        res.setHeader('Content-disposition', 'attachment; filename=i-miei-dati.json');
+        res.setHeader('Content-type', 'application/json');
+        res.send(JSON.stringify(userData, null, 2));
+        res.end();
+    } catch (error) {
+        console.error('Errore nel download dei dati utente:', error);
+        res.status(500).send('Errore nel download dei dati');
+    }
+});
 
 // Cancellazione account
 app.post('/user/delete-account', authenticate, async (req: Request, res: Response): Promise<void> => {
@@ -432,7 +446,7 @@ app.get('/cookies', (req: Request, res: Response) => {
 });
 
 // Route per le richieste di servizi - richiedono autenticazione
-app.get('/services/request/:id', authenticate, catchDatabaseErrors(async (req: Request, res: Response): Promise<void> => {
+app.get('/services/request/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
     const serviceId = req.params.id;
     
     try {
@@ -450,10 +464,10 @@ app.get('/services/request/:id', authenticate, catchDatabaseErrors(async (req: R
         console.error('Errore nel recupero del servizio:', error);
         res.status(500).send('Errore nel recupero del servizio');
     }
-}));
+});
 
 // Route di test per le impostazioni
-app.get('/test-settings', authenticate, catchDatabaseErrors(async (req: Request, res: Response): Promise<void> => {
+app.get('/test-settings', authenticate, async (req: Request, res: Response): Promise<void> => {
     try {
       const userId = req.user.userId;
       console.log('Test settings per userId:', userId);
@@ -475,10 +489,10 @@ app.get('/test-settings', authenticate, catchDatabaseErrors(async (req: Request,
       console.error('Errore test settings:', error);
       res.json({ error: String(error) });
     }
-  }));
+  });
 
 // Route per i dettagli dei servizi specifici - accessibile a tutti
-app.get('/services/:id', catchDatabaseErrors(async (req: Request, res: Response): Promise<void> => {
+app.get('/services/:id', async (req: Request, res: Response): Promise<void> => {
     const serviceId = req.params.id;
     
     // Verifica se c'è un utente autenticato
@@ -493,79 +507,106 @@ app.get('/services/:id', catchDatabaseErrors(async (req: Request, res: Response)
         }
     }
 
-    // Recupera il servizio dal database
-    const service = await ServiceModel.findByPk(serviceId);
-    
-    if (!service) {
-        res.status(404).send('Servizio non trovato');
-        return;
+    try {
+        // Recupera il servizio dal database
+        const service = await ServiceModel.findByPk(serviceId);
+        
+        if (!service) {
+            res.status(404).send('Servizio non trovato');
+            return;
+        }
+        
+        // Recupera servizi correlati (esempio: stessa categoria o categorie diverse)
+        const relatedServices = await ServiceModel.findAll({
+            where: {
+                id: { [Op.ne]: serviceId }, // Escludi il servizio corrente
+                [Op.or]: [
+                    { category: service.category }, // Stessa categoria
+                    { category: { [Op.ne]: service.category } } // O categoria diversa
+                ]
+            },
+            limit: 2 // Limita a 2 servizi correlati
+        });
+        
+        // Passa l'oggetto service e relatedServices al template
+        res.render('service-detail', { service, relatedServices, user });
+    } catch (error) {
+        console.error('Errore nel recupero del servizio:', error);
+        res.status(500).send('Errore nel recupero del servizio');
     }
-    
-    // Recupera servizi correlati
-    const relatedServices = await ServiceModel.findAll({
-        where: {
-            id: { [Op.ne]: serviceId },
-            [Op.or]: [
-                { category: service.category },
-                { category: { [Op.ne]: service.category } }
-            ]
-        },
-        limit: 2
-    });
-    
-    // Passa l'oggetto service e relatedServices al template
-    res.render('service-detail', { service, relatedServices, user });
-}));
+});
 
 // Route per ottenere i servizi per la dashboard
-app.get('/services/dashboard/services', authenticate, catchDatabaseErrors(async (req: Request, res: Response) => {
-    const services = await ServiceModel.findAll();
-    res.json(services);
-}));
+app.get('/services/dashboard/services', authenticate, async (req: Request, res: Response) => {
+    try {
+        const services = await ServiceModel.findAll();
+        res.json(services);
+    } catch (error) {
+        console.error('Errore nel recupero dei servizi:', error);
+        const errorMessage = (error as Error).message;
+        res.status(500).json({ message: 'Errore nel recupero dei servizi', error: errorMessage });
+    }
+});
 
 // API per recuperare i servizi (aggiungi questo codice prima di app.listen)
 
 // API endpoint per ottenere tutti i servizi
-app.get('/api/services', catchDatabaseErrors(async (req: Request, res: Response) => {
-    const { limit, category } = req.query;
-    
-    // Costruisci le opzioni di query
-    const options: any = {};
-    
-    // Limita il numero di risultati se specificato
-    if (limit && !isNaN(Number(limit))) {
-        options.limit = Number(limit);
+app.get('/api/services', async (req: Request, res: Response) => {
+    try {
+        const { limit, category } = req.query;
+        
+        // Costruisci le opzioni di query
+        const options: any = {};
+        
+        // Limita il numero di risultati se specificato
+        if (limit && !isNaN(Number(limit))) {
+            options.limit = Number(limit);
+        }
+        
+        // Filtra per categoria se specificata
+        if (category) {
+            options.where = {
+                category: category
+            };
+        }
+        
+        // Ordina per id o un altro campo
+        options.order = [['createdAt', 'DESC']];
+        
+        // Esegui la query
+        const services = await ServiceModel.findAll(options);
+        
+        // Restituisci i servizi come JSON
+        res.json(services);
+    } catch (error) {
+        console.error('Errore nel recupero dei servizi:', error);
+        res.status(500).json({ 
+            message: 'Errore nel recupero dei servizi', 
+            error: (error as Error).message 
+        });
     }
-    
-    // Filtra per categoria se specificata
-    if (category) {
-        options.where = {
-            category: category
-        };
-    }
-    
-    // Ordina per id o un altro campo
-    options.order = [['createdAt', 'DESC']];
-    
-    // Esegui la query
-    const services = await ServiceModel.findAll(options);
-    
-    // Restituisci i servizi come JSON
-    res.json(services);
-}));
+});
 
 // API endpoint per ottenere un singolo servizio per ID
-app.get('/api/services/:id', catchDatabaseErrors(async (req: Request, res: Response) => {
+app.get('/api/services/:id', (req: Request, res: Response) => {
     const serviceId = req.params.id;
     
-    const service = await ServiceModel.findByPk(serviceId);
-    
-    if (!service) {
-        return res.status(404).json({ message: 'Servizio non trovato' });
-    }
-    
-    res.json(service);
-}));
+    ServiceModel.findByPk(serviceId)
+        .then(service => {
+            if (!service) {
+                return res.status(404).json({ message: 'Servizio non trovato' });
+            }
+            
+            res.json(service);
+        })
+        .catch(error => {
+            console.error('Errore nel recupero del servizio:', error);
+            res.status(500).json({ 
+                message: 'Errore nel recupero del servizio', 
+                error: (error as Error).message 
+            });
+        });
+});
 
 // Aggiungi questo insieme alle altre route
 
@@ -673,21 +714,6 @@ app.post('/api/user/settings', authenticate, async (req: Request, res: Response)
   }
 });
 
-// Aggiungi questo prima del middleware di gestione degli errori database
-
-// Middleware per catturare gli errori non gestiti nelle chiamate API
-app.use('/api', (err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error('Errore API non gestito:', err);
-  
-  // Indipendentemente dal tipo di errore, renderizza sempre dberror.ejs
-  const errorCode = 'API' + Math.floor(1000 + Math.random() * 9000);
-  
-  return res.status(503).render('dberror', {
-    errorDetails: process.env.NODE_ENV === 'development' ? err.message : 'Errore di servizio',
-    errorCode
-  });
-});
-
 // Aggiungi questo middleware per la gestione degli errori di database prima del middleware 500
 // Posizionalo prima della gestione degli errori 500 ma dopo tutte le altre route
 
@@ -755,16 +781,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     error: process.env.NODE_ENV === 'development' ? err : undefined,
     showLogout: !!user  // Mostra il pulsante logout se l'utente è autenticato
   });
-});
-
-// Middleware per la gestione degli errori database - MANTIENI SOLO QUESTO
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  // Controlla se è un errore di database usando la funzione isDbError
-  if (isDbError(err)) {
-    return handleDbError(err, req, res);
-  }
-  // Se non è un errore di database, passa al prossimo middleware di gestione errori
-  next(err);
 });
 
 // Gestione pagina 404 - deve essere sempre l'ultima route
