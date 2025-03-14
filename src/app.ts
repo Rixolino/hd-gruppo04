@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import { Op } from 'sequelize';
 import { initializeDatabase } from './config/db';
 import UserModel from './models/userModel';
+import OrderModel from './models/orderModel';
 import { authenticate } from './middleware/authMiddleware';
 import jwt from 'jsonwebtoken';
 import * as profileController from './controllers/profileController';
@@ -16,6 +17,9 @@ import ServiceModel from './models/serviceModel'; // Assicurati di avere il mode
 import { loadUserSettings } from './middleware/settingsMiddleware';
 import SettingsModel from './models/settingsModel';
 import settingsRoutes from './routes/settingsRoutes';
+import multer from 'multer';
+import fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
 // Sincronizza il modello con il database (aggiunge le colonne mancanti)
 SettingsModel.sync({ alter: true }).then(() => {
@@ -793,3 +797,155 @@ app.listen(port, () => {
 });
 
 export default app;
+
+// Configurazione storage per i file caricati
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    const uploadDir = path.join(__dirname, '../uploads');
+    // Crea la directory se non esiste
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function(req, file, cb) {
+    // Genera un nome file univoco
+    cb(null, `${uuidv4()}-${file.originalname}`);
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+  fileFilter: function(req, file, cb) {
+    // Filtra i tipi di file accettati
+    const allowedTypes = /jpeg|jpg|png|gif|pdf|doc|docx|zip/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Formato file non supportato!'));
+    }
+  }
+});
+
+// POST route per la richiesta di servizio
+app.post('/services/request/:id', authenticate, upload.array('attachments', 5), async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceId = req.params.id;
+    const userId = req.user.userId;
+    
+    // Recupera il servizio dal database
+    const service = await ServiceModel.findByPk(serviceId);
+    
+    if (!service) {
+      return res.status(404).render('error', {
+        user: req.user,
+        errorMessage: 'Servizio non trovato',
+        showLogout: true
+      });
+    }
+    
+    // Estrai i dati del form
+    const {
+      requestTitle,
+      requestDescription, 
+      colorScheme,
+      features,
+      deadline,
+      additionalNotes,
+    } = req.body;
+    
+    // Gestione file allegati
+    let attachmentsInfo: { filename: string; originalName: string; path: string; size: number }[] = [];
+    if (req.files && Array.isArray(req.files)) {
+      attachmentsInfo = (req.files as Express.Multer.File[]).map(file => ({
+        filename: file.filename,
+        originalName: file.originalname,
+        path: file.path,
+        size: file.size
+      }));
+    }
+    
+    // Crea un nuovo ordine nel database
+    const order = await OrderModel.create({
+      utenteId: userId,
+      servizio: Number(serviceId),
+      titolo: requestTitle,
+      descrizione: requestDescription,
+      dettagliAggiuntivi: JSON.stringify({
+        colorScheme,
+        features: Array.isArray(features) ? features : features ? [features] : [],
+        additionalNotes,
+        deadline,
+        attachments: attachmentsInfo
+      }),
+      stato: 'pagamento-in-attesa',
+      dataRichiesta: new Date(),
+      dataConsegna: undefined,
+      prezzo: service.price,
+      progressoLavoro: 0
+    });
+    
+    // Aggiunge punti fedeltà all'utente (1 punto per ogni euro speso)
+    const user = await UserModel.findByPk(userId);
+    if (user) {
+      const puntiDaAggiungere = Math.floor(Number(service.price));
+      await user.update({ 
+        puntifedelta: user.puntifedelta + puntiDaAggiungere 
+      });
+    }
+    
+    // Notifica agli admin (implementazione base)
+    if (user) {
+        console.log(`Nuova richiesta di servizio: ${requestTitle} da ${user.nome} ${user.cognome}`);
+    } else {
+        console.log(`Nuova richiesta di servizio: ${requestTitle} da un utente sconosciuto`);
+    }
+    // Qui si potrebbe implementare l'invio di email o altre notifiche
+    
+    // Reindirizza alla pagina di conferma
+    res.redirect(`/order-confirmation/${order.id}`);
+  } catch (error) {
+    console.error('Errore nella creazione dell\'ordine:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      errorMessage: 'Si è verificato un errore durante l\'elaborazione della richiesta',
+      showLogout: true
+    });
+  }
+});
+
+// Rotta per la pagina di conferma dell'ordine
+app.get('/order-confirmation/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const orderId = req.params.id;
+    const order = await OrderModel.findByPk(orderId);
+    
+    if (!order || order.utenteId !== req.user.userId) {
+      return res.status(404).render('error', {
+        user: req.user,
+        errorMessage: 'Ordine non trovato',
+        showLogout: true
+      });
+    }
+    
+    // Recupera il servizio associato all'ordine
+    const service = await ServiceModel.findByPk(order.servizio);
+    
+    res.render('order-confirmation', {
+      user: req.user,
+      order,
+      service,
+      paymentLink: `/payments/${order.id}`
+    });
+  } catch (error) {
+    console.error('Errore nel caricamento della pagina di conferma:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      errorMessage: 'Si è verificato un errore nel caricamento della pagina di conferma',
+      showLogout: true
+    });
+  }
+});

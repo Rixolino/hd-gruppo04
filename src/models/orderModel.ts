@@ -2,11 +2,14 @@ import { DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/db';
 import User from './userModel';
 
-interface OrderAttributes {
+export interface OrderAttributes {
   id?: number;
   utenteId: number;
-  servizio: string;
-  stato: 'in-attesa' | 'pagamento-in-attesa' | 'in-lavorazione' | 'completato';
+  servizio: number;
+  titolo: string;
+  descrizione: string;
+  dettagliAggiuntivi: string;
+  stato: string;
   dataRichiesta: Date;
   dataConsegna?: Date;
   prezzo: number;
@@ -16,8 +19,11 @@ interface OrderAttributes {
 class Order extends Model<OrderAttributes> implements OrderAttributes {
   public id!: number;
   public utenteId!: number;
-  public servizio!: string;
-  public stato!: 'in-attesa' | 'pagamento-in-attesa' | 'in-lavorazione' | 'completato';
+  public servizio!: number;
+  public titolo!: string;
+  public descrizione!: string;
+  public dettagliAggiuntivi!: string;
+  public stato!: string;
   public dataRichiesta!: Date;
   public dataConsegna?: Date;
   public prezzo!: number;
@@ -43,11 +49,23 @@ Order.init({
     }
   },
   servizio: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  titolo: {
     type: DataTypes.STRING,
     allowNull: false
   },
+  descrizione: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  dettagliAggiuntivi: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
   stato: {
-    type: DataTypes.ENUM('in-attesa', 'pagamento-in-attesa', 'in-lavorazione', 'completato'),
+    type: DataTypes.STRING,
     allowNull: false,
     defaultValue: 'in-attesa'
   },

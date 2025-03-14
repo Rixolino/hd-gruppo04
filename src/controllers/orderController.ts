@@ -25,7 +25,7 @@ export const getUserOrders = async (req: Request, res: Response) => {
 // Crea un nuovo ordine
 export const createOrder = async (req: Request, res: Response) => {
   try {
-    const { servizio, prezzo } = req.body;
+    const { servizio, prezzo, titolo, descrizione, dettagliAggiuntivi } = req.body;
     const userId = req.user.id;
     
     const order = await Order.create({
@@ -34,7 +34,10 @@ export const createOrder = async (req: Request, res: Response) => {
       prezzo,
       stato: 'pagamento-in-attesa',
       dataRichiesta: new Date(),
-      progressoLavoro: 0
+      progressoLavoro: 0,
+      titolo, // Add appropriate title
+      descrizione, // Add appropriate description
+      dettagliAggiuntivi // Add appropriate additional details
     });
     
     // Aggiunge punti fedeltà all'utente (1 punto per ogni euro speso)
