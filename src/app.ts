@@ -29,6 +29,9 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Imposta l'URL base per le risorse statiche
+app.locals.baseURL = process.env.NODE_ENV === 'production' ? 'https://hd-gruppo04.vercel.app/' : '';
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -747,7 +750,7 @@ app.use((req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server avviato sulla porta ${port}`);
 });
 
 export default app;
