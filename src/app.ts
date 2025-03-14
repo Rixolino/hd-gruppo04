@@ -714,6 +714,48 @@ app.post('/api/user/settings', authenticate, async (req: Request, res: Response)
   }
 });
 
+// Aggiungi questo middleware per la gestione degli errori di database prima del middleware 500
+// Posizionalo prima della gestione degli errori 500 ma dopo tutte le altre route
+
+// Middleware per la gestione degli errori database
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  // Controlla se è un errore di database (verifica stringhe comuni negli errori MySQL/MariaDB)
+  if (err.message && (
+      err.message.includes('max_user_connections') ||
+      err.message.includes('ECONNREFUSED') ||
+      err.message.includes('ER_') || // Prefisso comune degli errori MySQL
+      err.message.includes('connection') ||
+      err.code === 'ETIMEDOUT' ||
+      err.code === 'ENOTFOUND'
+  )) {
+    console.error('Errore database:', err);
+    
+    // Verifica se c'è un utente autenticato
+    const token = req.cookies.token;
+    let user = null;
+    
+    if (token) {
+      try {
+        user = jwt.verify(token, process.env.JWT_SECRET!);
+      } catch (err) {
+        // Token non valido, user rimane null
+      }
+    }
+    
+    // Genera un codice di errore univoco per riferimento
+    const errorCode = 'DB' + Math.floor(1000 + Math.random() * 9000);
+    
+    return res.status(500).render('dberror', {
+      user: user,
+      errorDetails: process.env.NODE_ENV === 'development' ? err.message : 'Errore di connessione al database',
+      errorCode: errorCode
+    });
+  }
+  
+  // Se non è un errore di database, passa al prossimo middleware di gestione errori
+  next(err);
+});
+
 // Aggiungi questo prima della gestione 404 ma dopo tutte le altre route
 
 // Middleware per la gestione degli errori 500

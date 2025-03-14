@@ -904,10 +904,10 @@ const footer = `
                             </div>
                             <p class="footer-text mb-4">Soluzioni digitali su misura per privati e aziende. Trasformiamo la tua visione in realtà con servizi tecnologici professionali.</p>
                             <div class="social-links">
-                                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                                <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-                                <a href="https://www.instagram.com/helpdigit/" class="social-link"><i class="fab fa-instagram"></i></a>
+                                <a href="#" target="_blank" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" target="_blank" class="social-link"><i class="fab fa-twitter"></i></a>
+                                <a href="#" target="_blank" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="https://www.instagram.com/helpdigit/" target="_blank" class="social-link"><i class="fab fa-instagram"></i></a>
                             </div>
                         </div>
                     </div>

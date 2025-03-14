@@ -9,6 +9,13 @@
     --border-color: #dee2e6;
     --focus-color: rgba(37, 99, 235, 0.25);
     --hover-color: #1d4ed8;
+    --theme-text-color: #212529;
+    --theme-text-secondary: #6c757d;
+    --theme-text-accent: #007bff;
+    --theme-icon-color: #007bff;
+    --theme-border-color: rgba(0,0,0,.125);
+    --theme-bg-color: #fff;
+    --theme-list-item-bg: transparent;
 }
 
 /* Tema scuro */
@@ -22,6 +29,13 @@ body.dark-theme {
     --border-color: #2d2d2d;
     --focus-color: rgba(59, 130, 246, 0.5);
     --hover-color: #60a5fa;
+    --theme-text-color: #e9ecef;
+    --theme-text-secondary: #adb5bd;
+    --theme-text-accent: #5cbcff;
+    --theme-icon-color: #5cbcff;
+    --theme-border-color: rgba(255,255,255,.125);
+    --theme-bg-color: #343a40;
+    --theme-list-item-bg: #2c3136;
 }
 
 /* Colori primari personalizzati */
@@ -326,4 +340,38 @@ body.dark-theme .jumbotron.p-4.bg-dark-subtle a:not(.btn) {
 body.dark-theme .jumbotron.p-4.bg-dark-subtle a:not(.btn):hover {
     color: #9ec5fe !important;
     text-decoration: underline;
+}
+
+/* Stili per la lista che si adatta al tema */
+
+/* Classi responsive al tema */
+.theme-text {
+  color: var(--theme-text-color);
+}
+
+.theme-text-secondary {
+  color: var(--theme-text-secondary);
+}
+
+.theme-text-accent {
+  color: var(--theme-text-accent);
+}
+
+.theme-icon {
+  color: var(--theme-icon-color);
+}
+
+.theme-list {
+  background-color: var(--theme-bg-color);
+}
+
+.theme-list-item {
+  background-color: var(--theme-list-item-bg);
+  border-color: var(--theme-border-color);
+}
+
+/* Sovrascrivi stili Bootstrap per la lista in tema scuro */
+body.dark-theme .list-group-item {
+  background-color: var(--theme-list-item-bg);
+  border-color: var(--theme-border-color);
 }
