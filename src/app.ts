@@ -116,8 +116,48 @@ app.get('/', async (req: Request, res: Response) => {
     }
 });
 
-// Dashboard route - UNICA CORRETTA, RIMUOVI LE ALTRE DUE
-app.get('/dashboard', authenticate, dashboardController.getDashboard);
+// Modifica la route della dashboard in app.ts
+app.get('/dashboard', authenticate, async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Specifica manualmente gli attributi da selezionare, escludendo 'titolo'
+    const activeOrders = await OrderModel.findAll({
+      attributes: ['id', 'utenteId', 'servizio', 'descrizione', 'dettagliAggiuntivi', 
+                  'stato', 'dataRichiesta', 'dataConsegna', 'prezzo', 'progressoLavoro', 
+                  'createdAt', 'updatedAt'],
+      where: {
+        utenteId: req.user.userId,
+        stato: ['in-attesa', 'pagamento-in-attesa', 'in-lavorazione']
+      },
+      order: [['dataRichiesta', 'DESC']]
+    });
+
+    const completedOrders = await OrderModel.findAll({
+      attributes: ['id', 'utenteId', 'servizio', 'descrizione', 'dettagliAggiuntivi', 
+                  'stato', 'dataRichiesta', 'dataConsegna', 'prezzo', 'progressoLavoro', 
+                  'createdAt', 'updatedAt', 'feedback'],
+      where: {
+        utenteId: req.user.userId,
+        stato: 'completato'
+      },
+      order: [['dataConsegna', 'DESC']]
+    });
+
+    res.render('dashboard', {
+      user: req.user,
+      activeOrders: activeOrders,
+      completedOrders: completedOrders,
+      title: 'Dashboard'
+    });
+  } catch (error) {
+    console.error('Errore nel caricamento della dashboard:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Errore nel caricamento della dashboard: ' + error,
+      showLogout: true
+    });
+  }
+});
 
 // Profile routes
 app.get('/profile', authenticate, profileController.getProfile);
