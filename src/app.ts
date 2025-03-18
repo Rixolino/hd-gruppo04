@@ -938,6 +938,79 @@ app.get('/order-confirmation/:id', authenticate, async (req: Request, res: Respo
   }
 });
 
+// Rotta per la pagina di pagamento dell'ordine
+app.get('/payments/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const orderId = req.params.id;
+    const order = await OrderModel.findByPk(orderId);
+    
+    if (!order || order.utenteId !== req.user.userId) {
+      return res.status(404).render('error', {
+        user: req.user,
+        errorMessage: 'Ordine non trovato',
+        showLogout: true
+      });
+    }
+    
+    // Recupera il servizio associato all'ordine
+    const service = await ServiceModel.findByPk(order.servizio);
+    
+    if (!service) {
+      return res.status(404).render('error', {
+        user: req.user,
+        errorMessage: 'Servizio non trovato',
+        showLogout: true
+      });
+    }
+    
+    res.render('service-payment', {
+      user: req.user,
+      order,
+      service,
+      paymentSuccess: false
+    });
+  } catch (error) {
+    console.error('Errore nel caricamento della pagina di pagamento:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      errorMessage: 'Si è verificato un errore nel caricamento della pagina di pagamento',
+      showLogout: true
+    });
+  }
+});
+
+// Rotta per visualizzare i dettagli dell'ordine
+app.get('/orders/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const orderId = req.params.id;
+    const order = await OrderModel.findByPk(orderId);
+    
+    if (!order || order.utenteId !== req.user.userId) {
+      return res.status(404).render('error', {
+        user: req.user,
+        errorMessage: 'Ordine non trovato',
+        showLogout: true
+      });
+    }
+    
+    // Recupera il servizio associato all'ordine
+    const service = await ServiceModel.findByPk(order.servizio);
+    
+    res.render('order-detail', { 
+      user: req.user, 
+      order, 
+      service 
+    });
+  } catch (error) {
+    console.error('Errore nel caricamento dei dettagli dell\'ordine:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      errorMessage: 'Si è verificato un errore nel caricamento dei dettagli dell\'ordine',
+      showLogout: true
+    });
+  }
+});
+
 // Gestione pagina 404 - deve essere sempre l'ultima route
 app.use((req, res) => {
   res.status(404).render('404');

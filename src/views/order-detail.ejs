@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dettaglio Ordine - HelpDigit</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- La navbar verrà inserita qui da build.js -->
+    
+    <main class="container py-5">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h3 mb-0">Dettaglio Ordine #<%= order.id %></h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5 class="text-muted">Informazioni Ordine</h5>
+                            <p><strong>Servizio:</strong> <%= service ? service.name : 'N/D' %></p>
+                            <p><strong>Data richiesta:</strong> <%= new Date(order.dataRichiesta).toLocaleDateString('it-IT') %></p>
+                            <p><strong>Stato:</strong> <%= order.stato %></p>
+                            <p><strong>Prezzo:</strong> €<%= order.prezzo.toFixed(2) %></p>
+                            <% if (order.descrizione) { %>
+                                <p><strong>Descrizione:</strong> <%= order.descrizione %></p>
+                            <% } %>
+                            
+                            <% if (order.stato === 'pagamento-in-attesa') { %>
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    Pagamento in attesa
+                                </div>
+                                <a href="/payments/<%= order.id %>" class="btn btn-success">
+                                    <i class="fas fa-credit-card mr-2"></i>Procedi al pagamento
+                                </a>
+                            <% } else if (order.stato === 'in-lavorazione') { %>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" 
+                                        role="progressbar" 
+                                        id="orderProgressBar"
+                                        aria-valuenow="<%= order.progressoLavoro %>" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100">
+                                        <%= order.progressoLavoro %>%
+                                    </div>
+                                </div>
+                            <% } %>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="text-center">
+                            <a href="/dashboard" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left mr-2"></i>Torna alla dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Il footer verrà inserito qui da build.js -->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+</body>
+</html>
