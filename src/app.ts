@@ -787,17 +787,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-// Gestione pagina 404 - deve essere sempre l'ultima route
-app.use((req, res) => {
-  res.status(404).render('404');
-});
-
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
-
-export default app;
-
 // Configurazione storage per i file caricati
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -949,3 +938,14 @@ app.get('/order-confirmation/:id', authenticate, async (req: Request, res: Respo
     });
   }
 });
+
+// Gestione pagina 404 - deve essere sempre l'ultima route
+app.use((req, res) => {
+  res.status(404).render('404');
+});
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
+
+export default app;
