@@ -136,7 +136,13 @@
                                     <span class="badge badge-secondary status-badge">In attesa</span>
                                 <% } %>
                                 
-                                <h5 class="card-title"><%= order.servizio %></h5>
+                                <h5 class="card-title">
+                                  <% if (order.titolo) { %>
+                                    <%= order.titolo %>
+                                  <% } else { %>
+                                    <%= order.servizio %> 
+                                  <% } %>
+                                </h5>
                                 <p class="card-text">Richiesta inviata il <%= new Date(order.dataRichiesta).toLocaleDateString() %></p>
                                 
                                 <% if (order.stato === 'in-lavorazione' && order.progressoLavoro) { %>
