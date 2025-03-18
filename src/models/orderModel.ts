@@ -6,7 +6,6 @@ export interface OrderAttributes {
   id?: number;
   utenteId: number;
   servizio: number;
-  titolo: string;
   descrizione: string;
   dettagliAggiuntivi: string;
   stato: string;
@@ -20,7 +19,6 @@ class Order extends Model<OrderAttributes> implements OrderAttributes {
   public id!: number;
   public utenteId!: number;
   public servizio!: number;
-  public titolo!: string;
   public descrizione!: string;
   public dettagliAggiuntivi!: string;
   public stato!: string;
@@ -50,10 +48,6 @@ Order.init({
   },
   servizio: {
     type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  titolo: {
-    type: DataTypes.STRING,
     allowNull: false
   },
   descrizione: {
