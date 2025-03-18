@@ -17,14 +17,14 @@ interface AuthenticatedRequest extends Request {
 
 export const getDashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        // Ottieni l'ID utente dal token JWT decodificato nell'autenticazione
         const userId = (req as AuthenticatedRequest).user.userId;
 
-        // Recupera i dati completi dell'utente dal database
+        const attributes = ['id', 'utenteId', 'servizio', 'stato', 'dataRichiesta', 
+                            'dataConsegna', 'prezzo', 'progressoLavoro', 'createdAt', 'updatedAt'];
+
         const user = await UserModel.findByPk(userId);
         
         if (!user) {
-            // Invece di mandare solo un messaggio di errore, renderizza una pagina di errore
             return res.render('error', { 
                 user: req.user,
                 errorMessage: 'Utente non trovato',
@@ -32,8 +32,8 @@ export const getDashboard = async (req: Request, res: Response, next: NextFuncti
             });
         }
 
-        // Recupera gli ordini attivi dell'utente
         const activeOrders = await OrderModel.findAll({
+            attributes: attributes,
             where: { 
                 utenteId: userId,
                 stato: ['in-attesa', 'pagamento-in-attesa', 'in-lavorazione'] 
@@ -41,8 +41,8 @@ export const getDashboard = async (req: Request, res: Response, next: NextFuncti
             order: [['dataRichiesta', 'DESC']]
         });
 
-        // Recupera gli ordini completati dell'utente
         const completedOrders = await OrderModel.findAll({
+            attributes: attributes,
             where: { 
                 utenteId: userId,
                 stato: 'completato' 
@@ -51,7 +51,6 @@ export const getDashboard = async (req: Request, res: Response, next: NextFuncti
             limit: 5
         });
 
-        // Passa tutti i dati necessari al template
         res.render('dashboard', {
             user: user,
             activeOrders: activeOrders || [],
@@ -60,7 +59,6 @@ export const getDashboard = async (req: Request, res: Response, next: NextFuncti
         });
     } catch (error) {
         console.error('Errore nel caricamento della dashboard:', error);
-        // Renderizza la pagina 500.ejs invece di error.ejs
         res.status(500).render('500', { 
             user: req.user || null,
             message: 'Si è verificato un errore durante il caricamento della dashboard.',
