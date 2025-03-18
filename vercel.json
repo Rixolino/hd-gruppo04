@@ -19,9 +19,8 @@
         "src": "/js/(.*)",
         "dest": "/public/js/$1"
       },
-      {
-        "src": "/img/(.*)",
-        "dest": "/src/img/$1"
+      { "src": "/img/(.*)", 
+      "dest": "/public/img/$1" 
       },
       {
         "src": "/(.*)",
