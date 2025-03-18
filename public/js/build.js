@@ -960,7 +960,7 @@ const footer = `
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-md-6 text-center text-md-start">
-                        <p class="mb-0">&copy; ${new Date().getFullYear()} HelpDigit. Tutti i diritti riservati.</p>
+                        <p class="mb-0">&copy; ${new Date().getFullYear()} BetaCloud HelpDigit. Tutti i diritti riservati.</p>
                     </div>
                     <div class="col-md-6">
                         <div class="footer-legal text-center text-md-end">
