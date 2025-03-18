@@ -3,146 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= service.name %> - HelpDigit</title>
+    <title><%= title || service?.name || 'Pagamento' %> - HelpDigit</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
     <!-- La navbar verrà inserita da build.js -->
     
-    <main>
-        <!-- Hero Section -->
-        <section class="bg-primary text-white py-5">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-7">
-                        <h1 class="display-4 font-weight-bold mb-3"><%= service.name %></h1>
-                        <p class="lead"><%= service.shortDescription %></p>
-                        <a href="/services/request/<%= service.id %>" class="btn btn-light btn-lg mt-3">
-                            <i class="fas fa-shopping-cart mr-2"></i>Richiedi Servizio
+    <main class="container py-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h3 mb-0">Pagamento Servizio</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h4 class="mb-3">Riepilogo Ordine</h4>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title"><%= service?.name || 'Servizio' %></h5>
+                                    
+                                    <!-- Usa solo dati garantiti -->
+                                    <p class="card-text">
+                                        <strong>Data richiesta:</strong> 
+                                        <%= order.dataRichiesta ? new Date(order.dataRichiesta).toLocaleDateString('it-IT') : 'N/D' %>
+                                    </p>
+                                    
+                                    <% if (order.dataConsegna) { %>
+                                    <p class="card-text">
+                                        <strong>Data consegna prevista:</strong> 
+                                        <%= new Date(order.dataConsegna).toLocaleDateString('it-IT') %>
+                                    </p>
+                                    <% } %>
+                                    
+                                    <hr>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="h5 mb-0">Totale da pagare:</span>
+                                        <span class="h5 mb-0 text-primary">
+                                            €<%= order.prezzo ? Number(order.prezzo).toFixed(2) : '0.00' %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h4 class="mt-4">Seleziona Metodo di Pagamento</h4>
+                            <form action="/process-payment" method="POST" class="needs-validation" novalidate>
+                                <input type="hidden" name="orderId" value="<%= order.id %>">
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" value="card" checked>
+                                    <label class="form-check-label" for="creditCard">
+                                        <i class="fab fa-cc-visa mr-2"></i> Carta di Credito/Debito
+                                    </label>
+                                </div>
+                                
+                                <div id="creditCardFields">
+                                    <div class="form-group">
+                                        <label for="cardNumber">Numero Carta</label>
+                                        <input type="text" class="form-control" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" required>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="expiry">Data Scadenza</label>
+                                            <input type="text" class="form-control" id="expiry" name="expiry" placeholder="MM/AA" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="cvv">CVV</label>
+                                            <input type="text" class="form-control" id="cvv" name="cvv" placeholder="123" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="paypal" value="paypal">
+                                    <label class="form-check-label" for="paypal">
+                                        <i class="fab fa-paypal mr-2"></i> PayPal
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer" value="bank">
+                                    <label class="form-check-label" for="bankTransfer">
+                                        <i class="fas fa-university mr-2"></i> Bonifico Bancario
+                                    </label>
+                                </div>
+                                
+                                <hr class="mb-4">
+                                
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                    <label class="form-check-label" for="termsCheck">
+                                        Accetto i <a href="/terms" target="_blank">termini di servizio</a> e le <a href="/privacy" target="_blank">politiche sulla privacy</a>
+                                    </label>
+                                </div>
+                                
+                                <button class="btn btn-primary btn-lg btn-block" type="submit">Procedi al pagamento</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="/orders/<%= order.id %>" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left mr-2"></i>Torna ai dettagli ordine
                         </a>
                     </div>
-                    <div class="col-lg-5 text-center">
-                        <div class="bg-white p-3 rounded-circle d-inline-block shadow">
-                            <i class="fas <%= service.icon %> fa-5x text-primary"></i>
-                        </div>
-                    </div>
                 </div>
             </div>
-        </section>
-        
-        <!-- Dettagli Servizio -->
-        <section class="py-5">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="card border-0 shadow-sm mb-4">
-                            <div class="card-body p-4">
-                                <h3 class="mb-4">Descrizione</h3>
-                                <p><%= service.description %></p>
-                                
-                                <h4 class="mt-5 mb-4">Cosa include</h4>
-                                <ul class="list-unstyled">
-                                    <% service.features.forEach(function(feature) { %>
-                                        <li class="mb-3">
-                                            <div class="d-flex">
-                                                <div class="mr-3">
-                                                    <i class="fas fa-check-circle text-success"></i>
-                                                </div>
-                                                <div>
-                                                    <strong><%= feature.title %></strong>
-                                                    <p class="mb-0 text-muted"><%= feature.description %></p>
-                                                </div>
-                                            </div>
-                                        </li>
-                                    <% }); %>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        <!-- Recensioni -->
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-body p-4">
-                                <h3 class="mb-4">Recensioni</h3>
-                                <% if (service.reviews && service.reviews.length > 0) { %>
-                                    <% service.reviews.forEach(function(review) { %>
-                                        <div class="mb-4 pb-4 border-bottom">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <div>
-                                                    <h5 class="mb-0"><%= review.userName %></h5>
-                                                    <small class="text-muted"><%= review.date %></small>
-                                                </div>
-                                                <div>
-                                                    <% for(let i = 0; i < 5; i++) { %>
-                                                        <i class="fas fa-star <%= i < review.rating ? 'text-warning' : 'text-muted' %>"></i>
-                                                    <% } %>
-                                                </div>
-                                            </div>
-                                            <p><%= review.comment %></p>
-                                        </div>
-                                    <% }); %>
-                                <% } else { %>
-                                    <p class="text-muted">Nessuna recensione disponibile per questo servizio.</p>
-                                <% } %>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-lg-4">
-                        <!-- Sidebar con Prezzo e CTA -->
-                        <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
-                            <div class="card-body p-4">
-                                <h4 class="mb-4">Riepilogo</h4>
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Prezzo:</span>
-                                    <span class="font-weight-bold text-primary">€ <%= service.price.toFixed(2) %></span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-3">
-                                    <span>Tempo di consegna:</span>
-                                    <span><%= service.deliveryTime %></span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-4">
-                                    <span>Revisioni:</span>
-                                    <span><%= service.revisions %></span>
-                                </div>
-                                <a href="/services/request/<%= service.id %>" class="btn btn-primary btn-lg btn-block mb-3">
-                                    <i class="fas fa-shopping-cart mr-2"></i>Richiedi Ora
-                                </a>
-                                <small class="text-muted d-block text-center">Pagamento sicuro garantito</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Servizi Correlati -->
-        <section class="py-5 bg-light">
-            <div class="container">
-                <h3 class="mb-4 text-center">Potrebbe interessarti anche</h3>
-                <div class="row">
-                    <% relatedServices.forEach(function(relService) { %>
-                        <div class="col-md-4 mb-4">
-                            <div class="card h-100 shadow-sm border-0 transition-hover">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center mr-3" style="width: 40px; height: 40px;">
-                                            <i class="fas <%= relService.icon %>"></i>
-                                        </div>
-                                        <h5 class="card-title mb-0"><%= relService.name %></h5>
-                                    </div>
-                                    <p class="card-text text-muted small"><%= relService.shortDescription %></p>
-                                    <div class="d-flex justify-content-between align-items-center mt-3">
-                                        <h6 class="text-primary mb-0">€ <%= relService.price.toFixed(2) %></h6>
-                                        <a href="/services/<%= relService.id %>" class="btn btn-sm btn-outline-primary">Dettagli</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    <% }); %>
-                </div>
-            </div>
-        </section>
+        </div>
     </main>
     
     <!-- Il footer verrà inserito da build.js -->
@@ -151,5 +121,18 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/js/build.js"></script>
+    
+    <script>
+        // Gestione del form di pagamento
+        $(document).ready(function() {
+            $('input[name="paymentMethod"]').change(function() {
+                if ($(this).val() === 'card') {
+                    $('#creditCardFields').show();
+                } else {
+                    $('#creditCardFields').hide();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -909,11 +909,14 @@ app.post('/services/request/:id', authenticate, upload.array('attachments', 5), 
 app.get('/order-confirmation/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
     const orderId = req.params.id;
-    const order = await OrderModel.findByPk(orderId);
+    const order = await OrderModel.findByPk(orderId, {
+      attributes: ['id', 'utenteId', 'servizio', 'stato', 'dataRichiesta', 'dataConsegna', 'prezzo', 'progressoLavoro', 'createdAt', 'updatedAt']
+    });
     
     if (!order || order.utenteId !== req.user.userId) {
       return res.status(404).render('error', {
         user: req.user,
+        title: 'Ordine non trovato', // Aggiungi il titolo
         errorMessage: 'Ordine non trovato',
         showLogout: true
       });
@@ -926,12 +929,14 @@ app.get('/order-confirmation/:id', authenticate, async (req: Request, res: Respo
       user: req.user,
       order,
       service,
-      paymentLink: `/payments/${order.id}`
+      paymentLink: `/payments/${order.id}`,
+      title: 'Conferma Ordine' // Aggiungi il titolo
     });
   } catch (error) {
     console.error('Errore nel caricamento della pagina di conferma:', error);
     res.status(500).render('error', {
       user: req.user,
+      title: 'Errore', // Aggiungi il titolo
       errorMessage: 'Si è verificato un errore nel caricamento della pagina di conferma',
       showLogout: true
     });
@@ -942,11 +947,14 @@ app.get('/order-confirmation/:id', authenticate, async (req: Request, res: Respo
 app.get('/payments/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
     const orderId = req.params.id;
-    const order = await OrderModel.findByPk(orderId);
+    const order = await OrderModel.findByPk(orderId, {
+      attributes: ['id', 'utenteId', 'servizio', 'stato', 'dataRichiesta', 'dataConsegna', 'prezzo', 'progressoLavoro', 'createdAt', 'updatedAt']
+    });
     
     if (!order || order.utenteId !== req.user.userId) {
       return res.status(404).render('error', {
         user: req.user,
+        title: 'Ordine non trovato', // Aggiungi il titolo
         errorMessage: 'Ordine non trovato',
         showLogout: true
       });
@@ -958,6 +966,7 @@ app.get('/payments/:id', authenticate, async (req: Request, res: Response): Prom
     if (!service) {
       return res.status(404).render('error', {
         user: req.user,
+        title: 'Servizio non trovato', // Aggiungi il titolo
         errorMessage: 'Servizio non trovato',
         showLogout: true
       });
@@ -967,12 +976,14 @@ app.get('/payments/:id', authenticate, async (req: Request, res: Response): Prom
       user: req.user,
       order,
       service,
-      paymentSuccess: false
+      paymentSuccess: false,
+      title: 'Pagamento' // Aggiungi il titolo
     });
   } catch (error) {
     console.error('Errore nel caricamento della pagina di pagamento:', error);
     res.status(500).render('error', {
       user: req.user,
+      title: 'Errore', // Aggiungi il titolo
       errorMessage: 'Si è verificato un errore nel caricamento della pagina di pagamento',
       showLogout: true
     });
@@ -983,11 +994,15 @@ app.get('/payments/:id', authenticate, async (req: Request, res: Response): Prom
 app.get('/orders/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
     const orderId = req.params.id;
-    const order = await OrderModel.findByPk(orderId);
+    // Specifica solo le colonne esistenti nel database di produzione
+    const order = await OrderModel.findByPk(orderId, {
+      attributes: ['id', 'utenteId', 'servizio', 'stato', 'dataRichiesta', 'dataConsegna', 'prezzo', 'progressoLavoro', 'createdAt', 'updatedAt']
+    });
     
     if (!order || order.utenteId !== req.user.userId) {
       return res.status(404).render('error', {
         user: req.user,
+        title: 'Ordine non trovato', // Aggiungi il titolo qui
         errorMessage: 'Ordine non trovato',
         showLogout: true
       });
@@ -999,12 +1014,14 @@ app.get('/orders/:id', authenticate, async (req: Request, res: Response): Promis
     res.render('order-detail', { 
       user: req.user, 
       order, 
-      service 
+      service,
+      title: 'Dettaglio Ordine' // Aggiungi il titolo qui
     });
   } catch (error) {
     console.error('Errore nel caricamento dei dettagli dell\'ordine:', error);
     res.status(500).render('error', {
       user: req.user,
+      title: 'Errore', // Aggiungi il titolo qui
       errorMessage: 'Si è verificato un errore nel caricamento dei dettagli dell\'ordine',
       showLogout: true
     });
