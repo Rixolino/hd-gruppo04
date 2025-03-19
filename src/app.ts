@@ -63,6 +63,15 @@ app.set('views', path.join(__dirname, 'views'));
 // Applica il middleware di impostazioni solo dopo l'autenticazione
 app.use(loadUserSettings);
 
+// Aggiungi questo middleware dopo le dichiarazioni di app.use ma prima delle definizioni delle route
+app.use((req, res, next) => {
+  // Imposta valori predefiniti per variabili usate frequentemente nei template
+  res.locals.title = 'HelpDigit';
+  res.locals.user = req.user || null;
+  res.locals.showLogout = !!req.user;
+  next();
+});
+
 // Routes
 import authRoutes from './routes/authRoutes';
 import serviceRoutes from './routes/serviceRoutes';
@@ -831,8 +840,9 @@ app.post('/services/request/:id', authenticate, upload.array('attachments', 5), 
     if (!service) {
       return res.status(404).render('error', {
         user: req.user,
-        errorMessage: 'Servizio non trovato',
-        showLogout: true
+        title: 'Pagina non trovata',  // Assicurati che title sia sempre definito
+        errorMessage: 'La pagina richiesta non è stata trovata',
+        showLogout: !!req.user
       });
     }
     
@@ -1030,7 +1040,25 @@ app.get('/orders/:id', authenticate, async (req: Request, res: Response): Promis
 
 // Gestione pagina 404 - deve essere sempre l'ultima route
 app.use((req, res) => {
-  res.status(404).render('404');
+  res.status(404).render('error', {
+    user: req.user,
+    title: 'Pagina non trovata',  // Assicurati che title sia sempre definito
+    errorMessage: 'La pagina richiesta non è stata trovata',
+    showLogout: !!req.user
+  });
+});
+
+// Aggiungi questo prima della dichiarazione di app.listen
+// Middleware per la gestione degli errori
+app.use((err: Error, req: Request, res: Response, next: Function) => {
+  console.error('Errore dell\'applicazione:', err);
+  res.status(500).render('error', {
+    user: req.user || null,
+    title: 'Errore del server',
+    errorMessage: 'Si è verificato un errore imprevisto nel server',
+    error: process.env.NODE_ENV === 'development' ? err : null,
+    showLogout: !!req.user
+  });
 });
 
 app.listen(port, () => {
