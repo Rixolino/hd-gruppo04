@@ -1,5 +1,4 @@
-import express from 'express';
-import { Request, Response, NextFunction } from 'express';
+import express, { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import path from 'path';
@@ -727,75 +726,6 @@ app.post('/api/user/settings', authenticate, async (req: Request, res: Response)
   }
 });
 
-// Aggiungi questo middleware per la gestione degli errori di database prima del middleware 500
-// Posizionalo prima della gestione degli errori 500 ma dopo tutte le altre route
-
-// Middleware per la gestione degli errori database
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  // Controlla se è un errore di database (verifica stringhe comuni negli errori MySQL/MariaDB)
-  if (err.message && (
-      err.message.includes('max_user_connections') ||
-      err.message.includes('ECONNREFUSED') ||
-      err.message.includes('ER_') || // Prefisso comune degli errori MySQL
-      err.message.includes('connection') ||
-      err.code === 'ETIMEDOUT' ||
-      err.code === 'ENOTFOUND'
-  )) {
-    console.error('Errore database:', err);
-    
-    // Verifica se c'è un utente autenticato
-    const token = req.cookies.token;
-    let user = null;
-    
-    if (token) {
-      try {
-        user = jwt.verify(token, process.env.JWT_SECRET!);
-      } catch (err) {
-        // Token non valido, user rimane null
-      }
-    }
-    
-    // Genera un codice di errore univoco per riferimento
-    const errorCode = 'DB' + Math.floor(1000 + Math.random() * 9000);
-    
-    return res.status(500).render('dberror', {
-      user: user,
-      errorDetails: process.env.NODE_ENV === 'development' ? err.message : 'Errore di connessione al database',
-      errorCode: errorCode
-    });
-  }
-  
-  // Se non è un errore di database, passa al prossimo middleware di gestione errori
-  next(err);
-});
-
-// Aggiungi questo prima della gestione 404 ma dopo tutte le altre route
-
-// Middleware per la gestione degli errori 500
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error('Errore server:', err);
-  
-  // Verifica se c'è un utente autenticato
-  const token = req.cookies.token;
-  let user = null;
-  
-  if (token) {
-    try {
-      user = jwt.verify(token, process.env.JWT_SECRET!);
-    } catch (err) {
-      // Token non valido, user rimane null
-    }
-  }
-  
-  // Rendering della pagina 500.ejs con le informazioni necessarie
-  res.status(500).render('500', {
-    user: user,
-    message: err.message || 'Si è verificato un errore interno del server',
-    error: process.env.NODE_ENV === 'development' ? err : undefined,
-    showLogout: !!user  // Mostra il pulsante logout se l'utente è autenticato
-  });
-});
-
 // Configurazione storage per i file caricati
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
@@ -1038,20 +968,71 @@ app.get('/orders/:id', authenticate, async (req: Request, res: Response): Promis
   }
 });
 
-// Gestione pagina 404 - deve essere sempre l'ultima route
-app.use((req, res) => {
+// Gestione pagina 404 - deve essere sempre DOPO tutte le route ma PRIMA dei middleware di gestione errori
+app.use((req: Request, res: Response) => {
   res.status(404).render('error', {
     user: req.user,
-    title: 'Pagina non trovata',  // Assicurati che title sia sempre definito
+    title: 'Pagina non trovata',
     errorMessage: 'La pagina richiesta non è stata trovata',
     showLogout: !!req.user
   });
 });
 
-// Aggiungi questo prima della dichiarazione di app.listen
-// Middleware per la gestione degli errori
-app.use((err: Error, req: Request, res: Response, next: Function) => {
+// Middleware per intercettare errori specifici di database
+const dbErrorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction): void => {
+  // Controlla se è un errore di database
+  if (err.message && (
+      err.message.includes('max_user_connections') ||
+      err.message.includes('ECONNREFUSED') ||
+      err.sqlMessage?.includes('max_user_connections') ||
+      err.message.includes('ER_') ||
+      err.message.includes('connection') ||
+      err.code === 'ETIMEDOUT' ||
+      err.code === 'ENOTFOUND'
+  )) {
+    console.error('Errore database:', err);
+    
+    // Verifica se la richiesta è per un'API
+    if (req.path.startsWith('/api/') || req.xhr || req.headers.accept?.includes('application/json')) {
+      res.status(503).json({
+        success: false,
+        error: 'Servizio temporaneamente non disponibile',
+        message: 'Il server è attualmente sovraccarico. Riprova più tardi.'
+      });
+      return; // Termina l'esecuzione senza restituire nulla
+    }
+    
+    // Genera un codice di errore univoco per riferimento
+    const errorCode = 'DB' + Math.floor(1000 + Math.random() * 9000);
+    
+    res.status(503).render('error', {
+      user: req.user || null,
+      title: 'Errore di connessione',
+      errorMessage: 'Si è verificato un problema di connessione al database. Riprova più tardi.',
+      errorCode: errorCode,
+      showLogout: !!req.user
+    });
+    return; // Termina l'esecuzione senza restituire nulla
+  }
+  
+  // Passa al prossimo middleware se non è un errore database
+  next(err);
+};
+
+// Middleware generale per la gestione degli errori - DEVE ESSERE L'ULTIMO
+const generalErrorHandler: ErrorRequestHandler = (err: Error, req: Request, res: Response, next: NextFunction): void => {
   console.error('Errore dell\'applicazione:', err);
+  
+  // Verifica se la richiesta è per un'API
+  if (req.path.startsWith('/api/') || req.xhr || req.headers.accept?.includes('application/json')) {
+    res.status(500).json({
+      success: false,
+      error: 'Errore del server',
+      message: process.env.NODE_ENV === 'development' ? err.message : 'Si è verificato un errore interno'
+    });
+    return; // Termina l'esecuzione senza restituire nulla
+  }
+  
   res.status(500).render('error', {
     user: req.user || null,
     title: 'Errore del server',
@@ -1059,7 +1040,12 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
     error: process.env.NODE_ENV === 'development' ? err : null,
     showLogout: !!req.user
   });
-});
+  // Non è necessario un return qui poiché siamo alla fine della funzione
+};
+
+// Registra i middleware dopo la route 404
+app.use(dbErrorHandler);
+app.use(generalErrorHandler);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
