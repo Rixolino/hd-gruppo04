@@ -10,6 +10,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(newViewportMeta);
     }
 
+    // Rileva se il dispositivo utilizza Tizen
+    const isTizenDevice = (function() {
+        return navigator.userAgent.indexOf('Tizen') > -1 || 
+               navigator.appVersion.indexOf('Tizen') > -1 ||
+               (typeof window.tizen !== 'undefined');
+    })();
+
     // Gestione dinamica delle immagini con fallback per diversi ambienti
     const images = document.querySelectorAll('img');
     images.forEach(img => {
@@ -785,8 +792,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Funzione per costruire l'interfaccia
+    // Modifica la funzione buildInterface per supportare Tizen
     function buildInterface() {
+        if (isTizenDevice) {
+            buildTizenInterface();
+        } else {
+            buildStandardInterface();
+        }
+    }
+
+    // Funzione per costruire l'interfaccia standard (sposta il codice esistente qui)
+    function buildStandardInterface() {
         // Crea la barra di navigazione
         let navbarLinks;
         
@@ -1647,6 +1663,268 @@ const footer = `
         }
     }
 
+    // Nuova funzione per costruire l'interfaccia Tizen
+    function buildTizenInterface() {
+        // Determina i link in base allo stato di autenticazione
+        let buttonLinks;
+        
+        if (isAuthenticated) {
+            // Links per utenti autenticati
+            buttonLinks = `
+                <div class="tizen-button-row">
+                    <a href="/dashboard" class="tizen-button">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/about" class="tizen-button">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Chi Siamo</span>
+                    </a>
+                    <a href="/services" class="tizen-button">
+                        <i class="fas fa-cogs"></i>
+                        <span>Servizi</span>
+                    </a>
+                    <a href="/profile" class="tizen-button">
+                        <i class="fas fa-user"></i>
+                        <span>Profilo</span>
+                    </a>
+                    <a href="/settings" class="tizen-button">
+                        <i class="fas fa-cog"></i>
+                        <span>Impostazioni</span>
+                    </a>
+                    <a href="/auth/logout" class="tizen-button tizen-button-logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            `;
+        } else {
+            // Links per utenti non autenticati
+            buttonLinks = `
+                <div class="tizen-button-row">
+                    <a href="/" class="tizen-button">
+                        <i class="fas fa-home"></i>
+                        <span>Home</span>
+                    </a>
+                    <a href="/services" class="tizen-button">
+                        <i class="fas fa-cogs"></i>
+                        <span>Servizi</span>
+                    </a>
+                    <a href="/about" class="tizen-button">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Chi Siamo</span>
+                    </a>
+                    <a href="/contact" class="tizen-button">
+                        <i class="fas fa-envelope"></i>
+                        <span>Contatti</span>
+                    </a>
+                    <a href="/auth/login" class="tizen-button tizen-button-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Login</span>
+                    </a>
+                    <a href="/auth/register" class="tizen-button tizen-button-primary">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Registrati</span>
+                    </a>
+                </div>
+            `;
+        }
+
+        // Crea l'header legacy per Tizen
+        const tizenHeader = `
+            <header class="tizen-header">
+                <div class="tizen-logo">
+                    <i class="fas fa-laptop-code logo-icon"></i>
+                    <span class="tizen-title">Help<span class="tizen-title-accent">Digit</span></span>
+                </div>
+                ${buttonLinks}
+            </header>
+        `;
+
+        // Aggiungi CSS specifico per Tizen
+        const tizenStyles = `
+            <style>
+                /* Stili per l'interfaccia Tizen */
+                body {
+                    font-family: sans-serif;
+                    padding-top: 10px;
+                    background-color: #f2f2f2;
+                }
+                
+                .tizen-header {
+                    background-color: #143D80;
+                    color: white;
+                    padding: 15px 10px;
+                    text-align: center;
+                    margin-bottom: 20px;
+                    border-bottom: 3px solid #0f2b5b;
+                }
+                
+                .tizen-logo {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 15px;
+                }
+                
+                .logo-icon {
+                    font-size: 24px;
+                    margin-right: 10px;
+                    color: #f0f0f0;
+                }
+                
+                .tizen-title {
+                    font-size: 24px;
+                    font-weight: bold;
+                }
+                
+                .tizen-title-accent {
+                    color: #3b9dff;
+                }
+                
+                .tizen-button-row {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 10px;
+                    margin-top: 15px;
+                }
+                
+                .tizen-button {
+                    background-color: #f8f8f8;
+                    border: 1px solid #ddd;
+                    border-radius: 5px;
+                    color: #333;
+                    padding: 10px 15px;
+                    min-width: 100px;
+                    text-align: center;
+                    text-decoration: none;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    font-size: 14px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                }
+                
+                .tizen-button:hover {
+                    background-color: #eaeaea;
+                }
+                
+                .tizen-button i {
+                    font-size: 20px;
+                    margin-bottom: 5px;
+                    color: #143D80;
+                }
+                
+                .tizen-button-primary {
+                    background-color: #143D80;
+                    color: white;
+                }
+                
+                .tizen-button-primary i {
+                    color: white;
+                }
+                
+                .tizen-button-logout {
+                    background-color: #f8d7da;
+                    color: #721c24;
+                }
+                
+                .tizen-button-logout i {
+                    color: #721c24;
+                }
+                
+                /* Impostazioni tema scuro per Tizen */
+                body.dark-theme .tizen-header {
+                    background-color: #121212;
+                    border-bottom: 3px solid #2B99FF;
+                }
+                
+                body.dark-theme .tizen-button {
+                    background-color: #292929;
+                    border-color: #444;
+                    color: #e0e0e0;
+                }
+                
+                body.dark-theme .tizen-button i {
+                    color: #3b82f6;
+                }
+                
+                body.dark-theme .tizen-button-primary {
+                    background-color: #0078d7;
+                    color: white;
+                }
+                
+                body.dark-theme .tizen-button-logout {
+                    background-color: #4a1515;
+                    color: #f8d7da;
+                }
+                
+                body.dark-theme .tizen-button-logout i {
+                    color: #f8d7da;
+                }
+
+                /* Gestione accessibilità per Tizen */
+                .font-size-2 .tizen-button {
+                    font-size: 16px;
+                    padding: 12px 16px;
+                }
+                
+                .font-size-3 .tizen-button {
+                    font-size: 18px;
+                    padding: 14px 18px;
+                }
+                
+                /* Alto contrasto per Tizen */
+                body.high-contrast .tizen-header {
+                    background-color: #000;
+                    border-bottom-color: #fff;
+                }
+                
+                body.high-contrast .tizen-button {
+                    border: 2px solid #fff;
+                    color: #fff;
+                    background-color: #000;
+                }
+                
+                body.high-contrast .tizen-button i {
+                    color: #0099ff;
+                }
+            </style>
+        `;
+
+        // Inserisci gli stili Tizen nella head
+        document.head.insertAdjacentHTML('beforeend', tizenStyles);
+        
+        // Inserisci l'header Tizen all'inizio del body
+        document.body.insertAdjacentHTML('afterbegin', tizenHeader);
+        
+        // Usa il resto del codice standard per footer e altre funzionalità
+        // (ma con pulsanti legacy invece della navbar moderna)
+        // ...
+        
+        console.log('Interfaccia Tizen attivata');
+    }
+
+    // Aggiungi una funzione helper per forzare la modalità Tizen (per test)
+    window.toggleTizenMode = function() {
+        // Rimuovi tutti gli elementi dell'interfaccia esistenti
+        const header = document.querySelector('header');
+        if (header) header.remove();
+        
+        // Aggiorna lo stato Tizen
+        window.isTizenOverride = !window.isTizenOverride;
+        
+        // Ricrea l'interfaccia
+        if (window.isTizenOverride) {
+            buildTizenInterface();
+            console.log('Modalità Tizen attivata manualmente');
+        } else {
+            buildStandardInterface();
+            console.log('Modalità Tizen disattivata');
+        }
+    };
+
     // Aggiungi stili dinamici per le impostazioni di accessibilità
     const accessibilityStyles = `
         <style id="accessibility-styles">
@@ -2027,7 +2305,7 @@ const footer = `
                 border-width: 2px;
             }
 
-            /* Indicatore di focus più evidente per accessibilità */
+            /* Indicatori di focus più evidenti per accessibilità */
             body[class*="colorblind-"] *:focus {
                 outline: 3px solid var(--accent-color) !important;
                 outline-offset: 2px !important;
@@ -2229,4 +2507,390 @@ window.setColorblindMode = function(mode) {
         }
     }
 };
+
+// Funzione per costruire l'interfaccia Tizen (aggiungere dopo la funzione buildInterface)
+function buildTizenInterface() {
+    console.log('Dispositivo Tizen rilevato, caricamento interfaccia semplificata');
+    
+    // CSS specifico per Tizen - ottimizzato per TV e telecomandi
+    const tizenStyles = `
+        <style id="tizen-styles">
+            /* Stili base ottimizzati per TV */
+            body {
+                font-size: 1.2rem;
+                padding: 20px;
+                margin: 0;
+                background-color: #101010;
+                color: #f0f0f0;
+                font-family: 'Samsung Sans', 'Roboto', sans-serif;
+            }
+            
+            /* Navigazione con pulsanti grandi */
+            .tizen-nav {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: center;
+                background-color: rgba(0, 0, 0, 0.8);
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 10px;
+            }
+            
+            .tizen-logo {
+                display: flex;
+                align-items: center;
+                font-size: 1.8rem;
+                font-weight: bold;
+                color: white;
+                margin-right: auto;
+                padding: 0 20px;
+            }
+            
+            .tizen-logo i {
+                margin-right: 15px;
+                color: #3b82f6;
+                font-size: 2rem;
+            }
+            
+            .tizen-nav-buttons {
+                display: flex;
+                gap: 15px;
+            }
+            
+            .tizen-btn {
+                background-color: #2c2c2c;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 1.2rem;
+                border: none;
+                min-width: 150px;
+                text-align: center;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .tizen-btn i {
+                margin-right: 10px;
+                font-size: 1.4rem;
+            }
+            
+            .tizen-btn:hover, .tizen-btn:focus {
+                background-color: #3b82f6;
+                transform: scale(1.05);
+            }
+            
+            /* Focus style per navigazione con telecomando */
+            .tizen-btn:focus {
+                outline: 4px solid #ffcc00;
+                box-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+            }
+            
+            /* Stile per il footer semplificato */
+            .tizen-footer {
+                margin-top: 50px;
+                padding: 20px;
+                background-color: rgba(0, 0, 0, 0.8);
+                border-radius: 10px;
+                text-align: center;
+                font-size: 1rem;
+            }
+            
+            /* Supporto per tema scuro (default su Tizen) */
+            .dark-theme {
+                background-color: #101010;
+                color: #f0f0f0;
+            }
+            
+            /* Stile per le card contenuti */
+            .tizen-card {
+                background-color: rgba(50, 50, 50, 0.8);
+                border-radius: 15px;
+                padding: 25px;
+                margin-bottom: 20px;
+                transition: transform 0.2s;
+            }
+            
+            .tizen-card:focus-within {
+                transform: scale(1.02);
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            }
+            
+            /* Gestione accessibilità per telecomandi */
+            .visually-hidden {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+            
+            /* Tooltip per aiuti alla navigazione */
+            .tv-controls-hint {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: rgba(0, 0, 0, 0.7);
+                padding: 10px 15px;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                display: flex;
+                align-items: center;
+                z-index: 1000;
+            }
+            
+            .tv-controls-hint span {
+                margin: 0 5px;
+                font-weight: bold;
+                color: #ffcc00;
+            }
+            
+            /* Menu a schermo intero per Tizen */
+            .tizen-fullscreen-menu {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.9);
+                display: none;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+            }
+            
+            .tizen-fullscreen-menu.active {
+                display: flex;
+            }
+            
+            .tizen-menu-btn {
+                background-color: #333;
+                color: white;
+                width: 60%;
+                margin: 15px 0;
+                padding: 20px;
+                font-size: 1.5rem;
+                border-radius: 15px;
+                text-align: center;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .tizen-menu-btn:focus {
+                outline: 4px solid #ffcc00;
+                background-color: #3b82f6;
+            }
+            
+            .tizen-menu-close {
+                position: absolute;
+                top: 30px;
+                right: 30px;
+                background-color: #ff3b30;
+                color: white;
+                border: none;
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+        </style>
+    `;
+    
+    document.head.insertAdjacentHTML('beforeend', tizenStyles);
+    
+    // Navbar semplificata con pulsanti grandi
+    const tizenNavbar = `
+        <header class="tizen-nav">
+            <div class="tizen-logo">
+                <i class="fas fa-laptop-code"></i>
+                <span>HelpDigit</span>
+            </div>
+            <div class="tizen-nav-buttons">
+                <button class="tizen-btn" id="tizen-home-btn" tabindex="1">
+                    <i class="fas fa-home"></i> Home
+                </button>
+                <button class="tizen-btn" id="tizen-services-btn" tabindex="2">
+                    <i class="fas fa-cogs"></i> Servizi
+                </button>
+                <button class="tizen-btn" id="tizen-menu-btn" tabindex="3">
+                    <i class="fas fa-bars"></i> Menu
+                </button>
+            </div>
+        </header>
+    `;
+    
+    // Menu a schermo intero per la navigazione completa
+    const tizenFullscreenMenu = `
+        <div id="tizen-fullscreen-menu" class="tizen-fullscreen-menu">
+            <button class="tizen-menu-close" id="tizen-menu-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <button class="tizen-menu-btn" data-href="/" tabindex="101">
+                <i class="fas fa-home"></i> Home
+            </button>
+            <button class="tizen-menu-btn" data-href="/services" tabindex="102">
+                <i class="fas fa-cogs"></i> Servizi
+            </button>
+            <button class="tizen-menu-btn" data-href="/about" tabindex="103">
+                <i class="fas fa-info-circle"></i> Chi Siamo
+            </button>
+            <button class="tizen-menu-btn" data-href="/contact" tabindex="104">
+                <i class="fas fa-envelope"></i> Contatti
+            </button>
+            ${isAuthenticated ? `
+                <button class="tizen-menu-btn" data-href="/dashboard" tabindex="105">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                <button class="tizen-menu-btn" data-href="/profile" tabindex="106">
+                    <i class="fas fa-user"></i> Profilo
+                </button>
+                <button class="tizen-menu-btn" data-href="/settings" tabindex="107">
+                    <i class="fas fa-cog"></i> Impostazioni
+                </button>
+                <button class="tizen-menu-btn" data-href="/auth/logout" tabindex="108">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            ` : `
+                <button class="tizen-menu-btn" data-href="/auth/login" tabindex="105">
+                    <i class="fas fa-sign-in-alt"></i> Accedi
+                </button>
+                <button class="tizen-menu-btn" data-href="/auth/register" tabindex="106">
+                    <i class="fas fa-user-plus"></i> Registrati
+                </button>
+            `}
+        </div>
+    `;
+    
+    // Footer semplificato
+    const tizenFooter = `
+        <footer class="tizen-footer">
+            <p>&copy; ${new Date().getFullYear()} BetaCloud HelpDigit. Tutti i diritti riservati.</p>
+            <p>Ottimizzato per dispositivi Tizen</p>
+        </footer>
+        
+        <div class="tv-controls-hint">
+            <i class="fas fa-arrow-alt-circle-up"></i>
+            <i class="fas fa-arrow-alt-circle-down"></i>
+            <span>Frecce</span> per navigare &bull; 
+            <span>Enter</span> per selezionare &bull;
+            <span>Back</span> per tornare
+        </div>
+    `;
+    
+    // Inserisci gli elementi nell'HTML
+    document.body.insertAdjacentHTML('afterbegin', tizenNavbar);
+    document.body.insertAdjacentHTML('beforeend', tizenFooter);
+    document.body.insertAdjacentHTML('beforeend', tizenFullscreenMenu);
+    
+    // Aggiungi Font Awesome per le icone (se non già presente)
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+        const fontAwesome = document.createElement('link');
+        fontAwesome.rel = 'stylesheet';
+        fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+        document.head.appendChild(fontAwesome);
+    }
+    
+    // Avvolgi il contenuto principale in una card Tizen
+    const mainContent = document.querySelector('main');
+    if (mainContent) {
+        const contentHtml = mainContent.innerHTML;
+        mainContent.innerHTML = `<div class="tizen-card">${contentHtml}</div>`;
+    }
+    
+    // Aggiungi supporto per la navigazione con tastiera e telecomando
+    document.addEventListener('keydown', function(e) {
+        // Gestisci la navigazione con tasti freccia
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            // Logica per navigare tra i pulsanti
+            console.log('Navigazione con frecce su Tizen');
+        }
+        
+        // Menu completo con tasto Menu o M
+        if (e.key === 'Menu' || e.key === 'm') {
+            document.getElementById('tizen-fullscreen-menu').classList.toggle('active');
+        }
+        
+        // Tasto Back o Escape per chiudere menu
+        if (e.key === 'Back' || e.key === 'Escape') {
+            document.getElementById('tizen-fullscreen-menu').classList.remove('active');
+        }
+    });
+    
+    // Aggiungi gestione eventi per i pulsanti
+    document.getElementById('tizen-home-btn')?.addEventListener('click', () => {
+        window.location.href = '/';
+    });
+    
+    document.getElementById('tizen-services-btn')?.addEventListener('click', () => {
+        window.location.href = '/services';
+    });
+    
+    document.getElementById('tizen-menu-btn')?.addEventListener('click', () => {
+        document.getElementById('tizen-fullscreen-menu').classList.add('active');
+    });
+    
+    document.getElementById('tizen-menu-close')?.addEventListener('click', () => {
+        document.getElementById('tizen-fullscreen-menu').classList.remove('active');
+    });
+    
+    // Collega tutti i pulsanti del menu
+    document.querySelectorAll('.tizen-menu-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const url = btn.getAttribute('data-href');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+        
+        // Aggiungi supporto per Enter
+        btn.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                btn.click();
+            }
+        });
+    });
+    
+    // Applica le impostazioni utente
+    applyUserSettings(userSettings);
+    
+    // Ottimizza per performance su dispositivi con risorse limitate
+    disableHeavyAnimations();
+}
+
+// Funzione per ottimizzare le performance su dispositivi Tizen
+function disableHeavyAnimations() {
+    // Rimuovi tutte le animazioni AOS
+    if (window.AOS) {
+        window.AOS.init({ disable: true });
+    }
+    
+    // Rimuovi o semplifica altre animazioni pesanti
+    document.querySelectorAll('.service-card, [data-aos], .card, .animation, .animated').forEach(el => {
+        el.style.animation = 'none';
+        el.style.transition = 'none';
+        if (el.classList.contains('service-card')) {
+            el.classList.add('tizen-optimized');
+        }
+    });
+    
+    // Riduci la qualità delle immagini per migliorare le prestazioni
+    document.querySelectorAll('img').forEach(img => {
+        if (!img.classList.contains('essential-img')) {
+            img.loading = 'lazy';
+            img.decoding = 'async';
+        }
+    });
+    
+    console.log('Ottimizzazioni per Tizen applicate');
+}
 
