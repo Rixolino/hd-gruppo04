@@ -1,3 +1,192 @@
+// Rilevamento e supporto per browser Tizen
+(function() {
+    // Funzione per rilevare il browser Tizen
+    function isTizenBrowser() {
+        return /Tizen/.test(navigator.userAgent) || 
+               /SMART-TV/.test(navigator.userAgent) || 
+               /SmartTV/.test(navigator.userAgent);
+    }
+    
+    // Funzione per ottimizzare le prestazioni su Tizen
+    function optimizeForTizen() {
+        console.log('Browser Tizen rilevato. Applicazione ottimizzazioni...');
+        
+        // Imposta flag globale
+        window.isTizenDevice = true;
+        
+        // Aggiungi classe al body per stili specifici
+        document.documentElement.classList.add('tizen-browser');
+        
+        // Polyfill per funzionalità mancanti nei browser Tizen
+        // Array.from polyfill
+        if (!Array.from) {
+            Array.from = function(arrayLike) {
+                return [].slice.call(arrayLike);
+            };
+        }
+        
+        // Promise polyfill (versione semplificata)
+        if (!window.Promise) {
+            window.Promise = function(executor) {
+                this.then = function() { return this; };
+                this.catch = function() { return this; };
+                try { executor(function(){}, function(){}); } catch(e) {}
+            };
+            window.Promise.resolve = function() { return new window.Promise(function(){}); };
+            window.Promise.reject = function() { return new window.Promise(function(){}); };
+            window.Promise.all = function() { return new window.Promise(function(){}); };
+        }
+        
+        // NodeList.forEach polyfill
+        if (window.NodeList && !NodeList.prototype.forEach) {
+            NodeList.prototype.forEach = Array.prototype.forEach;
+        }
+        
+        // Fetch API polyfill (versione semplificata)
+        if (!window.fetch) {
+            window.fetch = function(url, options) {
+                return new Promise(function(resolve, reject) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open((options && options.method) || 'GET', url);
+                    
+                    if (options && options.headers) {
+                        for (var header in options.headers) {
+                            xhr.setRequestHeader(header, options.headers[header]);
+                        }
+                    }
+                    
+                    xhr.onload = function() {
+                        var response = {
+                            ok: xhr.status >= 200 && xhr.status < 300,
+                            status: xhr.status,
+                            statusText: xhr.statusText,
+                            json: function() { return Promise.resolve(JSON.parse(xhr.responseText)); },
+                            text: function() { return Promise.resolve(xhr.responseText); }
+                        };
+                        resolve(response);
+                    };
+                    
+                    xhr.onerror = function() {
+                        reject(new Error('Network request failed'));
+                    };
+                    
+                    xhr.send((options && options.body) || null);
+                });
+            };
+        }
+
+        // Ottimizza animazioni e transizioni
+        var styleEl = document.createElement('style');
+        styleEl.innerHTML = `
+            /* Stili ottimizzati per Tizen */
+            .tizen-browser * {
+                transition-duration: 0.1s !important;
+                animation-duration: 0.1s !important;
+            }
+            .tizen-browser .smart-navbar {
+                background-color: var(--navbar-solid) !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+            }
+            .tizen-browser .progress-bar,
+            .tizen-browser .btn-glow:before {
+                animation: none !important;
+            }
+            .tizen-browser .shadow,
+            .tizen-browser .shadow-sm,
+            .tizen-browser .shadow-lg {
+                box-shadow: none !important;
+            }
+            /* Disabilita effetti che potrebbero causare problemi */
+            .tizen-browser .dropdown-menu,
+            .tizen-browser .modal-content {
+                animation: none !important;
+                transition: none !important;
+            }
+            /* Semplificazioni per migliorare le prestazioni */
+            .tizen-browser .card {
+                border: 1px solid rgba(0,0,0,0.125) !important;
+                box-shadow: none !important;
+            }
+            .tizen-browser img {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+        `;
+        document.head.appendChild(styleEl);
+        
+        // Disabilita AOS per Tizen
+        window.AOS = {
+            init: function() {},
+            refresh: function() {},
+            refreshHard: function() {}
+        };
+        
+        // Semplifica il caricamento delle immagini
+        window.addEventListener('DOMContentLoaded', function() {
+            // Carica le immagini in modo progressivo
+            var images = document.querySelectorAll('img');
+            for (var i = 0; i < images.length; i++) {
+                images[i].loading = 'lazy';
+                
+                // Rimuovi gli effetti dalle immagini
+                images[i].style.transition = 'none';
+                images[i].classList.remove('fade-in', 'animate');
+            }
+            
+            // Ottimizza gli event listener
+            simplifyEventListeners();
+        });
+    }
+    
+    // Semplifica gli event listener per migliorare le prestazioni
+    function simplifyEventListeners() {
+        // Per Tizen usiamo un solo handler per lo scroll invece di molti
+        var lastScrollPos = window.pageYOffset;
+        var scrollHandlers = [];
+        
+        // Sostituisci tutti gli event listener di scroll esistenti
+        window.addEventListener('scroll', debounce(function() {
+            var currentScrollPos = window.pageYOffset;
+            var scrollDirection = currentScrollPos > lastScrollPos ? 'down' : 'up';
+            var scrollData = {
+                position: currentScrollPos,
+                direction: scrollDirection
+            };
+            
+            // Navbar semplificata per Tizen
+            var navbar = document.querySelector('.smart-navbar');
+            if (navbar) {
+                if (currentScrollPos > 10) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+            
+            lastScrollPos = currentScrollPos;
+        }, 100));
+        
+        // Funzione di debounce per limitare le chiamate frequenti
+        function debounce(func, wait) {
+            var timeout;
+            return function() {
+                var context = this, args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(function() {
+                    func.apply(context, args);
+                }, wait);
+            };
+        }
+    }
+    
+    // Esegui rilevamento e ottimizzazione
+    if (isTizenBrowser()) {
+        // Applica le ottimizzazioni prima del caricamento completo
+        optimizeForTizen();
+    }
+})();
+
 document.addEventListener('DOMContentLoaded', function() {
     // Imposta il meta tag viewport per impedire lo zoom sui dispositivi mobili
     const viewportMeta = document.querySelector('meta[name="viewport"]');
@@ -2230,191 +2419,3 @@ window.setColorblindMode = function(mode) {
     }
 };
 
-// Rilevamento e supporto per browser Tizen
-(function() {
-    // Funzione per rilevare il browser Tizen
-    function isTizenBrowser() {
-        return /Tizen/.test(navigator.userAgent) || 
-               /SMART-TV/.test(navigator.userAgent) || 
-               /SmartTV/.test(navigator.userAgent);
-    }
-    
-    // Funzione per ottimizzare le prestazioni su Tizen
-    function optimizeForTizen() {
-        console.log('Browser Tizen rilevato. Applicazione ottimizzazioni...');
-        
-        // Imposta flag globale
-        window.isTizenDevice = true;
-        
-        // Aggiungi classe al body per stili specifici
-        document.documentElement.classList.add('tizen-browser');
-        
-        // Polyfill per funzionalità mancanti nei browser Tizen
-        // Array.from polyfill
-        if (!Array.from) {
-            Array.from = function(arrayLike) {
-                return [].slice.call(arrayLike);
-            };
-        }
-        
-        // Promise polyfill (versione semplificata)
-        if (!window.Promise) {
-            window.Promise = function(executor) {
-                this.then = function() { return this; };
-                this.catch = function() { return this; };
-                try { executor(function(){}, function(){}); } catch(e) {}
-            };
-            window.Promise.resolve = function() { return new window.Promise(function(){}); };
-            window.Promise.reject = function() { return new window.Promise(function(){}); };
-            window.Promise.all = function() { return new window.Promise(function(){}); };
-        }
-        
-        // NodeList.forEach polyfill
-        if (window.NodeList && !NodeList.prototype.forEach) {
-            NodeList.prototype.forEach = Array.prototype.forEach;
-        }
-        
-        // Fetch API polyfill (versione semplificata)
-        if (!window.fetch) {
-            window.fetch = function(url, options) {
-                return new Promise(function(resolve, reject) {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open((options && options.method) || 'GET', url);
-                    
-                    if (options && options.headers) {
-                        for (var header in options.headers) {
-                            xhr.setRequestHeader(header, options.headers[header]);
-                        }
-                    }
-                    
-                    xhr.onload = function() {
-                        var response = {
-                            ok: xhr.status >= 200 && xhr.status < 300,
-                            status: xhr.status,
-                            statusText: xhr.statusText,
-                            json: function() { return Promise.resolve(JSON.parse(xhr.responseText)); },
-                            text: function() { return Promise.resolve(xhr.responseText); }
-                        };
-                        resolve(response);
-                    };
-                    
-                    xhr.onerror = function() {
-                        reject(new Error('Network request failed'));
-                    };
-                    
-                    xhr.send((options && options.body) || null);
-                });
-            };
-        }
-
-        // Ottimizza animazioni e transizioni
-        var styleEl = document.createElement('style');
-        styleEl.innerHTML = `
-            /* Stili ottimizzati per Tizen */
-            .tizen-browser * {
-                transition-duration: 0.1s !important;
-                animation-duration: 0.1s !important;
-            }
-            .tizen-browser .smart-navbar {
-                background-color: var(--navbar-solid) !important;
-                backdrop-filter: none !important;
-                -webkit-backdrop-filter: none !important;
-            }
-            .tizen-browser .progress-bar,
-            .tizen-browser .btn-glow:before {
-                animation: none !important;
-            }
-            .tizen-browser .shadow,
-            .tizen-browser .shadow-sm,
-            .tizen-browser .shadow-lg {
-                box-shadow: none !important;
-            }
-            /* Disabilita effetti che potrebbero causare problemi */
-            .tizen-browser .dropdown-menu,
-            .tizen-browser .modal-content {
-                animation: none !important;
-                transition: none !important;
-            }
-            /* Semplificazioni per migliorare le prestazioni */
-            .tizen-browser .card {
-                border: 1px solid rgba(0,0,0,0.125) !important;
-                box-shadow: none !important;
-            }
-            .tizen-browser img {
-                max-width: 100% !important;
-                height: auto !important;
-            }
-        `;
-        document.head.appendChild(styleEl);
-        
-        // Disabilita AOS per Tizen
-        window.AOS = {
-            init: function() {},
-            refresh: function() {},
-            refreshHard: function() {}
-        };
-        
-        // Semplifica il caricamento delle immagini
-        window.addEventListener('DOMContentLoaded', function() {
-            // Carica le immagini in modo progressivo
-            var images = document.querySelectorAll('img');
-            for (var i = 0; i < images.length; i++) {
-                images[i].loading = 'lazy';
-                
-                // Rimuovi gli effetti dalle immagini
-                images[i].style.transition = 'none';
-                images[i].classList.remove('fade-in', 'animate');
-            }
-            
-            // Ottimizza gli event listener
-            simplifyEventListeners();
-        });
-    }
-    
-    // Semplifica gli event listener per migliorare le prestazioni
-    function simplifyEventListeners() {
-        // Per Tizen usiamo un solo handler per lo scroll invece di molti
-        var lastScrollPos = window.pageYOffset;
-        var scrollHandlers = [];
-        
-        // Sostituisci tutti gli event listener di scroll esistenti
-        window.addEventListener('scroll', debounce(function() {
-            var currentScrollPos = window.pageYOffset;
-            var scrollDirection = currentScrollPos > lastScrollPos ? 'down' : 'up';
-            var scrollData = {
-                position: currentScrollPos,
-                direction: scrollDirection
-            };
-            
-            // Navbar semplificata per Tizen
-            var navbar = document.querySelector('.smart-navbar');
-            if (navbar) {
-                if (currentScrollPos > 10) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
-            }
-            
-            lastScrollPos = currentScrollPos;
-        }, 100));
-        
-        // Funzione di debounce per limitare le chiamate frequenti
-        function debounce(func, wait) {
-            var timeout;
-            return function() {
-                var context = this, args = arguments;
-                clearTimeout(timeout);
-                timeout = setTimeout(function() {
-                    func.apply(context, args);
-                }, wait);
-            };
-        }
-    }
-    
-    // Esegui rilevamento e ottimizzazione
-    if (isTizenBrowser()) {
-        // Applica le ottimizzazioni prima del caricamento completo
-        optimizeForTizen();
-    }
-})();

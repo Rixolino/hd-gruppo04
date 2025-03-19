@@ -16,6 +16,27 @@
     --theme-border-color: rgba(0,0,0,.125);
     --theme-bg-color: #fff;
     --theme-list-item-bg: transparent;
+    
+    /* Palette colori fluorescenti */
+    --fluo-pink: #ff1493;
+    --fluo-green: #00ff00;
+    --fluo-yellow: #ffff00;
+    --fluo-blue: #00ffff;
+    --fluo-orange: #ff6600;
+    --fluo-purple: #cc00ff;
+    
+    /* Valori per gradiente e animazione */
+    --fluo-gradient-light: linear-gradient(45deg, 
+        rgba(255, 20, 147, 0.2), 
+        rgba(0, 255, 255, 0.2), 
+        rgba(0, 255, 0, 0.2), 
+        rgba(255, 255, 0, 0.2));
+    --fluo-gradient-dark: linear-gradient(45deg, 
+        rgba(255, 20, 147, 0.15), 
+        rgba(0, 255, 255, 0.15), 
+        rgba(0, 255, 0, 0.15), 
+        rgba(255, 255, 0, 0.15));
+    --fluo-glow-filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
 }
 
 /* Tema scuro */
@@ -374,4 +395,156 @@ body.dark-theme .jumbotron.p-4.bg-dark-subtle a:not(.btn):hover {
 body.dark-theme .list-group-item {
   background-color: var(--theme-list-item-bg);
   border-color: var(--theme-border-color);
+}
+
+/* Sfondi fluorescenti */
+/* Classe base per sfondo fluorescente */
+.fluo-bg {
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Sfondo fluo statico */
+.fluo-bg::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: var(--fluo-gradient-light);
+    opacity: 0.7;
+}
+
+/* Sfondo fluo animato */
+.fluo-bg-animated::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background: var(--fluo-gradient-light);
+    opacity: 0.7;
+    animation: fluo-pulse 8s infinite alternate;
+}
+
+/* Tema scuro - regola opacità e colori */
+body.dark-theme.fluo-bg::before,
+body.dark-theme .fluo-bg::before {
+    background: var(--fluo-gradient-dark);
+    opacity: 0.4;
+}
+
+/* Animazioni */
+@keyframes fluo-pulse {
+    0% {
+        background-position: 0% 0%;
+        filter: hue-rotate(0deg);
+    }
+    50% {
+        background-position: 100% 100%;
+        filter: hue-rotate(180deg);
+    }
+    100% {
+        background-position: 0% 0%;
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* Effetto mesh gradiente più intenso */
+.fluo-mesh {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: 
+        radial-gradient(circle at 50% 50%, var(--fluo-pink) 0%, transparent 20%),
+        radial-gradient(circle at 80% 20%, var(--fluo-green) 0%, transparent 20%),
+        radial-gradient(circle at 10% 70%, var(--fluo-blue) 0%, transparent 20%),
+        radial-gradient(circle at 90% 90%, var(--fluo-yellow) 0%, transparent 20%),
+        radial-gradient(circle at 30% 30%, var(--fluo-purple) 0%, transparent 20%);
+    background-size: 300% 300%;
+    opacity: 0.15;
+    mix-blend-mode: screen;
+    animation: fluo-mesh 15s ease infinite;
+}
+
+body.dark-theme .fluo-mesh {
+    opacity: 0.10;
+    mix-blend-mode: screen;
+}
+
+@keyframes fluo-mesh {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 0%; }
+}
+
+/* Effetti neon per elementi UI */
+.fluo-card {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 0 15px rgba(255, 20, 147, 0.3) !important;
+}
+
+.fluo-button {
+    border: none;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    transition: color 0.3s ease;
+}
+
+.fluo-button::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, var(--fluo-pink), var(--fluo-blue));
+    z-index: -1;
+    transition: opacity 0.3s ease;
+}
+
+.fluo-button:hover::before {
+    opacity: 0.8;
+}
+
+/* Regolazioni per l'accessibilità */
+body[data-high-contrast="true"] .fluo-bg::before,
+body[data-high-contrast="true"] .fluo-bg-animated::before,
+body[data-high-contrast="true"] .fluo-mesh {
+    opacity: 0.1 !important;
+}
+
+body[data-reduce-animations="true"] .fluo-bg-animated::before,
+body[data-reduce-animations="true"] .fluo-mesh {
+    animation: none !important;
+}
+
+/* Testo leggibile su sfondo fluo */
+.fluo-bg .card,
+.fluo-bg .container-white {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+body.dark-theme.fluo-bg .card, 
+body.dark-theme .fluo-bg .card,
+body.dark-theme.fluo-bg .container-white,
+body.dark-theme .fluo-bg .container-white {
+    background-color: rgba(30, 30, 30, 0.9) !important;
+}
+
+/* Supporto per Tizen (Browser Smart TV) */
+.tizen-browser .fluo-bg::before,
+.tizen-browser .fluo-bg-animated::before,
+.tizen-browser .fluo-mesh {
+    animation: none !important;
+    background: linear-gradient(45deg, rgba(255, 20, 147, 0.1), rgba(0, 255, 0, 0.1));
+    opacity: 0.3;
 }
