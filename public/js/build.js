@@ -2766,9 +2766,9 @@ function buildTizenInterface() {
     console.log('Dispositivo Tizen rilevato, caricamento interfaccia semplificata');
     
     // CSS specifico per Tizen - ottimizzato per TV e telecomandi
-    const tizenStyles = `
+    const tizenCSS = `
         <style id="tizen-styles">
-            /* Stili base ottimizzati per TV */
+            /* Ottimizzazioni base per schermi TV */
             body {
                 font-size: 1.2rem;
                 padding: 20px;
@@ -2778,274 +2778,162 @@ function buildTizenInterface() {
                 font-family: 'Samsung Sans', 'Roboto', sans-serif;
             }
             
-            /* Navigazione con pulsanti grandi */
-            .tizen-nav {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-around;
-                align-items: center;
-                background-color: rgba(0, 0, 0, 0.8);
-                padding: 15px;
-                margin-bottom: 20px;
-                border-radius: 10px;
-            }
-            
-            .tizen-logo {
-                display: flex;
-                align-items: center;
-                font-size: 1.8rem;
-                font-weight: bold;
+            /* Grande header con pulsanti accessibili con telecomando */
+            .tv-header {
+                background-color: #0A1A2F;
                 color: white;
-                margin-right: auto;
-                padding: 0 20px;
-            }
-            
-            .tizen-logo i {
-                margin-right: 15px;
-                color: #3b82f6;
-                font-size: 2rem;
-            }
-            
-            .tizen-nav-buttons {
-                display: flex;
-                gap: 15px;
-            }
-            
-            .tizen-btn {
-                background-color: #2c2c2c;
-                color: white;
-                padding: 15px 25px;
-                border-radius: 10px;
-                cursor: pointer;
-                font-size: 1.2rem;
-                border: none;
-                min-width: 150px;
+                padding: 25px 20px;
                 text-align: center;
+                border-bottom: 3px solid #3b82f6;
+            }
+            
+            .tv-logo {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            
+            .tv-logo i {
+                font-size: 2.5rem;
+                color: #3b82f6;
+                margin-right: 15px;
+            }
+            
+            .tv-logo-text {
+                font-size: 2.5rem;
+                font-weight: bold;
+            }
+            
+            .tv-nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 20px;
+            }
+            
+            .tv-button {
+                background-color: #1E3A8A;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 15px 25px;
+                min-width: 180px;
+                font-size: 1.2rem;
+                cursor: pointer;
                 transition: all 0.2s;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                position: relative;
             }
             
-            .tizen-btn i {
+            .tv-button i {
                 margin-right: 10px;
                 font-size: 1.4rem;
             }
             
-            .tizen-btn:hover, .tizen-btn:focus {
-                background-color: #3b82f6;
-                transform: scale(1.05);
-            }
-            
-            /* Focus style per navigazione con telecomando */
-            .tizen-btn:focus {
+            /* Stile di focus per navigazione con telecomando */
+            .tv-button:focus {
                 outline: 4px solid #ffcc00;
-                box-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+                box-shadow: 0 0 0 6px rgba(255, 204, 0, 0.4);
+                transform: scale(1.05);
+                z-index: 10;
             }
             
-            /* Stile per il footer semplificato */
-            .tizen-footer {
-                margin-top: 50px;
-                padding: 20px;
-                background-color: rgba(0, 0, 0, 0.8);
-                border-radius: 10px;
-                text-align: center;
-                font-size: 1rem;
-            }
-            
-            /* Supporto per tema scuro (default su Tizen) */
-            .dark-theme {
-                background-color: #101010;
-                color: #f0f0f0;
-            }
-            
-            /* Stile per le card contenuti */
-            .tizen-card {
-                background-color: rgba(50, 50, 50, 0.8);
-                border-radius: 15px;
-                padding: 25px;
-                margin-bottom: 20px;
-                transition: transform 0.2s;
-            }
-            
-            .tizen-card:focus-within {
-                transform: scale(1.02);
-                box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-            }
-            
-            /* Gestione accessibilità per telecomandi */
-            .visually-hidden {
-                position: absolute;
-                width: 1px;
-                height: 1px;
-                padding: 0;
-                margin: -1px;
-                overflow: hidden;
-                clip: rect(0, 0, 0, 0);
-                white-space: nowrap;
-                border: 0;
-            }
-            
-            /* Tooltip per aiuti alla navigazione */
-            .tv-controls-hint {
+            /* Indicatore di navigazione */
+            .tv-focus-guide {
                 position: fixed;
                 bottom: 20px;
                 right: 20px;
-                background-color: rgba(0, 0, 0, 0.7);
-                padding: 10px 15px;
+                background-color: rgba(0, 0, 0, 0.8);
+                color: white;
                 border-radius: 8px;
-                font-size: 0.9rem;
-                display: flex;
-                align-items: center;
+                padding: 10px 15px;
+                font-size: 1rem;
                 z-index: 1000;
             }
             
-            .tv-controls-hint span {
-                margin: 0 5px;
-                font-weight: bold;
+            .tv-focus-guide span {
                 color: #ffcc00;
+                font-weight: bold;
+                margin: 0 3px;
             }
             
-            /* Menu a schermo intero per Tizen */
-            .tizen-fullscreen-menu {
+            /* Wrapper per il contenuto principale */
+            .tv-content {
+                padding: 30px;
+                margin: 20px auto;
+                max-width: 90%;
+                background-color: rgba(30, 41, 59, 0.8);
+                border-radius: 10px;
+                backdrop-filter: blur(5px);
+            }
+            
+            /* Pulsante back sempre visibile */
+            .tv-back-button {
                 position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.9);
-                display: none;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
-            }
-            
-            .tizen-fullscreen-menu.active {
+                top: 20px;
+                left: 20px;
+                background-color: rgba(59, 130, 246, 0.8);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 20px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                z-index: 1000;
                 display: flex;
+                align-items: center;
             }
             
-            .tizen-menu-btn {
-                background-color: #333;
-                color: white;
-                width: 60%;
-                margin: 15px 0;
-                padding: 20px;
-                font-size: 1.5rem;
-                border-radius: 15px;
+            .tv-back-button:focus {
+                outline: 3px solid #ffcc00;
+                box-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+            }
+            
+            .tv-back-button i {
+                margin-right: 8px;
+            }
+            
+            /* Semplifica il footer */
+            .tv-footer {
+                background-color: #0A1A2F;
+                color: #e5e7eb;
                 text-align: center;
-                border: none;
-                cursor: pointer;
+                padding: 20px;
+                margin-top: 40px;
+                border-top: 1px solid #3b82f6;
             }
             
-            .tizen-menu-btn:focus {
-                outline: 4px solid #ffcc00;
-                background-color: #3b82f6;
+            /* Adattamenti specifici per form e card */
+            .card, .form-control, .btn {
+                border-radius: 8px;
+                font-size: 1.2rem;
             }
             
-            .tizen-menu-close {
-                position: absolute;
-                top: 30px;
-                right: 30px;
-                background-color: #ff3b30;
-                color: white;
-                border: none;
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                font-size: 1.5rem;
-                cursor: pointer;
+            /* Dimensioni speciali per elementi interattivi (per facilitare la navigazione) */
+            .form-control {
+                height: 50px;
+                padding: 10px 15px;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+            }
+            
+            /* Stato hover per elementi focused */
+            *:focus {
+                outline-color: #ffcc00 !important;
             }
         </style>
     `;
     
-    document.head.insertAdjacentHTML('beforeend', tizenStyles);
+    // Inserisci CSS nel documento
+    document.head.insertAdjacentHTML('beforeend', tizenCSS);
     
-    // Navbar semplificata con pulsanti grandi
-    const tizenNavbar = `
-        <header class="tizen-nav">
-            <div class="tizen-logo">
-                <i class="fas fa-laptop-code"></i>
-                <span>HelpDigit</span>
-            </div>
-            <div class="tizen-nav-buttons">
-                <button class="tizen-btn" id="tizen-home-btn" tabindex="1">
-                    <i class="fas fa-home"></i> Home
-                </button>
-                <button class="tizen-btn" id="tizen-services-btn" tabindex="2">
-                    <i class="fas fa-cogs"></i> Servizi
-                </button>
-                <button class="tizen-btn" id="tizen-menu-btn" tabindex="3">
-                    <i class="fas fa-bars"></i> Menu
-                </button>
-            </div>
-        </header>
-    `;
-    
-    // Menu a schermo intero per la navigazione completa
-    const tizenFullscreenMenu = `
-        <div id="tizen-fullscreen-menu" class="tizen-fullscreen-menu">
-            <button class="tizen-menu-close" id="tizen-menu-close">
-                <i class="fas fa-times"></i>
-            </button>
-            <button class="tizen-menu-btn" data-href="/" tabindex="101">
-                <i class="fas fa-home"></i> Home
-            </button>
-            <button class="tizen-menu-btn" data-href="/services" tabindex="102">
-                <i class="fas fa-cogs"></i> Servizi
-            </button>
-            <button class="tizen-menu-btn" data-href="/about" tabindex="103">
-                <i class="fas fa-info-circle"></i> Chi Siamo
-            </button>
-            <button class="tizen-menu-btn" data-href="/contact" tabindex="104">
-                <i class="fas fa-envelope"></i> Contatti
-            </button>
-            ${isAuthenticated ? `
-                <button class="tizen-menu-btn" data-href="/dashboard" tabindex="105">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </button>
-                <button class="tizen-menu-btn" data-href="/profile" tabindex="106">
-                    <i class="fas fa-user"></i> Profilo
-                </button>
-                <button class="tizen-menu-btn" data-href="/settings" tabindex="107">
-                    <i class="fas fa-cog"></i> Impostazioni
-                </button>
-                <button class="tizen-menu-btn" data-href="/auth/logout" tabindex="108">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            ` : `
-                <button class="tizen-menu-btn" data-href="/auth/login" tabindex="105">
-                    <i class="fas fa-sign-in-alt"></i> Accedi
-                </button>
-                <button class="tizen-menu-btn" data-href="/auth/register" tabindex="106">
-                    <i class="fas fa-user-plus"></i> Registrati
-                </button>
-            `}
-        </div>
-    `;
-    
-    // Footer semplificato
-    const tizenFooter = `
-        <footer class="tizen-footer">
-            <p>&copy; ${new Date().getFullYear()} BetaCloud HelpDigit. Tutti i diritti riservati.</p>
-            <p>Ottimizzato per dispositivi Tizen</p>
-        </footer>
-        
-        <div class="tv-controls-hint">
-            <i class="fas fa-arrow-alt-circle-up"></i>
-            <i class="fas fa-arrow-alt-circle-down"></i>
-            <span>Frecce</span> per navigare &bull; 
-            <span>Enter</span> per selezionare &bull;
-            <span>Back</span> per tornare
-        </div>
-    `;
-    
-    // Inserisci gli elementi nell'HTML
-    document.body.insertAdjacentHTML('afterbegin', tizenNavbar);
-    document.body.insertAdjacentHTML('beforeend', tizenFooter);
-    document.body.insertAdjacentHTML('beforeend', tizenFullscreenMenu);
-    
-    // Aggiungi Font Awesome per le icone (se non già presente)
+    // Carica Font Awesome se non è già presente
     if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesome = document.createElement('link');
         fontAwesome.rel = 'stylesheet';
@@ -3053,98 +2941,193 @@ function buildTizenInterface() {
         document.head.appendChild(fontAwesome);
     }
     
-    // Avvolgi il contenuto principale in una card Tizen
-    const mainContent = document.querySelector('main');
-    if (mainContent) {
-        const contentHtml = mainContent.innerHTML;
-        mainContent.innerHTML = `<div class="tizen-card">${contentHtml}</div>`;
+    // Crea l'header con navigazione ottimizzata per TV
+    const createHeader = () => {
+        const links = isAuthenticated ? 
+            `
+                <button class="tv-button" tabindex="1" data-href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>Dashboard
+                </button>
+                <button class="tv-button" tabindex="2" data-href="/services">
+                    <i class="fas fa-cogs"></i>Servizi
+                </button>
+                <button class="tv-button" tabindex="3" data-href="/profile">
+                    <i class="fas fa-user"></i>Profilo
+                </button>
+                <button class="tv-button" tabindex="4" data-href="/settings">
+                    <i class="fas fa-cog"></i>Impostazioni
+                </button>
+                <button class="tv-button" tabindex="5" data-href="/auth/logout" style="background-color: #CC0000;">
+                    <i class="fas fa-sign-out-alt"></i>Logout
+                </button>
+            ` : 
+            `
+                <button class="tv-button" tabindex="1" data-href="/">
+                    <i class="fas fa-home"></i>Home
+                </button>
+                <button class="tv-button" tabindex="2" data-href="/services">
+                    <i class="fas fa-cogs"></i>Servizi
+                </button>
+                <button class="tv-button" tabindex="3" data-href="/about">
+                    <i class="fas fa-info-circle"></i>Chi Siamo
+                </button>
+                <button class="tv-button" tabindex="4" data-href="/contact">
+                    <i class="fas fa-envelope"></i>Contatti
+                </button>
+                <button class="tv-button" tabindex="5" data-href="/auth/login" style="background-color: #1C64F2;">
+                    <i class="fas fa-sign-in-alt"></i>Accedi
+                </button>
+                <button class="tv-button" tabindex="6" data-href="/auth/register" style="background-color: #1C64F2;">
+                    <i class="fas fa-user-plus"></i>Registrati
+                </button>
+            `;
+            
+        return `
+            <header class="tv-header">
+                <div class="tv-logo">
+                    <i class="fas fa-laptop-code"></i>
+                    <div class="tv-logo-text">Help<span style="color: #3b82f6;">Digit</span></div>
+                </div>
+                <nav class="tv-nav">
+                    ${links}
+                </nav>
+            </header>
+        `;
+    };
+    
+    // Crea guide per la navigazione con telecomando
+    const createNavigationGuide = () => {
+        return `
+            <div class="tv-focus-guide">
+                <i class="fas fa-arrow-circle-left"></i>
+                <i class="fas fa-arrow-circle-right"></i>
+                <span>Naviga</span> • 
+                <span>Enter</span> per selezionare • 
+                <span>Back</span> per tornare
+            </div>
+        `;
+    };
+    
+    // Crea footer semplificato
+    const createFooter = () => {
+        return `
+            <footer class="tv-footer">
+                <p>&copy; ${new Date().getFullYear()} HelpDigit - Versione ottimizzata per TV Samsung</p>
+            </footer>
+        `;
+    };
+    
+    // Inserisci HTML nel documento
+    document.body.insertAdjacentHTML('afterbegin', createHeader());
+    document.body.insertAdjacentHTML('beforeend', createNavigationGuide());
+    document.body.insertAdjacentHTML('beforeend', createFooter());
+    
+    // Aggiungi pulsante indietro
+    document.body.insertAdjacentHTML('afterbegin', `
+        <button class="tv-back-button" id="tvBackButton">
+            <i class="fas fa-arrow-left"></i> Indietro
+        </button>
+    `);
+    
+    // Avvolgi il contenuto principale in un wrapper
+    const main = document.querySelector('main');
+    if (main) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'tv-content';
+        
+        // Sposta tutto il contenuto dell'elemento main nel nuovo wrapper
+        wrapper.innerHTML = main.innerHTML;
+        main.innerHTML = '';
+        main.appendChild(wrapper);
     }
     
-    // Aggiungi supporto per la navigazione con tastiera e telecomando
+    // Gestione eventi per supporto navigazione telecomando
     document.addEventListener('keydown', function(e) {
-        // Gestisci la navigazione con tasti freccia
-        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-            // Logica per navigare tra i pulsanti
-            console.log('Navigazione con frecce su Tizen');
-        }
+        console.log('Tasto premuto:', e.key);
         
-        // Menu completo con tasto Menu o M
-        if (e.key === 'Menu' || e.key === 'm') {
-            document.getElementById('tizen-fullscreen-menu').classList.toggle('active');
-        }
-        
-        // Tasto Back o Escape per chiudere menu
-        if (e.key === 'Back' || e.key === 'Escape') {
-            document.getElementById('tizen-fullscreen-menu').classList.remove('active');
-        }
-    });
-    
-    // Aggiungi gestione eventi per i pulsanti
-    document.getElementById('tizen-home-btn')?.addEventListener('click', () => {
-        window.location.href = '/';
-    });
-    
-    document.getElementById('tizen-services-btn')?.addEventListener('click', () => {
-        window.location.href = '/services';
-    });
-    
-    document.getElementById('tizen-menu-btn')?.addEventListener('click', () => {
-        document.getElementById('tizen-fullscreen-menu').classList.add('active');
-    });
-    
-    document.getElementById('tizen-menu-close')?.addEventListener('click', () => {
-        document.getElementById('tizen-fullscreen-menu').classList.remove('active');
-    });
-    
-    // Collega tutti i pulsanti del menu
-    document.querySelectorAll('.tizen-menu-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const url = btn.getAttribute('data-href');
-            if (url) {
-                window.location.href = url;
+        // Navigazione con frecce
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+            const focusableElements = Array.from(document.querySelectorAll('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])'));
+            const currentIndex = focusableElements.indexOf(document.activeElement);
+            
+            if (currentIndex > -1) {
+                let nextIndex;
+                
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    nextIndex = (currentIndex + 1) % focusableElements.length;
+                } else {
+                    nextIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
+                }
+                
+                focusableElements[nextIndex].focus();
+                e.preventDefault();
+            } else if (focusableElements.length > 0) {
+                // Se nessun elemento ha il focus, seleziona il primo
+                focusableElements[0].focus();
             }
-        });
+        }
         
-        // Aggiungi supporto per Enter
-        btn.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                btn.click();
+        // Gestione del tasto Enter
+        if (e.key === 'Enter' && document.activeElement) {
+            const href = document.activeElement.getAttribute('data-href');
+            if (href) {
+                window.location.href = href;
+            } else {
+                document.activeElement.click();
             }
+        }
+        
+        // Gestione del tasto Back/Return del telecomando
+        if (e.key === 'Backspace' || e.key === 'Back' || e.key === 'Escape') {
+            window.history.back();
+            e.preventDefault();
+        }
+    });
+    
+    // Collega gli eventi click sui pulsanti TV
+    document.querySelectorAll('.tv-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const href = button.getAttribute('data-href');
+            if (href) window.location.href = href;
         });
     });
     
-    // Applica le impostazioni utente
-    applyUserSettings(userSettings);
-    
-    // Ottimizza per performance su dispositivi con risorse limitate
-    disableHeavyAnimations();
-}
-
-// Funzione per ottimizzare le performance su dispositivi Tizen
-function disableHeavyAnimations() {
-    // Rimuovi tutte le animazioni AOS
-    if (window.AOS) {
-        window.AOS.init({ disable: true });
-    }
-    
-    // Rimuovi o semplifica altre animazioni pesanti
-    document.querySelectorAll('.service-card, [data-aos], .card, .animation, .animated').forEach(el => {
-        el.style.animation = 'none';
-        el.style.transition = 'none';
-        if (el.classList.contains('service-card')) {
-            el.classList.add('tizen-optimized');
-        }
+    // Collega il pulsante "Indietro"
+    document.getElementById('tvBackButton').addEventListener('click', () => {
+        window.history.back();
     });
     
-    // Riduci la qualità delle immagini per migliorare le prestazioni
-    document.querySelectorAll('img').forEach(img => {
-        if (!img.classList.contains('essential-img')) {
+    // Quando la pagina è caricata, imposta il focus sul primo elemento
+    window.addEventListener('load', () => {
+        const firstFocusable = document.querySelector('[tabindex="1"]');
+        if (firstFocusable) firstFocusable.focus();
+    });
+    
+    // Ottimizza le prestazioni disabilitando animazioni pesanti
+    const disableHeavyAnimations = () => {
+        // Rimuovi animazioni AOS
+        if (window.AOS) window.AOS.init({ disable: true });
+        
+        // Rimuovi altre animazioni pesanti
+        document.querySelectorAll('[data-aos], .animate__animated, .animated').forEach(el => {
+            el.style.animation = 'none';
+            el.style.transition = 'none';
+            el.classList.remove('animated');
+            el.removeAttribute('data-aos');
+        });
+        
+        // Carica le immagini con lazy loading
+        document.querySelectorAll('img').forEach(img => {
             img.loading = 'lazy';
-            img.decoding = 'async';
-        }
-    });
+            if (img.width > 600) {
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+            }
+        });
+    };
     
-    console.log('Ottimizzazioni per Tizen applicate');
+    disableHeavyAnimations();
+    applyUserSettings(userSettings);
 }
 
 // Aggiungi questa funzione in build.js per creare l'interfaccia Tizen
@@ -3517,4 +3500,246 @@ function buildTizenInterface() {
     disableHeavyAnimations();
     applyUserSettings(userSettings);
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ...existing code...
+    
+    // Aggiungi il CSS Material Design 3 per i pulsanti dopo gli stili delle card
+    const materialButtonStyles = `
+        <style id="material-design-buttons">
+            /* Pulsanti Material Design 3 */
+            .btn {
+                position: relative;
+                border-radius: 20px !important;
+                font-family: 'Poppins', sans-serif;
+                font-weight: 500;
+                letter-spacing: 0.01em;
+                text-transform: none;
+                padding: 10px 24px !important;
+                overflow: hidden;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: none !important;
+                text-decoration: none;
+                line-height: 1.5;
+                cursor: pointer;
+                border: none;
+            }
+
+            /* Pulsante primario filled (default) */
+            .btn-primary {
+                background-color: var(--primary-color, #143D80) !important;
+                color: white !important;
+            }
+
+            .btn-primary:hover {
+                box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2),
+                            0px 5px 10px 4px rgba(0, 0, 0, 0.2) !important;
+                background-color: var(--secondary-color, #0A2558) !important;
+                transform: translateY(-2px) scale(1.02) !important;
+            }
+
+            /* Pulsante outlined */
+            .btn-outline-primary {
+                background-color: transparent !important;
+                color: var(--primary-color, #143D80) !important;
+                border: 1px solid var(--primary-color, #143D80) !important;
+            }
+
+            .btn-outline-primary:hover {
+                background-color: rgba(var(--primary-color-rgb, 20, 61, 128), 0.15) !important;
+                transform: translateY(-2px) scale(1.02) !important;
+                border-width: 1.5px !important;
+            }
+
+            /* Pulsante text (nessun bordo, nessun background) */
+            .btn-text {
+                background-color: transparent !important;
+                color: var(--primary-color, #143D80) !important;
+                padding: 10px 12px !important;
+                box-shadow: none !important;
+            }
+
+            .btn-text:hover {
+                background-color: rgba(var(--primary-color-rgb, 20, 61, 128), 0.15) !important;
+                transform: translateY(-1px) !important;
+                font-weight: 600 !important;
+            }
+
+            /* Pulsante tonal (tono intermedio) */
+            .btn-tonal {
+                background-color: rgba(var(--primary-color-rgb, 20, 61, 128), 0.12) !important;
+                color: var(--primary-color, #143D80) !important;
+            }
+
+            .btn-tonal:hover {
+                background-color: rgba(var(--primary-color-rgb, 20, 61, 128), 0.25) !important;
+                box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.15),
+                            0px 2px 4px 0px rgba(0, 0, 0, 0.3) !important;
+                transform: translateY(-2px) scale(1.02) !important;
+            }
+
+            /* Pulsante elevated (con ombra) */
+            .btn-elevated {
+                background-color: white !important;
+                color: var(--primary-color, #143D80) !important;
+                box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.15),
+                            0px 1px 2px 0px rgba(0, 0, 0, 0.3) !important;
+            }
+
+            .btn-elevated:hover {
+                box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.15),
+                            0px 2px 5px 0px rgba(0, 0, 0, 0.3) !important;
+                transform: translateY(-3px) scale(1.03) !important;
+                background-color: #f8f9ff !important;
+            }
+
+            /* Stati comuni dei pulsanti */
+            .btn:active {
+                transform: scale(0.96) !important;
+                transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+
+            /* FAB (Floating Action Button) */
+            .btn-fab:hover {
+                box-shadow: 0px 5px 10px -3px rgba(0, 0, 0, 0.3),
+                            0px 8px 16px 3px rgba(0, 0, 0, 0.2) !important;
+                transform: translateY(-4px) scale(1.05) !important;
+            }
+
+            /* Bottoni con icona */
+            .btn-icon:hover {
+                transform: translateY(-2px) scale(1.1) !important;
+                background-color: rgba(var(--primary-color-rgb, 20, 61, 128), 0.12) !important;
+            }
+
+            /* Supporto tema scuro */
+            .dark-theme .btn-primary:hover {
+                background-color: #47a3ff !important;
+                box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.3),
+                            0px 5px 10px 4px rgba(0, 0, 0, 0.3) !important;
+            }
+
+            .dark-theme .btn-outline-primary:hover {
+                background-color: rgba(43, 153, 255, 0.25) !important;
+                color: white !important;
+            }
+
+            .dark-theme .btn-text:hover {
+                background-color: rgba(43, 153, 255, 0.25) !important;
+            }
+
+            .dark-theme .btn-tonal:hover {
+                background-color: rgba(43, 153, 255, 0.3) !important;
+            }
+
+            .dark-theme .btn-elevated:hover {
+                background-color: #353535 !important;
+                box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.4),
+                            0px 2px 5px 0px rgba(0, 0, 0, 0.4) !important;
+            }
+
+            /* Aumenta la durata delle transizioni per essere più visibili */
+            .btn {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                            box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                            background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            }
+        </style>
+    `;
+
+    // Estendi la funzione addMaterialRippleEffect per includere anche i pulsanti
+    const addMaterialRippleEffect = () => {
+        // Per le card
+        document.querySelectorAll('.card').forEach(card => {
+            if (!card.querySelector('.ripple-container') && 
+                (card.onclick || card.querySelector('a, button'))) {
+                
+                const rippleContainer = document.createElement('div');
+                rippleContainer.className = 'ripple-container';
+                card.appendChild(rippleContainer);
+                
+                card.addEventListener('mousedown', function(e) {
+                    createRipple(e, rippleContainer);
+                });
+            }
+        });
+
+        // Per i pulsanti
+        document.querySelectorAll('.btn').forEach(btn => {
+            if (!btn.querySelector('.ripple-container')) {
+                const rippleContainer = document.createElement('div');
+                rippleContainer.className = 'ripple-container';
+                btn.appendChild(rippleContainer);
+                
+                btn.addEventListener('mousedown', function(e) {
+                    createRipple(e, rippleContainer);
+                });
+            }
+        });
+    };
+
+    // Funzione per creare l'effetto ripple
+    const createRipple = (event, container) => {
+        const rect = container.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        
+        // Calcola il diametro in base alla dimensione dell'elemento
+        const diameter = Math.max(rect.width, rect.height) * 2;
+        
+        ripple.style.cssText = `
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: scale(0);
+            top: ${y - diameter/2}px;
+            left: ${x - diameter/2}px;
+            width: ${diameter}px;
+            height: ${diameter}px;
+            animation: ripple-animation 0.8s ease-out forwards;
+        `;
+        
+        container.appendChild(ripple);
+        
+        setTimeout(() => {
+            ripple.remove();
+        }, 800);
+    };
+    
+    // Inserisci gli stili Material Design per i pulsanti nel documento
+    document.head.insertAdjacentHTML('beforeend', materialButtonStyles);
+    
+    // Aggiungi un hook per applicare gli effetti Material dopo il caricamento dell'interfaccia
+    const originalBuildInterface = buildInterface;
+    buildInterface = function() {
+        originalBuildInterface();
+        
+        // Aggiungi le variabili RGB dei colori
+        addColorVariables();
+        
+        // Aggiungi gli effetti ripple alle card e pulsanti
+        setTimeout(addMaterialRippleEffect, 500);
+        
+        // Monitora i cambiamenti dinamici nel DOM
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.addedNodes.length) {
+                    setTimeout(addMaterialRippleEffect, 100);
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    };
+    
+    // ...existing code...
+});
 
