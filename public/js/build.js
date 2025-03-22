@@ -2047,32 +2047,147 @@ const footer = `
             
             /* Modalità daltonismo */
             body.colorblind-deuteranopia {
-                --primary-color: #0056b3;
-                --accent-color: #0078d7;
-                --highlight-color: #0099ff;
+                --primary-color: #0056b3;       /* Blu più intenso */
+                --accent-color: #0078d7;        /* Blu medio */
+                --highlight-color: #0099ff;     /* Blu chiaro */
+                --success-color: #9747FF;       /* Viola al posto del verde */
+                --danger-color: #d91919;        /* Rosso più intenso */
+                --warning-color: #f6d12e;       /* Giallo intenso */
+                --info-color: #00b8e6;          /* Ciano */
             }
             
+            body.colorblind-deuteranopia .btn-success {
+                background-color: #9747FF !important;
+                border-color: #8a35ea !important;
+                color: #FFFFFF !important;      /* Testo bianco per miglior contrasto */
+            }
+            
+            body.colorblind-deuteranopia .btn-danger {
+                background-color: #d91919 !important;
+                border-color: #c01616 !important;
+                color: #FFFFFF !important;      /* Testo bianco per miglior contrasto */
+            }
+            
+            body.colorblind-deuteranopia .btn-primary {
+                color: #FFFFFF !important;      /* Testo bianco per miglior contrasto */
+                font-weight: 600 !important;    /* Testo più spesso per migliorare la leggibilità */
+            }
+            
+            body.colorblind-deuteranopia .btn-outline-primary {
+                color: #0056b3 !important;      /* Colore del testo più scuro */
+                border-color: #0056b3 !important;
+                font-weight: 600 !important;    /* Testo più spesso */
+            }
+            
+            body.colorblind-deuteranopia .btn-outline-primary:hover {
+                background-color: rgba(0, 86, 179, 0.15) !important;
+                color: #00408d !important;      /* Testo ancora più scuro quando hover */
+            }
+            
+            /* PROTANOPIA - Difficoltà con il rosso */
             body.colorblind-protanopia {
-                --primary-color: #005994;
-                --accent-color: #0074cc;
-                --highlight-color: #0099e6;
+                --primary-color: #0074aa;       /* Blu scuro */
+                --accent-color: #00a0e9;        /* Blu chiaro */
+                --highlight-color: #30c7ff;     /* Ciano */
+                --success-color: #00a5c2;       /* Turchese al posto del verde */
+                --danger-color: #e69100;        /* Arancione al posto del rosso */
+                --warning-color: #fdda25;       /* Giallo intenso */
+                --info-color: #80d8ff;          /* Ciano chiaro */
             }
             
+            body.colorblind-protanopia .btn-success {
+                background-color: #00a5c2 !important;
+                border-color: #0090aa !important;
+                color: #FFFFFF !important;      /* Testo bianco per miglior contrasto */
+            }
+            
+            body.colorblind-protanopia .btn-danger {
+                background-color: #e69100 !important;
+                border-color: #cc8000 !important;
+                color: #000000 !important;      /* Testo nero per miglior contrasto con l'arancione */
+                font-weight: 600 !important;    /* Testo più spesso */
+            }
+            
+            body.colorblind-protanopia .btn-primary {
+                color: #FFFFFF !important;      /* Testo bianco */
+                font-weight: 600 !important;    /* Testo più spesso */
+            }
+            
+            body.colorblind-protanopia .btn-outline-primary {
+                color: #005880 !important;      /* Colore del testo più scuro */
+                border-color: #0074aa !important;
+                font-weight: 600 !important;    /* Testo più spesso */
+            }
+            
+            /* TRITANOPIA - Difficoltà con il blu */
             body.colorblind-tritanopia {
-                --primary-color: #8800aa;
-                --accent-color: #aa00d4;
-                --highlight-color: #cc00ff;
+                --primary-color: #8800aa;       /* Viola */
+                --accent-color: #aa00d4;        /* Viola intenso */
+                --highlight-color: #cc00ff;     /* Magenta */
+                --success-color: #d4aa00;       /* Oro anziché verde */
+                --danger-color: #d4002d;        /* Rosso magenta */
+                --warning-color: #d47500;       /* Arancione */
+                --info-color: #aa557f;          /* Rosa medio */
             }
             
-            /* Riduzione animazioni */
-            body.reduce-animations *,
-            body.reduce-animations *::before,
-            body.reduce-animations *::after {
-                animation-duration: 0.001ms !important;
-                animation-delay: 0.001ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.001ms !important;
-                transition-delay: 0.001ms !important;
+            body.colorblind-tritanopia .btn-primary {
+                background-color: #8800aa !important;
+                border-color: #7a0096 !important;
+                color: #FFFFFF !important;      /* Testo bianco */
+                font-weight: 600 !important;    /* Testo più spesso */
+            }
+            
+            body.colorblind-tritanopia .btn-success {
+                background-color: #d4aa00 !important;
+                border-color: #b89200 !important;
+                color: #000000 !important;      /* Testo nero per miglior contrasto con oro */
+                font-weight: 600 !important;    /* Testo più spesso */
+            }
+            
+            body.colorblind-tritanopia .btn-info {
+                background-color: #aa557f !important;
+                border-color: #964670 !important;
+                color: #FFFFFF !important;      /* Testo bianco */
+            }
+            
+            /* Aggiungi etichette di testo per i pulsanti importanti in modalità daltonismo */
+            body[class*="colorblind-"] .btn-success::after {
+                content: "✓";
+                margin-left: 5px;
+                font-weight: bold;
+            }
+            
+            body[class*="colorblind-"] .btn-danger::after {
+                content: "✗";
+                margin-left: 5px;
+                font-weight: bold;
+            }
+            
+            /* Aggiungi contorno di testo per ulteriore miglioramento della leggibilità nei pulsanti critici */
+            body[class*="colorblind-"] .btn-primary,
+            body[class*="colorblind-"] .btn-success,
+            body[class*="colorblind-"] .btn-danger {
+                text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+                letter-spacing: 0.02em;  /* Spaziatura leggermente aumentata */
+            }
+            
+            /* Aumenta il contrasto per i pulsanti outline in tutte le modalità daltonismo */
+            body[class*="colorblind-"] .btn-outline-primary:focus,
+            body[class*="colorblind-"] .btn-outline-success:focus,
+            body[class*="colorblind-"] .btn-outline-danger:focus {
+                outline: 3px solid #000000 !important;
+                outline-offset: 2px !important;
+            }
+            
+            /* Miglioramenti per i pulsanti text in modalità daltonismo */
+            body[class*="colorblind-"] .btn-text {
+                text-decoration: underline !important;
+                font-weight: 600 !important;
+            }
+            
+            /* Miglioramenti per i pulsanti tonal in modalità daltonismo */
+            body[class*="colorblind-"] .btn-tonal {
+                border: 1px solid rgba(0, 0, 0, 0.2) !important;
             }
             
             /* Tema scuro */
@@ -2248,23 +2363,29 @@ const footer = `
             body.colorblind-deuteranopia .btn-success {
                 background-color: #9747FF !important;
                 border-color: #8a35ea !important;
+                color: #FFFFFF !important;      /* Testo bianco per miglior contrasto */
             }
 
             body.colorblind-deuteranopia .btn-danger {
                 background-color: #d91919 !important;
                 border-color: #c01616 !important;
+                color: #FFFFFF !important;      /* Testo bianco per miglior contrasto */
             }
 
-            body.colorblind-deuteranopia .text-success {
-                color: #9747FF !important;
+            body.colorblind-deuteranopia .btn-primary {
+                color: #FFFFFF !important;      /* Testo bianco per miglior contrasto */
+                font-weight: 600 !important;    /* Testo più spesso per migliorare la leggibilità */
             }
 
-            body.colorblind-deuteranopia .text-danger {
-                color: #d91919 !important;
+            body.colorblind-deuteranopia .btn-outline-primary {
+                color: #0056b3 !important;      /* Colore del testo più scuro */
+                border-color: #0056b3 !important;
+                font-weight: 600 !important;    /* Testo più spesso */
             }
 
-            body.colorblind-deuteranopia .badge-success {
-                background-color: #9747FF !important;
+            body.colorblind-deuteranopia .btn-outline-primary:hover {
+                background-color: rgba(0, 86, 179, 0.15) !important;
+                color: #00408d !important;      /* Testo ancora più scuro quando hover */
             }
 
             /* PROTANOPIA - Difficoltà con il rosso */
@@ -2281,23 +2402,25 @@ const footer = `
             body.colorblind-protanopia .btn-success {
                 background-color: #00a5c2 !important;
                 border-color: #0090aa !important;
+                color: #FFFFFF !important;      /* Testo bianco per miglior contrasto */
             }
 
             body.colorblind-protanopia .btn-danger {
                 background-color: #e69100 !important;
                 border-color: #cc8000 !important;
+                color: #000000 !important;      /* Testo nero per miglior contrasto con l'arancione */
+                font-weight: 600 !important;    /* Testo più spesso */
             }
 
-            body.colorblind-protanopia .text-success {
-                color: #00a5c2 !important;
+            body.colorblind-protanopia .btn-primary {
+                color: #FFFFFF !important;      /* Testo bianco */
+                font-weight: 600 !important;    /* Testo più spesso */
             }
 
-            body.colorblind-protanopia .text-danger {
-                color: #e69100 !important;
-            }
-
-            body.colorblind-protanopia .badge-danger {
-                background-color: #e69100 !important;
+            body.colorblind-protanopia .btn-outline-primary {
+                color: #005880 !important;      /* Colore del testo più scuro */
+                border-color: #0074aa !important;
+                font-weight: 600 !important;    /* Testo più spesso */
             }
 
             /* TRITANOPIA - Difficoltà con il blu */
@@ -2314,123 +2437,63 @@ const footer = `
             body.colorblind-tritanopia .btn-primary {
                 background-color: #8800aa !important;
                 border-color: #7a0096 !important;
+                color: #FFFFFF !important;      /* Testo bianco */
+                font-weight: 600 !important;    /* Testo più spesso */
             }
 
             body.colorblind-tritanopia .btn-success {
                 background-color: #d4aa00 !important;
                 border-color: #b89200 !important;
+                color: #000000 !important;      /* Testo nero per miglior contrasto con oro */
+                font-weight: 600 !important;    /* Testo più spesso */
             }
 
             body.colorblind-tritanopia .btn-info {
                 background-color: #aa557f !important;
                 border-color: #964670 !important;
+                color: #FFFFFF !important;      /* Testo bianco */
             }
 
-            /* Regolazioni comuni per grafici e visualizzazioni di dati */
-            body[class*="colorblind-"] .chart-area {
-                border: 2px dashed var(--accent-color);
-                padding: 5px;
-            }
-
-            body[class*="colorblind-"] .chart-label {
-                font-weight: bold;
-                text-decoration: underline;
-            }
-
-            /* Indicatori speciali per elementi importanti */
-            body[class*="colorblind-"] .btn,
-            body[class*="colorblind-"] .alert,
-            body[class*="colorblind-"] .badge {
-                position: relative;
-                overflow: hidden;
-            }
-
-            /* Aggiunge pattern per aiutare a distinguere meglio le aree colorate */
-            body.colorblind-deuteranopia .navbar::before,
-            body.colorblind-protanopia .navbar::before,
-            body.colorblind-tritanopia .navbar::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
-                background-size: 10px 10px;
-                pointer-events: none;
-                z-index: 1;
-                opacity: 0.3;
-            }
-
-            /* Aggiunge icone per aiutare a distinguere pulsanti importanti */
+            /* Aggiungi etichette di testo per i pulsanti importanti in modalità daltonismo */
             body[class*="colorblind-"] .btn-success::after {
                 content: "✓";
                 margin-left: 5px;
+                font-weight: bold;
             }
 
             body[class*="colorblind-"] .btn-danger::after {
                 content: "✗";
                 margin-left: 5px;
+                font-weight: bold;
             }
 
-            /* Miglioramenti per i link nei modelli daltonici */
-            body[class*="colorblind-"] a:not(.btn):not(.nav-link) {
-                text-decoration: underline;
-                font-weight: 500;
+            /* Aggiungi contorno di testo per ulteriore miglioramento della leggibilità nei pulsanti critici */
+            body[class*="colorblind-"] .btn-primary,
+            body[class*="colorblind-"] .btn-success,
+            body[class*="colorblind-"] .btn-danger {
+                text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+                letter-spacing: 0.02em;  /* Spaziatura leggermente aumentata */
             }
 
-            /* Aggiunge bordi per migliorare il contrasto di elementi importanti */
-            body[class*="colorblind-"] .card,
-            body[class*="colorblind-"] .alert,
-            body[class*="colorblind-"] .list-group-item.active {
-                border-width: 2px;
-            }
-
-            /* Indicatori di focus più evidenti per accessibilità */
-            body[class*="colorblind-"] *:focus {
-                outline: 3px solid var(--accent-color) !important;
+            /* Aumenta il contrasto per i pulsanti outline in tutte le modalità daltonismo */
+            body[class*="colorblind-"] .btn-outline-primary:focus,
+            body[class*="colorblind-"] .btn-outline-success:focus,
+            body[class*="colorblind-"] .btn-outline-danger:focus {
+                outline: 3px solid #000000 !important;
                 outline-offset: 2px !important;
             }
 
-            /* Impostazioni specifiche per le tabelle */
-            body[class*="colorblind-"] .table th {
-                border-bottom: 2px solid var(--accent-color);
-                font-weight: 700;
+            /* Miglioramenti per i pulsanti text in modalità daltonismo */
+            body[class*="colorblind-"] .btn-text {
+                text-decoration: underline !important;
+                font-weight: 600 !important;
             }
 
-            body[class*="colorblind-"] .table-striped tbody tr:nth-of-type(odd) {
-                background-color: rgba(0, 0, 0, 0.08);
+            /* Miglioramenti per i pulsanti tonal in modalità daltonismo */
+            body[class*="colorblind-"] .btn-tonal {
+                border: 1px solid rgba(0, 0, 0, 0.2) !important;
             }
-
-            body.dark-theme[class*="colorblind-"] .table-striped tbody tr:nth-of-type(odd) {
-                background-color: rgba(255, 255, 255, 0.08);
-            }
-
-            /* Notifica per il cambio modalità daltonico */
-            .color-mode-notification {
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background-color: var(--primary-color);
-                color: white;
-                padding: 10px 20px;
-                border-radius: 30px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 9999;
-                transition: opacity 0.5s ease;
-            }
-
-            .notification-content {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .notification-content i {
-                font-size: 1.2rem;
-            }
-
+            
             /* Correggi posizione e visibilità dell'icona hamburger su mobile */
            /* Garantisci visibilità icona hamburger in qualsiasi modalità */
             @media (max-width: 576px) {
