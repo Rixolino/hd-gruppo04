@@ -10,6 +10,19 @@
 </head>
 <body>
     
+    <div id="tizen-navigation-buttons" class="d-none">
+        <button class="tizen-nav-btn" data-href="/" tabindex="-1">Home</button>
+        <button class="tizen-nav-btn" data-href="/services" tabindex="-1">Servizi</button>
+        <button class="tizen-nav-btn" data-href="/about" tabindex="-1">Chi Siamo</button>
+        <button class="tizen-nav-btn" data-href="/contact" tabindex="-1">Contatti</button>
+        <button class="tizen-nav-btn" data-href="/auth/login" tabindex="-1">Accedi</button>
+        <button class="tizen-nav-btn" data-href="/auth/register" tabindex="-1">Registrati</button>
+        <button class="tizen-nav-btn" data-href="/dashboard" tabindex="-1">Dashboard</button>
+        <button class="tizen-nav-btn" data-href="/profile" tabindex="-1">Profilo</button>
+        <button class="tizen-nav-btn" data-href="/settings" tabindex="-1">Impostazioni</button>
+        <button class="tizen-nav-btn" data-href="/auth/logout" tabindex="-1">Logout</button>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero-section py-5">
         <div class="container">
@@ -259,6 +272,28 @@
             .hero-section {
                 padding-top: 4rem;
                 padding-bottom: 4rem;
+            }
+        }
+
+        /* Stile per i pulsanti Tizen nascosti */
+        #tizen-navigation-buttons {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            opacity: 0;
+            visibility: hidden;
+            z-index: -1;
+        }
+        
+        /* Stile specifico quando l'interfaccia Tizen è attiva */
+        body.tizen-interface #tizen-navigation-buttons {
+            display: none !important;
+        }
+        
+        /* Media query per dispositivi Tizen */
+        @media screen and (min-width: 1920px) and (min-height: 1080px) and (-webkit-device-pixel-ratio: 1) {
+            body.tizen-detected .navbar {
+                display: none !important;
             }
         }
     </style>
