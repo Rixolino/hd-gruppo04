@@ -82,14 +82,20 @@ CREATE TABLE `settings` (
 
 -- Creazione della tabella payments
 CREATE TABLE `payments` (
-  `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `amount` float NOT NULL,
-  `serviceId` varchar(255) NOT NULL,
-  `userId` varchar(255) NOT NULL,
-  `status` varchar(255) NOT NULL,
-  `createdAt` datetime NOT NULL,
-  `updatedAt` datetime NOT NULL,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orderId` int(11) NOT NULL,
+  `utenteId` int(11) NOT NULL,
+  `importo` decimal(10,2) NOT NULL,
+  `metodo` varchar(255) NOT NULL,
+  `stato` varchar(255) NOT NULL,
+  `riferimento` varchar(255) NOT NULL,
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `orderId` (`orderId`),
+  KEY `utenteId` (`utenteId`),
+  CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`orderId`) REFERENCES `ordini` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `payments_ibfk_2` FOREIGN KEY (`utenteId`) REFERENCES `utenti` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Inserimento dati nella tabella utenti
