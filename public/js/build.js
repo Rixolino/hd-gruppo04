@@ -2406,6 +2406,259 @@ const footer = `
     
     // Avvia il processo di caricamento delle impostazioni e creazione dell'interfaccia
     loadUserSettings();
+
+    // Aggiungi il CSS Material Design 3 per le card dopo gli altri stili
+    const materialCardStyles = `
+        <style id="material-design-cards">
+            /* Card in stile Material Design 3 */
+            .card {
+                border-radius: 16px !important;
+                border: none !important;
+                overflow: hidden !important;
+                transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+                            transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05), 
+                            0px 1px 3px 1px rgba(0, 0, 0, 0.05) !important;
+                position: relative !important;
+                background-clip: padding-box !important;
+            }
+            
+            /* Stati della card */
+            .card:hover {
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.08), 
+                            0px 3px 8px rgba(0, 0, 0, 0.08) !important;
+            }
+            
+            .card:focus-within {
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.12), 
+                            0px 4px 12px rgba(0, 0, 0, 0.12) !important;
+                outline: 2px solid var(--primary-color, #143D80) !important;
+                outline-offset: 2px !important;
+            }
+            
+            /* Card con elevazione più alta (es. card interattive) */
+            .card.card-elevated {
+                box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.08), 
+                            0px 8px 16px rgba(0, 0, 0, 0.08) !important;
+            }
+            
+            /* Layout interno card */
+            .card-body {
+                padding: 16px 24px !important;
+            }
+            
+            .card-header {
+                border-bottom: none !important;
+                padding: 16px 24px 0 24px !important;
+                background-color: transparent !important;
+            }
+            
+            .card-footer {
+                border-top: none !important;
+                padding: 8px 24px 16px 24px !important;
+                background-color: transparent !important;
+            }
+            
+            /* Supporto per tema scuro */
+            .dark-theme .card {
+                background-color: #2d2d2d !important;
+                box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25), 
+                            0px 1px 3px 1px rgba(0, 0, 0, 0.25) !important;
+            }
+            
+            .dark-theme .card:hover {
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.35), 
+                            0px 3px 8px rgba(0, 0, 0, 0.35) !important;
+            }
+            
+            /* Card con effetto superficie attiva */
+            .card.card-active {
+                background-color: rgba(var(--primary-color-rgb, 20, 61, 128), 0.08) !important;
+            }
+            
+            .dark-theme .card.card-active {
+                background-color: rgba(var(--primary-color-rgb, 20, 61, 128), 0.16) !important;
+            }
+            
+            /* Card con bordo (outlined) */
+            .card.card-outlined {
+                background-color: transparent !important;
+                border: 1px solid rgba(0, 0, 0, 0.12) !important;
+                box-shadow: none !important;
+            }
+            
+            .dark-theme .card.card-outlined {
+                border-color: rgba(255, 255, 255, 0.12) !important;
+            }
+            
+            /* Card con immagine in alto */
+            .card-img-top {
+                border-top-left-radius: 16px !important;
+                border-top-right-radius: 16px !important;
+            }
+            
+            /* Animazioni più fluide */
+            .service-card:hover {
+                transform: translateY(-6px) !important;
+                box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.12), 
+                            0px 8px 24px rgba(0, 0, 0, 0.12) !important;
+            }
+            
+            .dark-theme .service-card:hover {
+                box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3), 
+                            0px 8px 24px rgba(0, 0, 0, 0.3) !important;
+            }
+            
+            /* Assicura che ci sia un padding interno uniforme tra elementi */
+            .card h1, .card h2, .card h3, .card h4, .card h5, .card h6 {
+                margin-bottom: 16px !important;
+            }
+            
+            .card p:last-child {
+                margin-bottom: 0 !important;
+            }
+            
+            /* Aggiungi supporto per le ripples in stile Material */
+            .card .ripple-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                overflow: hidden;
+                pointer-events: none;
+                border-radius: inherit;
+            }
+            
+            /* Versione ripple dark mode */
+            .dark-theme .ripple {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            /* Compatibilità con le classi esistenti */
+            .card.card-dark {
+                background-color: #2d2d2d !important;
+            }
+        </style>
+    `;
+    
+    // Aggiungi funzione per gestire l'effetto ripple del Material Design
+    const addMaterialRippleEffect = () => {
+        // Aggiungi il container per le ripple a ogni card interattiva
+        document.querySelectorAll('.card').forEach(card => {
+            if (!card.querySelector('.ripple-container') && 
+                (card.onclick || card.querySelector('a, button'))) {
+                
+                const rippleContainer = document.createElement('div');
+                rippleContainer.className = 'ripple-container';
+                card.appendChild(rippleContainer);
+                
+                card.addEventListener('mousedown', function(e) {
+                    // Calcola la posizione relativa del click
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    // Crea l'elemento ripple
+                    const ripple = document.createElement('span');
+                    ripple.className = 'ripple';
+                    ripple.style.cssText = `
+                        position: absolute;
+                        background-color: rgba(0, 0, 0, 0.08);
+                        border-radius: 50%;
+                        pointer-events: none;
+                        transform: scale(0);
+                        top: ${y}px;
+                        left: ${x}px;
+                        width: 100px;
+                        height: 100px;
+                        animation: ripple-animation 0.8s ease-out forwards;
+                    `;
+                    
+                    // Aggiungi l'elemento al container
+                    rippleContainer.appendChild(ripple);
+                    
+                    // Rimuovi l'elemento dopo l'animazione
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 800);
+                });
+            }
+        });
+    };
+    
+    // Aggiungi una keyframe animation per l'effetto ripple
+    const rippleAnimation = `
+        <style>
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        </style>
+    `;
+    
+    // Funzione per aggiungere variabili CSS dei colori primari come RGB
+    const addColorVariables = () => {
+        // Funzione di supporto per convertire i colori HEX in valori RGB
+        function hexToRgb(hex) {
+            // Elimina il carattere # se presente
+            hex = hex.replace(/^#/, '');
+            
+            // Parsa il codice esadecimale
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            
+            // Restituisce i valori RGB come array
+            return [r, g, b];
+        }
+        
+        // Ottieni i colori primari da :root
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+        
+        if (primaryColor && primaryColor.startsWith('#')) {
+            // Converti in RGB e imposta come variabile CSS
+            const [r, g, b] = hexToRgb(primaryColor);
+            document.documentElement.style.setProperty('--primary-color-rgb', `${r}, ${g}, ${b}`);
+        } else {
+            // Default fallback: blu HelpDigit
+            document.documentElement.style.setProperty('--primary-color-rgb', '20, 61, 128');
+        }
+    };
+    
+    // Inserisci gli stili Material Design nel documento
+    document.head.insertAdjacentHTML('beforeend', materialCardStyles);
+    document.head.insertAdjacentHTML('beforeend', rippleAnimation);
+    
+    // Aggiungi un hook per applicare gli effetti Material dopo il caricamento dell'interfaccia
+    const originalBuildInterface = buildInterface;
+    buildInterface = function() {
+        originalBuildInterface();
+        
+        // Aggiungi le variabili RGB dei colori
+        addColorVariables();
+        
+        // Aggiungi gli effetti ripple alle card
+        setTimeout(addMaterialRippleEffect, 500);
+        
+        // Monitora i cambiamenti dinamici nel DOM
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.addedNodes.length) {
+                    setTimeout(addMaterialRippleEffect, 100);
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    };
+    
+    // ...existing code...
 });
 
 
