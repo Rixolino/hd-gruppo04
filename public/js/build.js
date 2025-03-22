@@ -1392,7 +1392,7 @@ const footer = `
                     width: 100%;
                 }
                 
-                .footer-contact {
+                ..footer-contact {
                     list-style: none;
                     padding: 0;
                     margin: 0;
@@ -2892,5 +2892,376 @@ function disableHeavyAnimations() {
     });
     
     console.log('Ottimizzazioni per Tizen applicate');
+}
+
+// Aggiungi questa funzione in build.js per creare l'interfaccia Tizen
+
+function buildTizenInterface() {
+    console.log('Interfaccia Tizen attivata per dispositivi TV Samsung');
+    
+    // CSS ottimizzato per TV
+    const tizenCSS = `
+        <style id="tizen-styles">
+            /* Ottimizzazioni base per schermi TV */
+            body {
+                font-size: 1.3rem;
+                padding: 0;
+                margin: 0;
+                background-color: #101010;
+                color: #f0f0f0;
+                font-family: 'Samsung Sans', 'Roboto', sans-serif;
+                overflow-x: hidden;
+            }
+            
+            /* Grande header con pulsanti accessibili con telecomando */
+            .tv-header {
+                background-color: #0A1A2F;
+                color: white;
+                padding: 25px 20px;
+                text-align: center;
+                border-bottom: 3px solid #3b82f6;
+            }
+            
+            .tv-logo {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            
+            .tv-logo i {
+                font-size: 2.5rem;
+                color: #3b82f6;
+                margin-right: 15px;
+            }
+            
+            .tv-logo-text {
+                font-size: 2.5rem;
+                font-weight: bold;
+            }
+            
+            .tv-nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+                margin-top: 20px;
+            }
+            
+            .tv-button {
+                background-color: #1E3A8A;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 15px 25px;
+                min-width: 180px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+            
+            .tv-button i {
+                margin-right: 10px;
+                font-size: 1.4rem;
+            }
+            
+            /* Stile di focus per navigazione con telecomando */
+            .tv-button:focus {
+                outline: 4px solid #ffcc00;
+                box-shadow: 0 0 0 6px rgba(255, 204, 0, 0.4);
+                transform: scale(1.05);
+                z-index: 10;
+            }
+            
+            /* Indicatore di navigazione */
+            .tv-focus-guide {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: rgba(0, 0, 0, 0.8);
+                color: white;
+                border-radius: 8px;
+                padding: 10px 15px;
+                font-size: 1rem;
+                z-index: 1000;
+            }
+            
+            .tv-focus-guide span {
+                color: #ffcc00;
+                font-weight: bold;
+                margin: 0 3px;
+            }
+            
+            /* Wrapper per il contenuto principale */
+            .tv-content {
+                padding: 30px;
+                margin: 20px auto;
+                max-width: 90%;
+                background-color: rgba(30, 41, 59, 0.8);
+                border-radius: 10px;
+                backdrop-filter: blur(5px);
+            }
+            
+            /* Pulsante back sempre visibile */
+            .tv-back-button {
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                background-color: rgba(59, 130, 246, 0.8);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 10px 20px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+            }
+            
+            .tv-back-button:focus {
+                outline: 3px solid #ffcc00;
+                box-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+            }
+            
+            .tv-back-button i {
+                margin-right: 8px;
+            }
+            
+            /* Semplifica il footer */
+            .tv-footer {
+                background-color: #0A1A2F;
+                color: #e5e7eb;
+                text-align: center;
+                padding: 20px;
+                margin-top: 40px;
+                border-top: 1px solid #3b82f6;
+            }
+            
+            /* Adattamenti specifici per form e card */
+            .card, .form-control, .btn {
+                border-radius: 8px;
+                font-size: 1.2rem;
+            }
+            
+            /* Dimensioni speciali per elementi interattivi (per facilitare la navigazione) */
+            .form-control {
+                height: 50px;
+                padding: 10px 15px;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+            }
+            
+            /* Stato hover per elementi focused */
+            *:focus {
+                outline-color: #ffcc00 !important;
+            }
+        </style>
+    `;
+    
+    // Inserisci CSS nel documento
+    document.head.insertAdjacentHTML('beforeend', tizenCSS);
+    
+    // Carica Font Awesome se non è già presente
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+        const fontAwesome = document.createElement('link');
+        fontAwesome.rel = 'stylesheet';
+        fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
+        document.head.appendChild(fontAwesome);
+    }
+    
+    // Crea l'header con navigazione ottimizzata per TV
+    const createHeader = () => {
+        const links = isAuthenticated ? 
+            `
+                <button class="tv-button" tabindex="1" data-href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>Dashboard
+                </button>
+                <button class="tv-button" tabindex="2" data-href="/services">
+                    <i class="fas fa-cogs"></i>Servizi
+                </button>
+                <button class="tv-button" tabindex="3" data-href="/profile">
+                    <i class="fas fa-user"></i>Profilo
+                </button>
+                <button class="tv-button" tabindex="4" data-href="/settings">
+                    <i class="fas fa-cog"></i>Impostazioni
+                </button>
+                <button class="tv-button" tabindex="5" data-href="/auth/logout" style="background-color: #CC0000;">
+                    <i class="fas fa-sign-out-alt"></i>Logout
+                </button>
+            ` : 
+            `
+                <button class="tv-button" tabindex="1" data-href="/">
+                    <i class="fas fa-home"></i>Home
+                </button>
+                <button class="tv-button" tabindex="2" data-href="/services">
+                    <i class="fas fa-cogs"></i>Servizi
+                </button>
+                <button class="tv-button" tabindex="3" data-href="/about">
+                    <i class="fas fa-info-circle"></i>Chi Siamo
+                </button>
+                <button class="tv-button" tabindex="4" data-href="/contact">
+                    <i class="fas fa-envelope"></i>Contatti
+                </button>
+                <button class="tv-button" tabindex="5" data-href="/auth/login" style="background-color: #1C64F2;">
+                    <i class="fas fa-sign-in-alt"></i>Accedi
+                </button>
+                <button class="tv-button" tabindex="6" data-href="/auth/register" style="background-color: #1C64F2;">
+                    <i class="fas fa-user-plus"></i>Registrati
+                </button>
+            `;
+            
+        return `
+            <header class="tv-header">
+                <div class="tv-logo">
+                    <i class="fas fa-laptop-code"></i>
+                    <div class="tv-logo-text">Help<span style="color: #3b82f6;">Digit</span></div>
+                </div>
+                <nav class="tv-nav">
+                    ${links}
+                </nav>
+            </header>
+        `;
+    };
+    
+    // Crea guide per la navigazione con telecomando
+    const createNavigationGuide = () => {
+        return `
+            <div class="tv-focus-guide">
+                <i class="fas fa-arrow-circle-left"></i>
+                <i class="fas fa-arrow-circle-right"></i>
+                <span>Naviga</span> • 
+                <span>Enter</span> per selezionare • 
+                <span>Back</span> per tornare
+            </div>
+        `;
+    };
+    
+    // Crea footer semplificato
+    const createFooter = () => {
+        return `
+            <footer class="tv-footer">
+                <p>&copy; ${new Date().getFullYear()} HelpDigit - Versione ottimizzata per TV Samsung</p>
+            </footer>
+        `;
+    };
+    
+    // Inserisci HTML nel documento
+    document.body.insertAdjacentHTML('afterbegin', createHeader());
+    document.body.insertAdjacentHTML('beforeend', createNavigationGuide());
+    document.body.insertAdjacentHTML('beforeend', createFooter());
+    
+    // Aggiungi pulsante indietro
+    document.body.insertAdjacentHTML('afterbegin', `
+        <button class="tv-back-button" id="tvBackButton">
+            <i class="fas fa-arrow-left"></i> Indietro
+        </button>
+    `);
+    
+    // Avvolgi il contenuto principale in un wrapper
+    const main = document.querySelector('main');
+    if (main) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'tv-content';
+        
+        // Sposta tutto il contenuto dell'elemento main nel nuovo wrapper
+        wrapper.innerHTML = main.innerHTML;
+        main.innerHTML = '';
+        main.appendChild(wrapper);
+    }
+    
+    // Gestione eventi per supporto navigazione telecomando
+    document.addEventListener('keydown', function(e) {
+        console.log('Tasto premuto:', e.key);
+        
+        // Navigazione con frecce
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+            const focusableElements = Array.from(document.querySelectorAll('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])'));
+            const currentIndex = focusableElements.indexOf(document.activeElement);
+            
+            if (currentIndex > -1) {
+                let nextIndex;
+                
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    nextIndex = (currentIndex + 1) % focusableElements.length;
+                } else {
+                    nextIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
+                }
+                
+                focusableElements[nextIndex].focus();
+                e.preventDefault();
+            } else if (focusableElements.length > 0) {
+                // Se nessun elemento ha il focus, seleziona il primo
+                focusableElements[0].focus();
+            }
+        }
+        
+        // Gestione del tasto Enter
+        if (e.key === 'Enter' && document.activeElement) {
+            const href = document.activeElement.getAttribute('data-href');
+            if (href) {
+                window.location.href = href;
+            } else {
+                document.activeElement.click();
+            }
+        }
+        
+        // Gestione del tasto Back/Return del telecomando
+        if (e.key === 'Backspace' || e.key === 'Back' || e.key === 'Escape') {
+            window.history.back();
+            e.preventDefault();
+        }
+    });
+    
+    // Collega gli eventi click sui pulsanti TV
+    document.querySelectorAll('.tv-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const href = button.getAttribute('data-href');
+            if (href) window.location.href = href;
+        });
+    });
+    
+    // Collega il pulsante "Indietro"
+    document.getElementById('tvBackButton').addEventListener('click', () => {
+        window.history.back();
+    });
+    
+    // Quando la pagina è caricata, imposta il focus sul primo elemento
+    window.addEventListener('load', () => {
+        const firstFocusable = document.querySelector('[tabindex="1"]');
+        if (firstFocusable) firstFocusable.focus();
+    });
+    
+    // Ottimizza le prestazioni disabilitando animazioni pesanti
+    const disableHeavyAnimations = () => {
+        // Rimuovi animazioni AOS
+        if (window.AOS) window.AOS.init({ disable: true });
+        
+        // Rimuovi altre animazioni pesanti
+        document.querySelectorAll('[data-aos], .animate__animated, .animated').forEach(el => {
+            el.style.animation = 'none';
+            el.style.transition = 'none';
+            el.classList.remove('animated');
+            el.removeAttribute('data-aos');
+        });
+        
+        // Carica le immagini con lazy loading
+        document.querySelectorAll('img').forEach(img => {
+            img.loading = 'lazy';
+            if (img.width > 600) {
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+            }
+        });
+    };
+    
+    disableHeavyAnimations();
+    applyUserSettings(userSettings);
 }
 
