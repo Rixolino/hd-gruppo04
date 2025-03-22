@@ -7,6 +7,84 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* Stili Material Design per il modal */
+        .modal-content {
+            border-radius: 8px;
+            box-shadow: 0 11px 15px -7px rgba(0,0,0,.2), 0 24px 38px 3px rgba(0,0,0,.14), 0 9px 46px 8px rgba(0,0,0,.12);
+            border: none;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            border-bottom: none;
+            padding: 24px 24px 0;
+        }
+        
+        .modal-body {
+            padding: 20px 24px;
+        }
+        
+        .modal-footer {
+            border-top: none;
+            padding: 8px 24px 24px;
+        }
+        
+        .btn-flat {
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-flat:after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .5s, opacity 1s;
+        }
+        
+        .btn-flat:active:after {
+            transform: scale(0, 0);
+            opacity: .3;
+            transition: 0s;
+        }
+        
+        .delete-icon-container {
+            background-color: #ffebee;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .delete-icon {
+            color: #f44336;
+            font-size: 28px;
+        }
+        
+        .modal-danger-heading {
+            color: rgba(0,0,0,0.87);
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+    </style>
 </head>
 <body>
     <!-- La navbar verrà inserita qui da build.js -->
@@ -124,6 +202,12 @@
                             <a href="/dashboard" class="btn btn-outline-primary">
                                 <i class="fas fa-arrow-left mr-2"></i>Torna alla dashboard
                             </a>
+                            <% if (order.stato !== 'completato' && order.stato !== 'cancellato') { %>
+                                <!-- Modifica qui: il pulsante ora apre il modal invece di inviare direttamente il form -->
+                                <button type="button" class="btn btn-danger ml-2" data-toggle="modal" data-target="#confirmDeleteModal">
+                                    <i class="fas fa-times-circle mr-2"></i>Cancella Ordine
+                                </button>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -131,11 +215,81 @@
         </div>
     </main>
     
+    <!-- Modal di conferma in stile Material Design -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <div class="d-flex justify-content-center">
+                        <div class="delete-icon-container mb-3">
+                            <i class="fas fa-trash-alt delete-icon"></i>
+                        </div>
+                    </div>
+                    <h4 class="modal-danger-heading">Sei sicuro di voler cancellare questo ordine?</h4>
+                    <p class="text-muted">Questa azione non può essere annullata. L'ordine e tutti i dati associati verranno eliminati permanentemente dal sistema.</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0">
+                    <button type="button" class="btn btn-flat btn-outline-secondary mr-2" data-dismiss="modal">
+                        Annulla
+                    </button>
+                    <!-- Form effettivo per la cancellazione -->
+                    <form action="/orders/<%= order.id %>/cancel" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-flat btn-danger">
+                            <i class="fas fa-trash-alt mr-2"></i>Elimina definitivamente
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Il footer verrà inserito qui da build.js -->
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/js/build.js"></script>
+    
+    <script>
+        // Aggiungi l'effetto ripple ai pulsanti in stile Material Design
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aggiungi un effetto ripple quando i pulsanti vengono cliccati
+            document.querySelectorAll('.btn-flat').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const x = e.clientX - e.target.getBoundingClientRect().left;
+                    const y = e.clientY - e.target.getBoundingClientRect().top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple');
+                    ripple.style.cssText = `
+                        position: absolute;
+                        background: rgba(255, 255, 255, 0.4);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.6s linear;
+                        pointer-events: none;
+                    `;
+                    
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+    </script>
+    
+    <style>
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
 </body>
 </html>

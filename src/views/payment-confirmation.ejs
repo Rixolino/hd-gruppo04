@@ -29,14 +29,24 @@
                 
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-primary text-white">
-                        <h1 class="h3 mb-0">Dettagli Pagamento</h1>
+                        <h1 class="h3 mb-0">Riepilogo Pagamento</h1>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <h5 class="text-muted mb-3">Informazioni Pagamento</h5>
+                                <h5 class="text-muted mb-3">Dettagli Pagamento</h5>
                                 <p><strong>Riferimento:</strong> <%= payment.riferimento %></p>
-                                <p><strong>Metodo:</strong> <%= payment.metodo === 'card' ? 'Carta di credito' : payment.metodo === 'paypal' ? 'PayPal' : 'Bonifico bancario' %></p>
+                                <p><strong>Metodo:</strong> 
+                                    <span class="badge badge-info">
+                                        <% if (payment.metodo === 'card') { %>
+                                            <i class="fas fa-credit-card mr-1"></i> Carta di Credito
+                                        <% } else if (payment.metodo === 'paypal') { %>
+                                            <i class="fab fa-paypal mr-1"></i> PayPal
+                                        <% } else { %>
+                                            <i class="fas fa-university mr-1"></i> Bonifico Bancario
+                                        <% } %>
+                                    </span>
+                                </p>
                                 <p><strong>Importo:</strong> €<%= payment.importo.toFixed(2) %></p>
                                 <p><strong>Data:</strong> <%= new Date(payment.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric' }) %></p>
                             </div>
@@ -44,7 +54,7 @@
                                 <h5 class="text-muted mb-3">Dettagli Ordine</h5>
                                 <p><strong>Ordine #:</strong> <%= order.id %></p>
                                 <p><strong>Servizio:</strong> <%= service ? service.name : 'N/D' %></p>
-                                <p><strong>Stato ordine:</strong> <span class="badge badge-info">In lavorazione</span></p>
+                                <p><strong>Stato attuale:</strong> <span class="badge badge-info">In lavorazione</span></p>
                                 <% if (order.dataConsegna) { %>
                                     <p><strong>Data consegna prevista:</strong> <%= new Date(order.dataConsegna).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' }) %></p>
                                 <% } %>
@@ -59,13 +69,13 @@
                                     <i class="fas fa-info-circle fa-2x"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-1">Cosa succede adesso?</h5>
-                                    <p class="mb-0">Il nostro team ha ricevuto il tuo ordine e inizierà a lavorare su di esso. Puoi monitorare lo stato dalla tua dashboard. Ti invieremo aggiornamenti via email quando ci saranno novità sul tuo ordine.</p>
+                                    <h5 class="mb-1">Prossimi passi</h5>
+                                    <p class="mb-0">Il nostro team ha ricevuto il tuo ordine e inizierà a lavorare su di esso. Puoi monitorare lo stato dalla tua dashboard. Ti invieremo aggiornamenti via email quando ci saranno novità.</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <% if (user && user.puntifedelta) { %>
+                        <% if (user && user.puntifedelta !== undefined) { %>
                             <div class="alert alert-success mt-3">
                                 <div class="d-flex align-items-center">
                                     <div class="mr-3">
@@ -78,6 +88,10 @@
                                 </div>
                             </div>
                         <% } %>
+                        
+                        <div class="small text-muted text-center p-2 mt-4 bg-light rounded">
+                            <i class="fas fa-flask mr-1"></i> Questa è una simulazione di pagamento per scopi dimostrativi.
+                        </div>
                     </div>
                 </div>
                 
@@ -99,5 +113,66 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/js/build.js"></script>
+    
+    <script>
+        // Animazione confetti per la conferma del pagamento
+        $(document).ready(function() {
+            // Semplice animazione confetti
+            const confetti = document.createElement('canvas');
+            confetti.style.position = 'fixed';
+            confetti.style.top = '0';
+            confetti.style.left = '0';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.zIndex = '9999';
+            confetti.width = window.innerWidth;
+            confetti.height = window.innerHeight;
+            document.body.appendChild(confetti);
+            
+            const ctx = confetti.getContext('2d');
+            const pieces = [];
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+            
+            for (let i = 0; i < 100; i++) {
+                pieces.push({
+                    x: Math.random() * confetti.width,
+                    y: Math.random() * -confetti.height,
+                    rot: Math.random() * 360,
+                    size: Math.random() * 10 + 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    speed: Math.random() * 3 + 2
+                });
+            }
+            
+            function drawConfetti() {
+                ctx.clearRect(0, 0, confetti.width, confetti.height);
+                
+                pieces.forEach(function(p) {
+                    ctx.save();
+                    ctx.fillStyle = p.color;
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rot * Math.PI / 180);
+                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size/2);
+                    ctx.restore();
+                    
+                    p.y += p.speed;
+                    p.rot += 1;
+                    
+                    if (p.y > confetti.height) {
+                        p.y = -20;
+                        p.x = Math.random() * confetti.width;
+                    }
+                });
+                
+                requestAnimationFrame(drawConfetti);
+            }
+            
+            drawConfetti();
+            
+            // Rimuovi confetti dopo 10 secondi
+            setTimeout(function() {
+                document.body.removeChild(confetti);
+            }, 10000);
+        });
+    </script>
 </body>
 </html>

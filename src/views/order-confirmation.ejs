@@ -51,8 +51,8 @@
                                         <div class="alert alert-warning">
                                             <i class="fas fa-clock mr-2"></i> In attesa di pagamento
                                         </div>
-                                        <p><strong>Importo:</strong> € <%= order.prezzo.toFixed(2) %></p>
-                                        <p><strong>Punti fedeltà guadagnati:</strong> <%= Math.floor(Number(order.prezzo)) %></p>
+                                        <p><strong>Importo:</strong> € <%= Number(order.prezzo).toFixed(2) %></p>
+                                        <p><strong>Punti fedeltà che guadagnerai dopo l'acquisto:</strong> <%= Math.floor(Number(order.prezzo)) %></p>
                                     </div>
                                 </div>
                                 

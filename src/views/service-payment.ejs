@@ -101,7 +101,28 @@
                                     </label>
                                 </div>
                                 
-                                <button class="btn btn-primary btn-lg btn-block" type="submit">Procedi al pagamento</button>
+                                <div class="card bg-light mb-4">
+                                    <div class="card-body">
+                                        <h6><i class="fas fa-flask mr-2"></i> Opzioni di test</h6>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="bypassPayment" name="bypassPayment">
+                                            <label class="form-check-label" for="bypassPayment">
+                                                Bypass (salta validazione dei campi)
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="simulateError" name="simulateError">
+                                            <label class="form-check-label" for="simulateError">
+                                                Simula errore transazione
+                                            </label>
+                                        </div>
+                                        <small class="text-muted">Queste opzioni sono disponibili solo per scopi di test.</small>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-primary btn-lg btn-block" type="submit" id="paymentButton">
+                                    <i class="fas fa-credit-card mr-2"></i>Procedi al pagamento
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -130,6 +151,65 @@
                     $('#creditCardFields').show();
                 } else {
                     $('#creditCardFields').hide();
+                }
+            });
+        });
+    </script>
+    <script>
+        // Simulazione del pagamento
+        $(document).ready(function() {
+            const form = $('form.needs-validation');
+            
+            form.submit(function(event) {
+                // Disattivare la validazione per il bypass
+                if (!$('#bypassPayment').is(':checked')) {
+                    // Validazione base dei campi
+                    if ($('#creditCard').is(':checked')) {
+                        const cardNumber = $('#cardNumber').val();
+                        const expiry = $('#expiry').val();
+                        const cvv = $('#cvv').val();
+                        
+                        if (!cardNumber || !expiry || !cvv) {
+                            event.preventDefault();
+                            alert('Per favore compila tutti i campi della carta.');
+                            return false;
+                        }
+                        
+                        // Simulazione di validazione carta
+                        if (cardNumber.length < 12) {
+                            event.preventDefault();
+                            alert('Il numero di carta deve contenere almeno 12 cifre.');
+                            return false;
+                        }
+                    }
+                }
+                
+                // Mostra spinner di caricamento
+                $('#paymentButton').html('<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> Elaborazione in corso...');
+                $('#paymentButton').prop('disabled', true);
+                
+                // Simula ritardo di elaborazione
+                if ($('#simulateError').is(':checked')) {
+                    event.preventDefault();
+                    setTimeout(function() {
+                        alert('Errore simulato: La transazione è stata rifiutata dalla banca. Prova con un altro metodo di pagamento.');
+                        $('#paymentButton').html('<i class="fas fa-credit-card mr-2"></i>Procedi al pagamento');
+                        $('#paymentButton').prop('disabled', false);
+                    }, 2000);
+                    return false;
+                }
+                
+                // Procedi con il submit del form dopo una breve attesa (simulazione)
+                if ($('#bypassPayment').is(':checked')) {
+                    // Non fare niente, lascia che il form venga inviato normalmente
+                } else {
+                    // Simula il completamento
+                    event.preventDefault();
+                    setTimeout(function() {
+                        form.off('submit'); // Rimuovi l'evento submit
+                        form.submit(); // Invia il form
+                    }, 2000);
+                    return false;
                 }
             });
         });

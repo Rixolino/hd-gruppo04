@@ -5,20 +5,21 @@ import User from './userModel';
 export interface OrderAttributes {
   id?: number;
   utenteId: number;
-  servizio: number;
-  descrizione: string;
-  dettagliAggiuntivi: string;
+  servizio: string;
+  prezzo: number;
   stato: string;
   dataRichiesta: Date;
-  dataConsegna?: Date;
-  prezzo: number;
   progressoLavoro: number;
+  dataConsegna?: Date;
+  titolo: string; // Add appropriate title
+  descrizione: string; // Add appropriate description
+  dettagliAggiuntivi: string; // Add appropriate additional details
 }
 
 class Order extends Model<OrderAttributes> implements OrderAttributes {
   public id!: number;
   public utenteId!: number;
-  public servizio!: number;
+  public servizio!: string;
   public descrizione!: string;
   public dettagliAggiuntivi!: string;
   public stato!: string;
@@ -26,6 +27,7 @@ class Order extends Model<OrderAttributes> implements OrderAttributes {
   public dataConsegna?: Date;
   public prezzo!: number;
   public progressoLavoro!: number;
+  public titolo!: string;
   
   // Timestamps
   public readonly createdAt!: Date;
@@ -47,7 +49,7 @@ Order.init({
     }
   },
   servizio: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false
   },
   descrizione: {
@@ -80,6 +82,10 @@ Order.init({
     type: DataTypes.INTEGER,
     allowNull: false,
     defaultValue: 0
+  },
+  titolo: {
+    type: DataTypes.STRING,
+    allowNull: false
   }
 }, {
   sequelize,

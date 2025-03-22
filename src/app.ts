@@ -17,7 +17,7 @@ import { loadUserSettings } from './middleware/settingsMiddleware';
 import SettingsModel from './models/settingsModel';
 import settingsRoutes from './routes/settingsRoutes';
 import multer from 'multer';
-import PaymentModel from './models/paymentModel'; // Add this line to import PaymentModel
+import PaymentModel, { IPaymentAttributes } from './models/paymentModel'; // Add this line to import PaymentModel
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -771,7 +771,7 @@ app.post('/services/request/:id', authenticate, upload.array('attachments', 5), 
     if (!service) {
       return res.status(404).render('error', {
         user: req.user,
-        title: 'Pagina non trovata',  // Assicurati che title sia sempre definito
+        title: 'Pagina non trovata',
         errorMessage: 'La pagina richiesta non è stata trovata',
         showLogout: !!req.user
       });
@@ -801,7 +801,8 @@ app.post('/services/request/:id', authenticate, upload.array('attachments', 5), 
     // Crea un nuovo ordine nel database
     const order = await OrderModel.create({
       utenteId: userId,
-      servizio: Number(serviceId),
+      servizio: serviceId,
+      titolo: requestTitle,
       descrizione: requestDescription,
       dettagliAggiuntivi: JSON.stringify({
         colorScheme,
@@ -817,16 +818,8 @@ app.post('/services/request/:id', authenticate, upload.array('attachments', 5), 
       progressoLavoro: 0
     });
     
-    // Aggiunge punti fedeltà all'utente (1 punto per ogni euro speso)
-    const user = await UserModel.findByPk(userId);
-    if (user) {
-      const puntiDaAggiungere = Math.floor(Number(service.price));
-      await user.update({ 
-        puntifedelta: user.puntifedelta + puntiDaAggiungere 
-      });
-    }
-    
     // Notifica agli admin (implementazione base)
+    const user = await UserModel.findByPk(userId);
     if (user) {
         console.log(`Nuova richiesta di servizio: ${requestTitle} da ${user.nome} ${user.cognome}`);
     } else {
@@ -884,47 +877,43 @@ app.get('/order-confirmation/:id', authenticate, async (req: Request, res: Respo
   }
 });
 
-// Rotta per la pagina di pagamento dell'ordine
+// Visualizzazione della pagina di pagamento
 app.get('/payments/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
     const orderId = req.params.id;
-    const order = await OrderModel.findByPk(orderId, {
-      attributes: ['id', 'utenteId', 'servizio', 'stato', 'dataRichiesta', 'dataConsegna', 'prezzo', 'progressoLavoro', 'createdAt', 'updatedAt']
-    });
+    
+    // Recupera l'ordine
+    const order = await OrderModel.findByPk(orderId);
     
     if (!order || order.utenteId !== req.user.userId) {
       return res.status(404).render('error', {
         user: req.user,
-        title: 'Ordine non trovato', // Aggiungi il titolo
-        errorMessage: 'Ordine non trovato',
+        title: 'Ordine non trovato',
+        errorMessage: 'Ordine non trovato o non autorizzato',
         showLogout: true
       });
+    }
+    
+    // Verifica che l'ordine sia in attesa di pagamento
+    if (order.stato !== 'pagamento-in-attesa') {
+      return res.redirect(`/orders/${orderId}`);
     }
     
     // Recupera il servizio associato all'ordine
     const service = await ServiceModel.findByPk(order.servizio);
     
-    if (!service) {
-      return res.status(404).render('error', {
-        user: req.user,
-        title: 'Servizio non trovato', // Aggiungi il titolo
-        errorMessage: 'Servizio non trovato',
-        showLogout: true
-      });
-    }
-    
+    // Renderizza la pagina di pagamento
     res.render('service-payment', {
       user: req.user,
       order,
       service,
-      paymentSuccess: false,
-      title: 'Pagamento' // Aggiungi il titolo
+      title: 'Pagamento'
     });
   } catch (error) {
     console.error('Errore nel caricamento della pagina di pagamento:', error);
     res.status(500).render('error', {
       user: req.user,
-      title: 'Errore', // Aggiungi il titolo
+      title: 'Errore',
       errorMessage: 'Si è verificato un errore nel caricamento della pagina di pagamento',
       showLogout: true
     });
@@ -1065,6 +1054,7 @@ app.post('/process-payment', authenticate, async (req: Request, res: Response): 
       orderId: order.id,
       utenteId: req.user.userId,
       importo: order.prezzo,
+      servizio: Number(order.servizio),
       metodo: paymentMethod,
       stato: 'completato',
       riferimento: 'PAY-' + Math.random().toString(36).substring(2, 10).toUpperCase()
@@ -1089,17 +1079,77 @@ app.post('/process-payment', authenticate, async (req: Request, res: Response): 
   }
 });
 
+// Elaborazione del pagamento
+app.post('/process-payment', authenticate, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { orderId, paymentMethod, bypassPayment } = req.body;
+    
+    // Recupera l'ordine
+    const order = await OrderModel.findByPk(orderId);
+    
+    if (!order || order.utenteId !== req.user.userId) {
+      return res.status(404).render('error', {
+        user: req.user,
+        title: 'Ordine non trovato',
+        errorMessage: 'Ordine non trovato o non autorizzato',
+        showLogout: true
+      });
+    }
+    
+    // Crea un record di pagamento con i campi corretti
+    const payment = await PaymentModel.create({
+      orderId: order.id,
+      utenteId: req.user.userId,
+      importo: order.prezzo,
+      servizio: Number(order.servizio),
+      metodo: paymentMethod,
+      stato: 'completato',
+      riferimento: 'SIM-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
+      dettagli: JSON.stringify({
+        simulazione: true,
+        timestamp: new Date().toISOString()
+      })
+    }) as unknown as IPaymentAttributes;
+    
+    // Aggiorna lo stato dell'ordine
+    await order.update({
+      stato: 'in-lavorazione',
+      dataConsegna: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Data di consegna: 7 giorni da oggi
+    });
+    
+    // Aggiorna i punti fedeltà
+    const user = await UserModel.findByPk(req.user.userId);
+    if (user) {
+      const puntiGuadagnati = Math.floor(Number(order.prezzo));
+      await user.update({
+        puntifedelta: (user.puntifedelta || 0) + puntiGuadagnati
+      });
+    }
+    
+    // Reindirizza alla pagina di conferma pagamento
+    res.redirect(`/payment-confirmation/${payment.id}`);
+  } catch (error) {
+    console.error('Errore nell\'elaborazione del pagamento:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      title: 'Errore pagamento',
+      errorMessage: 'Si è verificato un errore durante l\'elaborazione del pagamento',
+      showLogout: true
+    });
+  }
+});
+
 // Pagina di conferma pagamento
 app.get('/payment-confirmation/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
     const paymentId = req.params.id;
-    const payment = await PaymentModel.findByPk(paymentId);
+    const payment = await PaymentModel.findByPk(paymentId) as unknown as IPaymentAttributes;
     
     if (!payment || payment.utenteId !== req.user.userId) {
       return res.status(404).render('error', {
         user: req.user,
         title: 'Pagamento non trovato',
-        errorMessage: 'Pagamento non trovato',
+        errorMessage: 'Pagamento non trovato o non autorizzato',
         showLogout: true
       });
     }
@@ -1115,15 +1165,46 @@ app.get('/payment-confirmation/:id', authenticate, async (req: Request, res: Res
       title: 'Conferma Pagamento'
     });
   } catch (error) {
-    console.error('Errore nel caricamento della pagina di conferma pagamento:', error);
+    console.error('Errore nel caricamento della conferma pagamento:', error);
     res.status(500).render('error', {
       user: req.user,
       title: 'Errore',
-      errorMessage: 'Si è verificato un errore nel caricamento della pagina di conferma pagamento',
+      errorMessage: 'Si è verificato un errore nel caricamento della conferma di pagamento',
       showLogout: true
     });
   }
 });
+
+// Rotta per cancellare un ordine
+app.post('/orders/:id/cancel', authenticate, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const orderId = req.params.id;
+    const order = await OrderModel.findByPk(orderId);
+    
+    if (!order || order.utenteId !== req.user.userId) {
+      return res.status(404).render('error', {
+        user: req.user,
+        title: 'Ordine non trovato',
+        errorMessage: 'Ordine non trovato o non autorizzato',
+        showLogout: true
+      });
+    }
+    
+    // Elimina l'ordine dal database
+    await order.destroy();
+    
+    res.redirect('/dashboard');
+  } catch (error) {
+    console.error('Errore nella cancellazione dell\'ordine:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Si è verificato un errore nella cancellazione dell\'ordine',
+      showLogout: true
+    });
+  }
+});
+
 
 // Gestione pagina 404 - deve essere sempre DOPO tutte le route ma PRIMA dei middleware di gestione errori
 app.use((req: Request, res: Response) => {
@@ -1203,6 +1284,7 @@ const generalErrorHandler: ErrorRequestHandler = (err: Error, req: Request, res:
 // Registra i middleware dopo la route 404
 app.use(dbErrorHandler);
 app.use(generalErrorHandler);
+
 
 
 app.listen(port, () => {
