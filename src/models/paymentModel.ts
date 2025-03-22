@@ -4,22 +4,28 @@ import { sequelize } from '../config/db';
 // Definisci l'interfaccia per il modello
 interface IPaymentAttributes {
     id?: number;
-    amount: number;
-    serviceId: string;
-    userId: string;
-    status: string;
+    orderId: number;
+    utenteId: number;
+    importo: number;
+    metodo: string;
+    stato: string;
+    riferimento: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 // Definisci l'interfaccia per la creazione del modello
-interface IPaymentCreationAttributes extends Optional<IPaymentAttributes, 'id'> {}
+interface IPaymentCreationAttributes extends Optional<IPaymentAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
 
 // Definisci il modello
-class Payment extends Model<IPaymentAttributes, IPaymentCreationAttributes> implements IPaymentAttributes {
+class PaymentModel extends Model<IPaymentAttributes, IPaymentCreationAttributes> implements IPaymentAttributes {
     public id!: number;
-    public amount!: number;
-    public serviceId!: string;
-    public userId!: string;
-    public status!: string;
+    public orderId!: number;
+    public utenteId!: number;
+    public importo!: number;
+    public metodo!: string;
+    public stato!: string;
+    public riferimento!: string;
 
     // Timestamps
     public readonly createdAt!: Date;
@@ -27,29 +33,37 @@ class Payment extends Model<IPaymentAttributes, IPaymentCreationAttributes> impl
 }
 
 // Inizializza il modello
-Payment.init(
+PaymentModel.init(
     {
         id: {
             type: DataTypes.INTEGER.UNSIGNED,
             autoIncrement: true,
             primaryKey: true,
         },
-        amount: {
+        orderId: {
+            type: DataTypes.INTEGER.UNSIGNED,
+            allowNull: false,
+        },
+        utenteId: {
+            type: DataTypes.INTEGER.UNSIGNED,
+            allowNull: false,
+        },
+        importo: {
             type: DataTypes.FLOAT,
             allowNull: false,
         },
-        serviceId: {
+        metodo: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        userId: {
+        stato: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        status: {
+        riferimento: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
+        }
     },
     {
         sequelize,
@@ -58,4 +72,4 @@ Payment.init(
     }
 );
 
-export default Payment;
+export default PaymentModel;

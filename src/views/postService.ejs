@@ -2,34 +2,162 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Post Servizio - HelpDigit</title>
-    <link rel="stylesheet" href="../public/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - HelpDigit</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .star-rating {
+            font-size: 1.5rem;
+            color: #e5e5e5;
+            cursor: pointer;
+        }
+        .star-rating .fas {
+            color: #ffc107;
+        }
+        .loyalty-card {
+            background: linear-gradient(135deg, #6f42c1, #007bff);
+            color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        .loyalty-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: translate(30%, 30%);
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Riepilogo Post Servizio</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="services.html">Servizi</a></li>
-                <li><a href="request.html">Invia Richiesta</a></li>
-                <li><a href="payment.html">Pagamento</a></li>
-                <li><a href="login.html">Login</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <h2>Grazie per aver utilizzato i nostri servizi!</h2>
-        <p>Il tuo servizio è stato completato con successo.</p>
-        <h3>Feedback</h3>
-        <form action="/submit-feedback" method="POST">
-            <label for="feedback">Lascia il tuo feedback:</label><br>
-            <textarea id="feedback" name="feedback" rows="4" cols="50" required></textarea><br>
-            <input type="submit" value="Invia Feedback">
-        </form>
+    <!-- La navbar verrà inserita qui da build.js -->
+    
+    <main class="container py-5">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h3 mb-0">Il tuo feedback è importante per noi</h1>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h5>Servizio completato: <%= service.name %></h5>
+                            <p class="text-muted">Ordine #<%= order.id %> completato il <%= new Date(order.dataConsegna).toLocaleDateString('it-IT') %></p>
+                        </div>
+                        
+                        <form action="/orders/<%= order.id %>/feedback" method="post" id="feedbackForm">
+                            <div class="form-group">
+                                <label>Valuta la tua esperienza complessiva:</label>
+                                <div class="star-rating d-flex mb-2" id="ratingContainer">
+                                    <span data-rating="1"><i class="far fa-star"></i></span>
+                                    <span data-rating="2"><i class="far fa-star"></i></span>
+                                    <span data-rating="3"><i class="far fa-star"></i></span>
+                                    <span data-rating="4"><i class="far fa-star"></i></span>
+                                    <span data-rating="5"><i class="far fa-star"></i></span>
+                                </div>
+                                <input type="hidden" name="rating" id="ratingInput" value="0" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="feedbackText">Il tuo feedback:</label>
+                                <textarea class="form-control" id="feedbackText" name="feedbackText" rows="4" placeholder="Raccontaci la tua esperienza con questo servizio..." required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="publicFeedback" name="publicFeedback" checked>
+                                    <label class="custom-control-label" for="publicFeedback">Sono d'accordo che questo feedback sia pubblicato sul sito</label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Invia feedback</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card loyalty-card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-white">I tuoi punti fedeltà</h5>
+                                <h2 class="display-4 mb-3 font-weight-bold"><%= user.puntifedelta %></h2>
+                                <p class="card-text">Hai guadagnato <%= Math.floor(order.prezzo) %> punti con questo ordine!</p>
+                                <a href="/rewards" class="btn btn-light mt-2">Scopri le offerte</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Prossimo servizio?</h5>
+                                <p class="card-text">Abbiamo delle offerte speciali pensate per te in base ai tuoi interessi.</p>
+                                <p><small class="text-muted">Usa i tuoi punti fedeltà per ottenere sconti sui prossimi servizi!</small></p>
+                                <a href="/services" class="btn btn-outline-primary mt-2">Esplora i servizi</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
-    <footer>
-        <p>&copy; 2025 HelpDigit. Tutti i diritti riservati.</p>
-    </footer>
+
+    <!-- Il footer verrà inserito qui da build.js -->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+    
+    <script>
+        // Gestione del rating a stelle
+        $(document).ready(function() {
+            $('#ratingContainer span').on('click', function() {
+                const rating = $(this).data('rating');
+                $('#ratingInput').val(rating);
+                
+                // Aggiorna l'UI
+                $('#ratingContainer span').each(function() {
+                    const starRating = $(this).data('rating');
+                    if (starRating <= rating) {
+                        $(this).html('<i class="fas fa-star"></i>');
+                    } else {
+                        $(this).html('<i class="far fa-star"></i>');
+                    }
+                });
+            });
+            
+            // Hover effect
+            $('#ratingContainer span').hover(
+                function() {
+                    const rating = $(this).data('rating');
+                    $('#ratingContainer span').each(function() {
+                        const starRating = $(this).data('rating');
+                        if (starRating <= rating) {
+                            $(this).html('<i class="fas fa-star"></i>');
+                        }
+                    });
+                },
+                function() {
+                    const currentRating = $('#ratingInput').val();
+                    $('#ratingContainer span').each(function() {
+                        const starRating = $(this).data('rating');
+                        if (starRating <= currentRating) {
+                            $(this).html('<i class="fas fa-star"></i>');
+                        } else {
+                            $(this).html('<i class="far fa-star"></i>');
+                        }
+                    });
+                }
+            );
+        });
+    </script>
 </body>
 </html>

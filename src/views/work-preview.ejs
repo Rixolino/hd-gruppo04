@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anteprima Lavoro - HelpDigit</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- La navbar verrà inserita qui da build.js -->
+    
+    <main class="container py-5">
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h1 class="h3 mb-0">Anteprima del lavoro #<%= order.id %></h1>
+                        <span class="badge badge-light">Completato</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <h4>Servizio: <%= service.name %></h4>
+                            <p class="text-muted"><%= service.description %></p>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <h5 class="mb-3">Anteprima del risultato</h5>
+                                <div class="card">
+                                    <img src="/img/preview/<%= order.id %>.jpg" class="card-img-top" alt="Anteprima del lavoro" onerror="this.onerror=null;this.src='/img/placeholder-preview.jpg';">
+                                    <div class="card-body">
+                                        <p class="card-text">Questa è un'anteprima del lavoro completato secondo le tue specifiche. Per favore, controlla attentamente e scegli se approvare o richiedere modifiche.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        Dettagli Completamento
+                                    </div>
+                                    <div class="card-body">
+                                        <p><strong>Completato il:</strong> <%= new Date().toLocaleDateString('it-IT') %></p>
+                                        <p><strong>Revisioni disponibili:</strong> <%= service.revisions || '1' %></p>
+                                        <p><strong>Note:</strong> Lavoro completato secondo le specifiche richieste.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <form action="/orders/<%= order.id %>/approve" method="post">
+                                    <button type="submit" class="btn btn-success btn-lg btn-block">
+                                        <i class="fas fa-check-circle mr-2"></i>Approva e concludi
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <button type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#revisionModal">
+                                    <i class="fas fa-edit mr-2"></i>Richiedi modifiche
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modal per le richieste di modifiche -->
+    <div class="modal fade" id="revisionModal" tabindex="-1" aria-labelledby="revisionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="revisionModalLabel">Richiedi modifiche</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="/orders/<%= order.id %>/revision" method="post" id="revisionForm">
+                        <div class="form-group">
+                            <label for="revisionDetails">Descrivi dettagliatamente le modifiche richieste:</label>
+                            <textarea class="form-control" id="revisionDetails" name="revisionDetails" rows="5" required></textarea>
+                            <small class="form-text text-muted">Sii specifico riguardo le modifiche che desideri. Questo ci aiuterà a soddisfare le tue esigenze in modo preciso.</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Aree che necessitano modifiche:</label>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="designChanges" name="areas[]" value="design">
+                                <label class="custom-control-label" for="designChanges">Design/Layout</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="contentChanges" name="areas[]" value="content">
+                                <label class="custom-control-label" for="contentChanges">Contenuto/Testo</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="functionalChanges" name="areas[]" value="functional">
+                                <label class="custom-control-label" for="functionalChanges">Funzionalità</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="otherChanges" name="areas[]" value="other">
+                                <label class="custom-control-label" for="otherChanges">Altro</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                    <button type="submit" form="revisionForm" class="btn btn-primary">Invia richiesta di modifica</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Il footer verrà inserito qui da build.js -->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+</body>
+</html>

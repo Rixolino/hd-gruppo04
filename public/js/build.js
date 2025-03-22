@@ -809,9 +809,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isAuthenticated) {
             // Links per utenti autenticati
             navbarLinks = `
-                <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="/about"><i class="fas fa-info-circle"></i> Chi Siamo</a></li>
-                <li class="nav-item"><a class="nav-link" href="/services"><i class="fas fa-cogs"></i> Servizi</a></li>
+                <li class="nav-item"><a class="nav-link animated-link" href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link animated-link" href="/about"><i class="fas fa-info-circle"></i> Chi Siamo</a></li>
+                <li class="nav-item"><a class="nav-link animated-link" href="/services"><i class="fas fa-cogs"></i> Servizi</a></li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <div class="user-avatar-mini d-none d-sm-inline-block">
@@ -832,18 +832,18 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/profile">
+                        <a class="dropdown-item animated-link" href="/profile">
                             <i class="fas fa-id-card dropdown-icon"></i>
                             <span>Profilo</span>
                             <i class="fas fa-chevron-right dropdown-indicator"></i>
                         </a>
-                        <a class="dropdown-item" href="/settings">
+                        <a class="dropdown-item animated-link" href="/settings">
                             <i class="fas fa-cog dropdown-icon"></i>
                             <span>Impostazioni</span>
                             <i class="fas fa-chevron-right dropdown-indicator"></i>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item logout-item" href="/auth/logout">
+                        <a class="dropdown-item logout-item animated-link" href="/auth/logout">
                             <i class="fas fa-sign-out-alt dropdown-icon"></i>
                             <span>Logout</span>
                         </a>
@@ -853,10 +853,10 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             // Links per utenti non autenticati
             navbarLinks = `
-                <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="/services"><i class="fas fa-cogs"></i> Servizi</a></li>
-                <li class="nav-item"><a class="nav-link" href="/about"><i class="fas fa-info-circle"></i> Chi Siamo</a></li>
-                <li class="nav-item"><a class="nav-link" href="/contact"><i class="fas fa-envelope"></i> Contatti</a></li>
+                <li class="nav-item"><a class="nav-link animated-link" href="/"><i class="fas fa-home"></i> Home</a></li>
+                <li class="nav-item"><a class="nav-link animated-link" href="/services"><i class="fas fa-cogs"></i> Servizi</a></li>
+                <li class="nav-item"><a class="nav-link animated-link" href="/about"><i class="fas fa-info-circle"></i> Chi Siamo</a></li>
+                <li class="nav-item"><a class="nav-link animated-link" href="/contact"><i class="fas fa-envelope"></i> Contatti</a></li>
                 <li class="nav-item"><a class="nav-link btn btn-glow btn-outline-light btn-sm ml-2" href="/auth/login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
                 <li class="nav-item"><a class="nav-link btn btn-glow btn-primary btn-sm ml-2" href="/auth/register"><i class="fas fa-user-plus"></i> Registrati</a></li>
             `;
@@ -920,10 +920,10 @@ const footer = `
                             </div>
                             <p class="footer-text mb-4">Soluzioni digitali su misura per privati e aziende. Trasformiamo la tua visione in realtà con servizi tecnologici professionali.</p>
                             <div class="social-links">
-                                <a href="#" target="_blank" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                                <a href="#" target="_blank" class="social-link"><i class="fab fa-twitter"></i></a>
-                                <a href="#" target="_blank" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-                                <a href="https://www.instagram.com/helpdigit/" target="_blank" class="social-link"><i class="fab fa-instagram"></i></a>
+                                <a href="#" target="_blank" class="social-link animated-social"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" target="_blank" class="social-link animated-social"><i class="fab fa-twitter"></i></a>
+                                <a href="#" target="_blank" class="social-link animated-social"><i class="fab fa-linkedin-in"></i></a>
+                                <a href="https://www.instagram.com/helpdigit/" target="_blank" class="social-link animated-social"><i class="fab fa-instagram"></i></a>
                             </div>
                         </div>
                     </div>
@@ -931,20 +931,20 @@ const footer = `
                     <div class="col-lg-2 col-md-6 col-6 mb-4 mb-lg-0">
                         <h3 class="footer-heading">Servizi</h3>
                         <ul class="footer-links">
-                            <li><a href="/services/volantini">Creazione Volantini</a></li>
-                            <li><a href="/services/digitalizzazione">Digitalizzazione</a></li>
-                            <li><a href="/services/supporto">Supporto Tecnico</a></li>
-                            <li><a href="/services/consulenza">Consulenza IT</a></li>
+                            <li><a href="/services/volantini" class="footer-animated-link">Creazione Volantini</a></li>
+                            <li><a href="/services/digitalizzazione" class="footer-animated-link">Digitalizzazione</a></li>
+                            <li><a href="/services/supporto" class="footer-animated-link">Supporto Tecnico</a></li>
+                            <li><a href="/services/consulenza" class="footer-animated-link">Consulenza IT</a></li>
                         </ul>
                     </div>
                     
                     <div class="col-lg-2 col-md-6 col-6 mb-4 mb-lg-0">
                         <h3 class="footer-heading">Azienda</h3>
                         <ul class="footer-links">
-                            <li><a href="/about">Chi Siamo</a></li>
-                            <li><a href="/faq">FAQ</a></li>
-                            <li><a href="/privacy">Privacy</a></li>
-                            <li><a href="/terms">Termini</a></li>
+                            <li><a href="/about" class="footer-animated-link">Chi Siamo</a></li>
+                            <li><a href="/faq" class="footer-animated-link">FAQ</a></li>
+                            <li><a href="/privacy" class="footer-animated-link">Privacy</a></li>
+                            <li><a href="/terms" class="footer-animated-link">Termini</a></li>
                         </ul>
                     </div>
                     
@@ -960,7 +960,7 @@ const footer = `
                             </li>
                             <li>
                                 <i class="fas fa-envelope contact-icon"></i>
-                                <a href="mailto:helpdigit2025@gmail.com">helpdigit2025@gmail.com</a>
+                                <a href="mailto:helpdigit2025@gmail.com" class="footer-animated-link">helpdigit2025@gmail.com</a>
                             </li>
                             <li>
                                 <i class="fas fa-clock contact-icon"></i>
@@ -980,9 +980,9 @@ const footer = `
                     </div>
                     <div class="col-md-6">
                         <div class="footer-legal text-center text-md-end">
-                            <a href="/privacy">Privacy</a>
-                            <a href="/terms">Termini</a>
-                            <a href="/cookies">Cookie</a>
+                            <a href="/privacy" class="footer-animated-link">Privacy</a>
+                            <a href="/terms" class="footer-animated-link">Termini</a>
+                            <a href="/cookies" class="footer-animated-link">Cookie</a>
                         </div>
                     </div>
                 </div>
@@ -1525,7 +1525,88 @@ const footer = `
             </style>
         `;
 
+        // Aggiungi gli stili CSS per l'animazione dei link
+        const linkAnimationStyles = `
+            <style>
+                /* Animazione link navbar */
+                .animated-link {
+                    position: relative;
+                    transition: all 0.3s ease;
+                }
+                
+                .animated-link::after {
+                    content: '';
+                    position: absolute;
+                    width: 0;
+                    height: 2px;
+                    bottom: 0;
+                    left: 0;
+                    background-color: var(--accent-color, #3182CE);
+                    transition: width 0.3s ease;
+                    opacity: 0.8;
+                }
+                
+                .animated-link:hover::after {
+                    width: 100%;
+                }
+                
+                /* Animazione link footer */
+                .footer-animated-link {
+                    position: relative;
+                    transition: all 0.3s ease;
+                }
+                
+                .footer-animated-link::after {
+                    content: '';
+                    position: absolute;
+                    width: 0;
+                    height: 1px;
+                    bottom: -2px;
+                    left: 0;
+                    background-color: #3b82f6;
+                    transition: width 0.3s ease;
+                }
+                
+                .footer-animated-link:hover::after {
+                    width: 100%;
+                }
+                
+                /* Animazione social link */
+                .animated-social {
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .animated-social::after {
+                    content: '';
+                    position: absolute;
+                    width: 0;
+                    height: 100%;
+                    bottom: 0;
+                    left: 0;
+                    background-color: rgba(59, 130, 246, 0.2);
+                    transition: width 0.3s ease;
+                    z-index: -1;
+                }
+                
+                .animated-social:hover::after {
+                    width: 100%;
+                }
+                
+                /* Aggiustamento per i link della navbar */
+                .navbar .nav-link.animated-link {
+                    padding-bottom: 5px; /* Spazio per l'animazione */
+                }
+                
+                /* Adattamenti per tema scuro */
+                .dark-theme .animated-link::after {
+                    background-color: #47a3ff;
+                }
+            </style>
+        `;
+
         // Inserisci gli stili personalizzati nella head
+        document.head.insertAdjacentHTML('beforeend', linkAnimationStyles);
         document.head.insertAdjacentHTML('beforeend', customStyles);
         
         // Inserisci la barra di navigazione all'inizio del body
@@ -2459,7 +2540,7 @@ const footer = `
                 background-color: transparent !important;
             }
             
-            /* Supporto per tema scuro */
+            /* Supporto tema scuro */
             .dark-theme .card {
                 background-color: #2d2d2d !important;
                 box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.25), 

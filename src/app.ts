@@ -17,6 +17,7 @@ import { loadUserSettings } from './middleware/settingsMiddleware';
 import SettingsModel from './models/settingsModel';
 import settingsRoutes from './routes/settingsRoutes';
 import multer from 'multer';
+import PaymentModel from './models/paymentModel'; // Add this line to import PaymentModel
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -968,6 +969,162 @@ app.get('/orders/:id', authenticate, async (req: Request, res: Response): Promis
   }
 });
 
+// Mostra l'anteprima del lavoro completato (Scenario 5)
+app.get('/orders/:id/preview', authenticate, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const orderId = req.params.id;
+    
+    // Recupera l'ordine con le colonne necessarie
+    const order = await OrderModel.findByPk(orderId, {
+      attributes: ['id', 'utenteId', 'servizio', 'stato', 'dataRichiesta', 
+                  'dataConsegna', 'prezzo', 'progressoLavoro', 'dettagliAggiuntivi', 
+                  'createdAt', 'updatedAt']
+    });
+    
+    // Verifica che l'ordine esista e appartenga all'utente autenticato
+    if (!order || order.utenteId !== req.user.userId) {
+      return res.status(404).render('error', {
+        user: req.user,
+        title: 'Ordine non trovato',
+        errorMessage: 'Anteprima non disponibile o non autorizzata',
+        showLogout: true
+      });
+    }
+    
+    // Verifica che l'ordine sia in uno stato appropriato per mostrare l'anteprima
+    if (order.stato !== 'completato' && order.stato !== 'in-revisione') {
+      return res.status(400).render('error', {
+        user: req.user,
+        title: 'Anteprima non disponibile',
+        errorMessage: 'L\'anteprima è disponibile solo per ordini completati o in fase di revisione',
+        showLogout: true
+      });
+    }
+    
+    // Recupera il servizio associato all'ordine
+    const service = await ServiceModel.findByPk(order.servizio);
+    
+    if (!service) {
+      return res.status(404).render('error', {
+        user: req.user,
+        title: 'Servizio non trovato',
+        errorMessage: 'Il servizio associato a questo ordine non è stato trovato',
+        showLogout: true
+      });
+    }
+    
+    // Recupera informazioni extra come gli allegati o i dettagli della revisione
+    let dettagliAggiuntivi = {};
+    try {
+      if (order.dettagliAggiuntivi) {
+        dettagliAggiuntivi = JSON.parse(order.dettagliAggiuntivi);
+      }
+    } catch (e) {
+      console.error('Errore nel parsing dei dettagli aggiuntivi:', e);
+    }
+    
+    // Renderizza la pagina di anteprima del lavoro
+    res.render('work-preview', {
+      user: req.user,
+      order,
+      service,
+      dettagliAggiuntivi,
+      revisioni: service.revisions || 1, // Numero di revisioni disponibili
+      dataCompletamento: new Date(), // Data di completamento (simulata)
+      title: 'Anteprima Lavoro'
+    });
+  } catch (error) {
+    console.error('Errore nel caricamento dell\'anteprima:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Si è verificato un errore nel caricamento dell\'anteprima',
+      showLogout: true
+    });
+  }
+});
+
+app.post('/process-payment', authenticate, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { orderId, paymentMethod } = req.body;
+    
+    // Recupera l'ordine
+    const order = await OrderModel.findByPk(orderId);
+    
+    if (!order || order.utenteId !== req.user.userId) {
+      return res.status(404).render('error', {
+        user: req.user,
+        title: 'Ordine non trovato',
+        errorMessage: 'Ordine non trovato o non autorizzato',
+        showLogout: true
+      });
+    }
+    
+    // Crea un record di pagamento
+    const payment = await PaymentModel.create({
+      orderId: order.id,
+      utenteId: req.user.userId,
+      importo: order.prezzo,
+      metodo: paymentMethod,
+      stato: 'completato',
+      riferimento: 'PAY-' + Math.random().toString(36).substring(2, 10).toUpperCase()
+    });
+    
+    // Aggiorna lo stato dell'ordine
+    await order.update({
+      stato: 'in-lavorazione',
+      dataConsegna: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Data di consegna: 7 giorni da oggi
+    });
+    
+    // Reindirizza alla pagina di conferma pagamento
+    res.redirect(`/payment-confirmation/${payment.id}`);
+  } catch (error) {
+    console.error('Errore nell\'elaborazione del pagamento:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Si è verificato un errore durante l\'elaborazione del pagamento',
+      showLogout: true
+    });
+  }
+});
+
+// Pagina di conferma pagamento
+app.get('/payment-confirmation/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const paymentId = req.params.id;
+    const payment = await PaymentModel.findByPk(paymentId);
+    
+    if (!payment || payment.utenteId !== req.user.userId) {
+      return res.status(404).render('error', {
+        user: req.user,
+        title: 'Pagamento non trovato',
+        errorMessage: 'Pagamento non trovato',
+        showLogout: true
+      });
+    }
+    
+    const order = await OrderModel.findByPk(payment.orderId);
+    const service = order ? await ServiceModel.findByPk(order.servizio) : null;
+    
+    res.render('payment-confirmation', {
+      user: req.user,
+      payment,
+      order,
+      service,
+      title: 'Conferma Pagamento'
+    });
+  } catch (error) {
+    console.error('Errore nel caricamento della pagina di conferma pagamento:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Si è verificato un errore nel caricamento della pagina di conferma pagamento',
+      showLogout: true
+    });
+  }
+});
+
 // Gestione pagina 404 - deve essere sempre DOPO tutte le route ma PRIMA dei middleware di gestione errori
 app.use((req: Request, res: Response) => {
   res.status(404).render('error', {
@@ -1046,6 +1203,7 @@ const generalErrorHandler: ErrorRequestHandler = (err: Error, req: Request, res:
 // Registra i middleware dopo la route 404
 app.use(dbErrorHandler);
 app.use(generalErrorHandler);
+
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
