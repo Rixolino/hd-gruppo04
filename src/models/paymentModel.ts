@@ -4,7 +4,7 @@ import { sequelize } from '../config/db';
 // Definizione dell'interfaccia per gli attributi del modello Payment
 export interface IPaymentAttributes {
   id: number;
-  orderId: number;
+  orderId: number;  // Assicurati che questo campo sia presente
   utenteId: number;
   importo: number;
   servizio: number;
@@ -12,6 +12,7 @@ export interface IPaymentAttributes {
   stato: string;
   riferimento: string;
   dettagli?: string;
+  
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -22,7 +23,7 @@ export interface IPaymentCreationAttributes extends Optional<IPaymentAttributes,
 // Definisci la classe del modello che estende Model con le interfacce
 class PaymentModel extends Model<IPaymentAttributes, IPaymentCreationAttributes> implements IPaymentAttributes {
   public id!: number;
-  public orderId!: number;
+  public orderId!: number;  // Assicurati che questo campo sia presente
   public utenteId!: number;
   public importo!: number;
   public servizio!: number;
@@ -36,7 +37,7 @@ class PaymentModel extends Model<IPaymentAttributes, IPaymentCreationAttributes>
   public readonly updatedAt!: Date;
 }
 
-// Inizializza il modello
+// Inizializza il modello con la mappatura corretta ai campi del database
 PaymentModel.init({
   id: {
     type: DataTypes.INTEGER,
@@ -45,35 +46,43 @@ PaymentModel.init({
   },
   orderId: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    field: 'orderId'  // Esplicita il mapping (anche se identico)
   },
   utenteId: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    field: 'userId' 
   },
   importo: {
     type: DataTypes.DECIMAL(10, 2),
-    allowNull: false
+    allowNull: false,
+    field: 'amount'
   },
   servizio: {
     type: DataTypes.INTEGER,
-    allowNull: false
+    allowNull: false,
+    field: 'serviceId'
   },
   metodo: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    field: 'paymentMethod'
   },
   stato: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    field: 'status'
   },
   riferimento: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    field: 'transactionId'
   },
   dettagli: {
     type: DataTypes.TEXT,
-    allowNull: true
+    allowNull: true,
+    field: 'details'
   }
 }, {
   sequelize,

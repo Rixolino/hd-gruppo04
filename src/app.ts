@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import { Op } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { initializeDatabase } from './config/db';
 import UserModel from './models/userModel';
 import OrderModel from './models/orderModel';
@@ -20,6 +20,7 @@ import multer from 'multer';
 import PaymentModel, { IPaymentAttributes } from './models/paymentModel'; // Add this line to import PaymentModel
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
+import { sequelize } from './config/db';
 
 // Sincronizza il modello con il database (aggiunge le colonne mancanti)
 SettingsModel.sync({ alter: true }).then(() => {
@@ -1033,6 +1034,7 @@ app.get('/orders/:id/preview', authenticate, async (req: Request, res: Response)
   }
 });
 
+// Elaborazione del pagamento - usa questa versione e rimuovi la duplicata
 app.post('/process-payment', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
     const { orderId, paymentMethod } = req.body;
@@ -1048,76 +1050,40 @@ app.post('/process-payment', authenticate, async (req: Request, res: Response): 
         showLogout: true
       });
     }
-    
-    // Crea un record di pagamento
-    const payment = await PaymentModel.create({
-      orderId: order.id,
-      utenteId: req.user.userId,
-      importo: order.prezzo,
-      servizio: Number(order.servizio),
-      metodo: paymentMethod,
-      stato: 'completato',
-      riferimento: 'PAY-' + Math.random().toString(36).substring(2, 10).toUpperCase()
-    });
-    
-    // Aggiorna lo stato dell'ordine
-    await order.update({
-      stato: 'in-lavorazione',
-      dataConsegna: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Data di consegna: 7 giorni da oggi
-    });
-    
-    // Reindirizza alla pagina di conferma pagamento
-    res.redirect(`/payment-confirmation/${payment.id}`);
-  } catch (error) {
-    console.error('Errore nell\'elaborazione del pagamento:', error);
-    res.status(500).render('error', {
-      user: req.user,
-      title: 'Errore',
-      errorMessage: 'Si è verificato un errore durante l\'elaborazione del pagamento',
-      showLogout: true
-    });
-  }
-});
 
-// Elaborazione del pagamento
-app.post('/process-payment', authenticate, async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { orderId, paymentMethod, bypassPayment } = req.body;
+    // Genera una reference ID univoca per il pagamento
+    const transactionId = 'PAY-' + Math.random().toString(36).substring(2, 10).toUpperCase();
     
-    // Recupera l'ordine
-    const order = await OrderModel.findByPk(orderId);
+    // Usa SQL diretto per inserire il pagamento
+    const [results] = await sequelize.query(
+      `INSERT INTO payments 
+       (orderId, userId, amount, serviceId, status, paymentMethod, transactionId, details, createdAt, updatedAt) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+      {
+        replacements: [
+          order.id, // orderId
+          req.user.userId, // userId
+          order.prezzo, // amount
+          order.servizio ? (isNaN(Number(order.servizio)) ? 0 : Number(order.servizio)) : 0, // serviceId, con gestione del NaN
+          'completato', // status
+          paymentMethod, // paymentMethod
+          transactionId, // transactionId
+          'Pagamento per ordine #' + order.id // details
+        ],
+        type: QueryTypes.INSERT
+      }
+    );
     
-    if (!order || order.utenteId !== req.user.userId) {
-      return res.status(404).render('error', {
-        user: req.user,
-        title: 'Ordine non trovato',
-        errorMessage: 'Ordine non trovato o non autorizzato',
-        showLogout: true
-      });
-    }
-    
-    // Crea un record di pagamento con i campi corretti
-    const payment = await PaymentModel.create({
-      orderId: order.id,
-      utenteId: req.user.userId,
-      importo: order.prezzo,
-      servizio: Number(order.servizio),
-      metodo: paymentMethod,
-      stato: 'completato',
-      riferimento: 'SIM-' + Math.random().toString(36).substring(2, 10).toUpperCase(),
-      dettagli: JSON.stringify({
-        simulazione: true,
-        timestamp: new Date().toISOString()
-      })
-    }) as unknown as IPaymentAttributes;
+    // results contiene [insertId, affectedRows]
+    const paymentId = Array.isArray(results) ? results[0] : results;
     
     // Aggiorna lo stato dell'ordine
     await order.update({
       stato: 'in-lavorazione',
-      dataConsegna: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Data di consegna: 7 giorni da oggi
+      dataConsegna: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     });
     
-    // Aggiorna i punti fedeltà
+    // Aggiorna i punti fedeltà se necessario
     const user = await UserModel.findByPk(req.user.userId);
     if (user) {
       const puntiGuadagnati = Math.floor(Number(order.prezzo));
@@ -1127,7 +1093,7 @@ app.post('/process-payment', authenticate, async (req: Request, res: Response): 
     }
     
     // Reindirizza alla pagina di conferma pagamento
-    res.redirect(`/payment-confirmation/${payment.id}`);
+    res.redirect(`/payment-confirmation/${paymentId}`);
   } catch (error) {
     console.error('Errore nell\'elaborazione del pagamento:', error);
     res.status(500).render('error', {
@@ -1143,9 +1109,9 @@ app.post('/process-payment', authenticate, async (req: Request, res: Response): 
 app.get('/payment-confirmation/:id', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
     const paymentId = req.params.id;
-    const payment = await PaymentModel.findByPk(paymentId) as unknown as IPaymentAttributes;
+    const payment = await PaymentModel.findByPk(paymentId);
     
-    if (!payment || payment.utenteId !== req.user.userId) {
+    if (!payment || payment.get('userId') !== req.user.userId) {
       return res.status(404).render('error', {
         user: req.user,
         title: 'Pagamento non trovato',
@@ -1154,12 +1120,27 @@ app.get('/payment-confirmation/:id', authenticate, async (req: Request, res: Res
       });
     }
     
-    const order = await OrderModel.findByPk(payment.orderId);
+    const order = await OrderModel.findByPk(payment.get('orderId'));
     const service = order ? await ServiceModel.findByPk(order.servizio) : null;
+    
+    // Crea un oggetto con mappatura dei nomi per il template
+    const paymentData = {
+      id: payment.id,
+      orderId: payment.get('orderId'),
+      utenteId: payment.get('userId'),
+      importo: payment.get('amount'),
+      servizio: payment.get('serviceId'),
+      metodo: payment.get('paymentMethod'),
+      stato: payment.get('status'),
+      riferimento: payment.get('transactionId'),
+      dettagli: payment.get('details'),
+      createdAt: payment.createdAt,
+      updatedAt: payment.updatedAt
+    };
     
     res.render('payment-confirmation', {
       user: req.user,
-      payment,
+      payment: paymentData,
       order,
       service,
       title: 'Conferma Pagamento'
