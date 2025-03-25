@@ -1,0 +1,13 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": "false",
+      "installBash": "true",
+      "installOhMyZsh": "false",
+      "installNpm": "true",
+      "installNode": "none"
+    },
+    "ghcr.io/devcontainers/features/powershell:1": {}
+  }
+}
