@@ -1,0 +1,11 @@
+{
+    "name": "My Dev Container",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "extensions": [
+        "ms-python.python",
+        "ms-vscode.cpptools",
+        "ms-vscode.powershell"
+    ]
+}
