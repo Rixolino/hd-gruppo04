@@ -1160,8 +1160,10 @@ app.get('/payment-confirmation/:id', authenticate, async (req: Request, res: Res
 app.post('/orders/:id/cancel', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
     const orderId = req.params.id;
+
+    // Recupera l'ordine
     const order = await OrderModel.findByPk(orderId);
-    
+
     if (!order || order.utenteId !== req.user.userId) {
       return res.status(404).render('error', {
         user: req.user,
@@ -1170,10 +1172,21 @@ app.post('/orders/:id/cancel', authenticate, async (req: Request, res: Response)
         showLogout: true
       });
     }
-    
+
+    // Recupera l'utente associato
+    const user = await UserModel.findByPk(req.user.userId);
+
+    if (user) {
+      // Calcola i punti da sottrarre (1 punto per ogni euro speso)
+      const puntiDaSottrarre = Math.floor(Number(order.prezzo));
+      await user.update({
+        puntifedelta: Math.max(0, (user.puntifedelta || 0) - puntiDaSottrarre) // Evita valori negativi
+      });
+    }
+
     // Elimina l'ordine dal database
     await order.destroy();
-    
+
     res.redirect('/dashboard');
   } catch (error) {
     console.error('Errore nella cancellazione dell\'ordine:', error);
