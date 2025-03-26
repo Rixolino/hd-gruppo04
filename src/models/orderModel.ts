@@ -54,7 +54,7 @@ Order.init({
   },
   descrizione: {
     type: DataTypes.TEXT,
-    allowNull: false
+    allowNull: true // Modifica secondo necessità
   },
   dettagliAggiuntivi: {
     type: DataTypes.TEXT,
