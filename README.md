@@ -1,3 +1,6 @@
+* Strumenti: Vercel (per hosting)
+* Linguaggio: TypeScript e varie librerie (+ modelli relazionali) per funzionamento del sito
+
 # Scopo del Progetto
 
 ## Obiettivo Generale
