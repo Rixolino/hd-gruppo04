@@ -1,6 +1,6 @@
 * Strumenti: Vercel (per hosting)
 * Linguaggio: TypeScript e varie librerie (+ modelli relazionali) per funzionamento del sito
-* Hosting datbase gratuito: Filess.io
+* Hosting datbase gratuito: Filess.io<br>
 N.B per hosting database:  Soluzione gratuita però limitata a 5 connessioni, per questo potrebbe generare (spesso) errori di connessione nel database, quindi aspettare fino a quando si ristabilizza
 
 # Scopo del Progetto
