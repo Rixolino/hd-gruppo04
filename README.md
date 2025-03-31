@@ -1,9 +1,10 @@
+# HelpDigit
 * Strumenti: Vercel (per hosting)
 * Linguaggio: TypeScript e varie librerie (+ modelli relazionali) per funzionamento del sito
 * Hosting datbase gratuito: Filess.io<br>
 N.B per hosting database:  Soluzione gratuita però limitata a 5 connessioni, per questo potrebbe generare (spesso) errori di connessione nel database, quindi aspettare fino a quando si ristabilizza
 
-# Scopo del Progetto
+
 
 ## Obiettivo Generale
 Il progetto mira a fornire una piattaforma digitale che consenta agli utenti di accedere a una vasta gamma di servizi personalizzati, gestire richieste, effettuare pagamenti e monitorare lo stato dei servizi in modo semplice e intuitivo. Il sistema è progettato per garantire un'esperienza utente fluida, accessibile e sicura, con un'interfaccia moderna e funzionalità avanzate per la gestione delle impostazioni e delle preferenze personali.
