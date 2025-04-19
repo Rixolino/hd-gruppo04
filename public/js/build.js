@@ -17,40 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
                (typeof window.tizen !== 'undefined');
     })();
 
-    // Gestione dinamica delle immagini con fallback per diversi ambienti
-    const images = document.querySelectorAll('img');
-    images.forEach(img => {
-      img.onerror = function() {
-        // Se l'immagine non si carica, prova un percorso alternativo
-        const currentSrc = this.src;
-        console.log('Errore caricamento immagine:', currentSrc);
-        
-        // Prova a correggere il percorso
-        if (currentSrc.includes('/img/')) {
-          this.src = currentSrc.replace('/img/', '/public/img/');
-          console.log('Tentativo con percorso alternativo:', this.src);
-          
-          // Se anche questo fallisce, usa un'immagine placeholder
-          this.onerror = function() {
-            console.log('Fallimento anche con percorso alternativo, uso placeholder');
-            this.src = 'https://via.placeholder.com/300x200?text=Immagine+non+disponibile';
-            this.onerror = null; // Previene ricorsione infinita
-          };
-        } else if (currentSrc.includes('src/img/')) {
-          this.src = currentSrc.replace('src/img/', '/img/');
-          console.log('Tentativo con percorso di produzione:', this.src);
-          
-          this.onerror = function() {
-            this.src = 'https://via.placeholder.com/300x200?text=Immagine+non+disponibile';
-            this.onerror = null;
-          };
-        } else {
-          this.src = 'https://via.placeholder.com/300x200?text=Immagine+non+disponibile';
-          console.log('Uso placeholder diretto');
-        }
-      };
-    });
-
     // Verifica se l'utente è autenticato (controlla se esiste un cookie di autenticazione)
     const isAuthenticated = document.cookie.split(';').some((item) => item.trim().startsWith('token='));
     
