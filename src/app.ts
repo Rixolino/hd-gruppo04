@@ -21,6 +21,7 @@ import PaymentModel, { IPaymentAttributes } from './models/paymentModel'; // Add
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { sequelize } from './config/db';
+import { isAdmin } from './middleware/adminMiddleware';
 
 // Sincronizza il modello con il database (aggiunge le colonne mancanti)
 SettingsModel.sync({ alter: true }).then(() => {
@@ -1034,7 +1035,281 @@ app.get('/orders/:id/preview', authenticate, async (req: Request, res: Response)
   }
 });
 
-// Elaborazione del pagamento - usa questa versione e rimuovi la duplicata
+// Vista per il feedback del servizio consegnato
+app.get('/orders/:id/feedback', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    // Verifica che l'utente sia il proprietario dell'ordine
+    const [orderRows] = await sequelize.query(
+      'SELECT o.*, s.name as serviceName FROM ordini o JOIN services s ON o.serviceId = s.id WHERE o.id = ? AND o.utenteId = ?',
+      { replacements: [id, req.user.userId], type: QueryTypes.SELECT }
+    );
+    
+    if (!Array.isArray(orderRows) || orderRows.length === 0) {
+      return res.render('error', {
+        user: req.user,
+        title: 'Errore',
+        errorMessage: 'Ordine non trovato',
+        showLogout: true
+      });
+    }
+    
+    const order = orderRows[0];
+    
+    // Verifica che l'ordine sia stato consegnato
+    if (order.status !== 'consegnato') {
+      return res.render('error', {
+        user: req.user,
+        title: 'Errore',
+        errorMessage: 'Puoi lasciare feedback solo per ordini completati',
+        showLogout: true
+      });
+    }
+    
+    // Verifica che non sia già stato lasciato un feedback
+    const [feedbackRows] = await sequelize.query(
+      'SELECT id FROM feedback WHERE ordineId = ?',
+      { replacements: [id], type: QueryTypes.SELECT }
+    );
+    
+    if (Array.isArray(feedbackRows) && feedbackRows.length > 0) {
+      return res.render('error', {
+        user: req.user,
+        title: 'Errore',
+        errorMessage: 'Hai già lasciato un feedback per questo ordine',
+        showLogout: true
+      });
+    }
+    
+    // Renderizza la vista del feedback
+    return res.render('service-feedback', {
+      title: 'Lascia un Feedback',
+      user: req.user,
+      order
+    });
+    
+  } catch (error) {
+    console.error('Errore nella pagina di feedback:', error);
+    return res.status(500).render('error', {
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Si è verificato un errore nel caricamento della pagina di feedback',
+      showLogout: true
+    });
+  }
+});
+
+// SCENARIO 5: Lavorazione del Servizio - Update status e anteprima
+app.post('/api/orders/:id/status', authenticate, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    
+    await sequelize.query(
+      'UPDATE ordini SET status = ? WHERE id = ?',
+      { replacements: [status, id], type: QueryTypes.UPDATE }
+    );
+    
+    res.json({ success: true, message: `Stato dell'ordine aggiornato a: ${status}` });
+  } catch (error) {
+    console.error('Errore nell\'aggiornamento dello stato:', error);
+    res.status(500).json({ success: false, error: 'Errore nell\'aggiornamento dello stato' });
+  }
+});
+
+app.post('/api/orders/:id/preview', authenticate, upload.single('previewFile'), async (req, res): Promise<void> => {
+    try {
+        const { id } = req.params;
+        if (!req.file) {
+            res.status(400).json({ success: false, error: 'File di anteprima non fornito' });
+            return;
+        }
+        const previewUrl = `/uploads/${req.file.filename}`;
+        
+        await sequelize.query(
+            'UPDATE ordini SET anteprima = ?, status = "completato" WHERE id = ?',
+            { replacements: [previewUrl, id], type: QueryTypes.UPDATE }
+        );
+        
+        res.json({ success: true, previewUrl });
+    } catch (error) {
+        console.error('Errore nel caricamento dell\'anteprima:', error);
+        res.status(500).json({ success: false, error: 'Errore nel caricamento dell\'anteprima' });
+    }
+});
+
+// SCENARIO 6: Modifica del Servizio - Approvazione o richiesta revisione
+app.post('/api/orders/:id/approve', authenticate, async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await sequelize.query(
+      'UPDATE ordini SET status = "consegnato", approvato = 1, dataApprovazione = ? WHERE id = ?',
+      { replacements: [new Date(), id], type: QueryTypes.UPDATE }
+    );
+    
+    res.json({ success: true, message: 'Lavoro approvato!' });
+  } catch (error) {
+    console.error('Errore nell\'approvazione del lavoro:', error);
+    res.status(500).json({ success: false, error: 'Errore nell\'approvazione del lavoro' });
+  }
+});
+
+app.post('/api/orders/:id/revision', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { feedback } = req.body;
+    
+    // 1. Recupera i dati dell'ordine e del servizio
+    const [orderRows] = await sequelize.query(
+      'SELECT o.*, s.revisions FROM ordini o JOIN services s ON o.serviceId = s.id WHERE o.id = ?',
+      { replacements: [id], type: QueryTypes.SELECT }
+    );
+    
+    if (!Array.isArray(orderRows) || !orderRows.length) {
+      res.status(404).json({ success: false, error: 'Ordine non trovato' });
+      return;
+    }
+    
+    const order = orderRows[0] as any;
+    
+    // 2. Controlla il numero di revisioni disponibili
+    const [revisionRows] = await sequelize.query(
+      'SELECT COUNT(*) as revisionCount FROM revisioni WHERE ordineId = ?',
+      { replacements: [id], type: QueryTypes.SELECT }
+    );
+    
+    if (!Array.isArray(revisionRows) || !revisionRows.length) {
+      res.status(500).json({ success: false, error: 'Errore nel recupero delle revisioni' });
+      return;
+    }
+    
+    const currentRevisions = (revisionRows[0] as any).revisionCount || 0;
+    
+    // Gestisci con sicurezza il valore di revisions
+    let maxRevisions = 1; // valore predefinito
+    if (typeof order.revisions === 'string') {
+      if (order.revisions === 'Illimitate') {
+        maxRevisions = 999;
+      } else {
+        const match = order.revisions.match(/\d+/);
+        if (match) {
+          maxRevisions = parseInt(match[0], 10);
+        }
+      }
+    } else if (typeof order.revisions === 'number') {
+      maxRevisions = order.revisions;
+    }
+    
+    if (currentRevisions >= maxRevisions) {
+      res.status(400).json({ 
+        success: false, 
+        error: 'Hai esaurito il numero di revisioni disponibili per questo servizio' 
+      });
+      return;
+    }
+    
+    // 3. Crea una nuova revisione
+    await sequelize.query(
+      'INSERT INTO revisioni (ordineId, feedback, createdAt) VALUES (?, ?, ?)',
+      { replacements: [id, feedback, new Date()], type: QueryTypes.INSERT }
+    );
+    
+    // 4. Aggiorna lo stato dell'ordine
+    await sequelize.query(
+      'UPDATE ordini SET status = "in-revisione" WHERE id = ?',
+      { replacements: [id], type: QueryTypes.UPDATE }
+    );
+    
+    res.json({ 
+      success: true, 
+      message: 'Richiesta di revisione inviata',
+      revisionsLeft: maxRevisions - currentRevisions - 1
+    });
+  } catch (error) {
+    console.error('Errore nella richiesta di revisione:', error);
+    res.status(500).json({ success: false, error: 'Errore nella richiesta di revisione' });
+  }
+});
+
+// SCENARIO 7: Post-Servizio - Feedback e punti fedeltà
+app.post('/api/orders/:id/feedback', authenticate, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+    const userId = req.user.userId;
+    
+    // 1. Verifica che il feedback non sia già stato inviato
+    const [existingFeedback] = await sequelize.query(
+      'SELECT id FROM feedback WHERE ordineId = ?',
+      { replacements: [id], type: QueryTypes.SELECT }
+    );
+    
+    if (Array.isArray(existingFeedback) && existingFeedback.length > 0) {
+      res.status(400).json({ 
+        success: false, 
+        error: 'Hai già inviato un feedback per questo servizio' 
+      });
+      return;
+    }
+    
+    // 2. Salva il nuovo feedback
+    await sequelize.query(
+      'INSERT INTO feedback (ordineId, userId, rating, comment, createdAt) VALUES (?, ?, ?, ?, ?)',
+      { replacements: [id, userId, rating, comment, new Date()], type: QueryTypes.INSERT }
+    );
+    
+    // 3. Recupera il prezzo dell'ordine per calcolare i punti
+    const [orderRows] = await sequelize.query(
+      'SELECT prezzo as totalPrice FROM ordini WHERE id = ?',
+      { replacements: [id], type: QueryTypes.SELECT }
+    );
+    
+    if (!Array.isArray(orderRows) || !orderRows.length) {
+      res.status(404).json({ success: false, error: 'Ordine non trovato' });
+      return;
+    }
+    
+    const order = orderRows[0] as any;
+    const loyaltyPoints = Math.floor(Number(order.totalPrice));
+    
+    // 4. Aggiorna i punti fedeltà dell'utente
+    await sequelize.query(
+      'UPDATE utenti SET puntiFedelta = COALESCE(puntiFedelta, 0) + ? WHERE id = ?',
+      { replacements: [loyaltyPoints, userId], type: QueryTypes.UPDATE }
+    );
+    
+    // 5. Recupera i punti aggiornati dell'utent
+    const [userRows] = await sequelize.query(
+      'SELECT puntiFedelta FROM utenti WHERE id = ?',
+      { replacements: [userId], type: QueryTypes.SELECT }
+    );
+    
+    if (!Array.isArray(userRows) || !userRows.length) {
+      res.status(404).json({ success: false, error: 'Utente non trovato' });
+      return;
+    }
+    
+    // 6. Recupera le offerte disponibili in base ai punti
+    const [offersRows] = await sequelize.query(
+      'SELECT * FROM offerte WHERE puntiRichiesti <= ? ORDER BY puntiRichiesti DESC',
+      { replacements: [(userRows[0] as any).puntiFedelta], type: QueryTypes.SELECT }
+    );
+    
+    res.json({ 
+      success: true, 
+      message: 'Feedback inviato con successo',
+      loyaltyPoints: (userRows[0] as any).puntiFedelta,
+      pointsEarned: loyaltyPoints,
+      availableOffers: offersRows 
+    });
+  } catch (error) {
+    console.error('Errore nell\'invio del feedback:', error);
+    res.status(500).json({ success: false, error: 'Errore nell\'invio del feedback' });
+  }
+});
+
 app.post('/process-payment', authenticate, async (req: Request, res: Response): Promise<void> => {
   try {
     const { orderId, paymentMethod } = req.body;
@@ -1199,6 +1474,72 @@ app.post('/orders/:id/cancel', authenticate, async (req: Request, res: Response)
   }
 });
 
+// Pagina di amministrazione degli ordini - solo per admin
+app.get('/admin/orders', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Recupera tutti gli ordini con informazioni degli utenti associati
+    const [orders] = await sequelize.query(
+      `SELECT o.*, u.nome, u.cognome, u.email, s.name as serviceName
+       FROM ordini o
+       JOIN utenti u ON o.utenteId = u.id
+       JOIN services s ON o.servizio = s.id
+       ORDER BY o.createdAt DESC`,
+      { type: QueryTypes.SELECT }
+    );
+
+    // Recupera le statistiche degli ordini
+    const [stats] = await sequelize.query(
+      `SELECT 
+         COUNT(*) as totalOrders,
+         COUNT(CASE WHEN stato = 'in-attesa' OR stato = 'pagamento-in-attesa' THEN 1 END) as pendingOrders,
+         COUNT(CASE WHEN stato = 'in-lavorazione' THEN 1 END) as inProgressOrders,
+         COUNT(CASE WHEN stato = 'completato' THEN 1 END) as completedOrders,
+         COUNT(CASE WHEN stato = 'in-revisione' THEN 1 END) as revisionOrders,
+         COUNT(CASE WHEN stato = 'consegnato' THEN 1 END) as deliveredOrders,
+         SUM(prezzo) as totalRevenue
+       FROM ordini`,
+      { type: QueryTypes.SELECT }
+    );
+
+    res.render('admin/orders', {
+      user: req.user,
+      orders: Array.isArray(orders) ? orders : [],
+      stats: Array.isArray(stats) && stats.length > 0 ? stats[0] : {},
+      title: 'Gestione Ordini - Admin',
+      req: req,
+      query: req.query
+    });
+  } catch (error) {
+    console.error('Errore nel recupero degli ordini:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Si è verificato un errore nel recupero degli ordini',
+      showLogout: true
+    });
+  }
+});
+
+// Rotta per aggiornare lo stato di un ordine (azione amministratore)
+app.post('/admin/orders/:id/update-status', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { status, progressoLavoro } = req.body;
+    
+    await sequelize.query(
+      'UPDATE ordini SET status = ?, progressoLavoro = ? WHERE id = ?',
+      { 
+        replacements: [status, progressoLavoro || 0, id], 
+        type: QueryTypes.UPDATE 
+      }
+    );
+    
+    res.redirect('/admin/orders?success=Stato ordine aggiornato con successo');
+  } catch (error) {
+    console.error('Errore nell\'aggiornamento dell\'ordine:', error);
+    res.redirect(`/admin/orders?error=Errore nell'aggiornamento dell'ordine: ${(error as Error).message}`);
+  }
+});
 
 // Gestione pagina 404 - deve essere sempre DOPO tutte le route ma PRIMA dei middleware di gestione errori
 app.use((req: Request, res: Response) => {
@@ -1278,8 +1619,6 @@ const generalErrorHandler: ErrorRequestHandler = (err: Error, req: Request, res:
 // Registra i middleware dopo la route 404
 app.use(dbErrorHandler);
 app.use(generalErrorHandler);
-
-
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

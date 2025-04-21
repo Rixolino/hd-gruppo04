@@ -100,6 +100,46 @@ CREATE TABLE `settings` (
   CONSTRAINT `settings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `utenti` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+
+-- Tabella per le revisioni
+CREATE TABLE IF NOT EXISTS revisioni (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  ordineId INT NOT NULL,
+  feedback TEXT NOT NULL,
+  createdAt DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (ordineId) REFERENCES ordini(id) ON DELETE CASCADE
+);
+
+-- Tabella per i feedback
+CREATE TABLE IF NOT EXISTS feedback (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  ordineId INT NOT NULL,
+  userId INT NOT NULL,
+  rating INT NOT NULL,
+  comment TEXT,
+  createdAt DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY (ordineId),
+  FOREIGN KEY (ordineId) REFERENCES ordini(id) ON DELETE CASCADE,
+  FOREIGN KEY (userId) REFERENCES utenti(id) ON DELETE CASCADE
+);
+
+-- Tabella per le offerte
+CREATE TABLE IF NOT EXISTS offerte (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  title VARCHAR(100) NOT NULL,
+  description TEXT NOT NULL,
+  puntiRichiesti INT NOT NULL,
+  sconto DECIMAL(5,2) NOT NULL,
+  active BOOLEAN DEFAULT TRUE,
+  createdAt DATETIME NOT NULL,
+  updatedAt DATETIME NOT NULL,
+  PRIMARY KEY (id)
+);
+
+
+
 -- Inserimento dati nella tabella utenti
 INSERT INTO `utenti` (`id`, `nome`, `cognome`, `email`, `password`, `telefono`, `indirizzo`, `isAdmin`, `puntifedelta`, `isDeleted`, `settings`, `createdAt`, `updatedAt`) VALUES
 (1, 'SIMONE', 'Rixolino', 'elrisolix.erx@outlook.com', '$2b$10$Ospmp1.8H98CTqVpc5LzHO5P3DoxR8X1WZ3z3/3Tv0OCLc2uirNsG', NULL, NULL, 1, 0, 0, '{\"fontSize\":2,\"highContrast\":false,\"reduceAnimations\":false,\"colorBlindMode\":\"none\",\"theme\":\"light\"}', '2025-03-10 15:49:34', '2025-03-10 17:28:02'),

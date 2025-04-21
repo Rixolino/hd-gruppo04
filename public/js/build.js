@@ -758,6 +758,33 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Funzione per verificare se l'utente è admin
+    function isUserAdmin() {
+        // Verifica se l'utente è autenticato
+        const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+            const [key, value] = cookie.trim().split('=');
+            acc[key] = value;
+            return acc;
+        }, {});
+        
+        // Se c'è un token nel cookie, prova a decodificarlo
+        if (cookies.token) {
+            try {
+                // Decodifica il token JWT (solo la parte payload)
+                const base64Url = cookies.token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const payload = JSON.parse(window.atob(base64));
+                
+                // Restituisci il valore di isAdmin
+                return !!payload.isAdmin;
+            } catch (error) {
+                console.error('Errore nella decodifica del token:', error);
+            }
+        }
+        
+        return false; // Default: non admin
+    }
+
     // Modifica la funzione buildInterface per supportare Tizen
     function buildInterface() {
         if (isTizenDevice) {
@@ -771,6 +798,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function buildStandardInterface() {
         // Crea la barra di navigazione
         let navbarLinks;
+        const isAdminUser = isUserAdmin();
         
         if (isAuthenticated) {
             // Links per utenti autenticati
@@ -778,6 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li class="nav-item"><a class="nav-link animated-link" href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link animated-link" href="/about"><i class="fas fa-info-circle"></i> Chi Siamo</a></li>
                 <li class="nav-item"><a class="nav-link animated-link" href="/services"><i class="fas fa-cogs"></i> Servizi</a></li>
+                ${isAdminUser ? `<li class="nav-item"><a class="nav-link animated-link" href="/admin/orders"><i class="fas fa-clipboard-list"></i> Gestione Ordini</a></li>` : ''}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <div class="user-avatar-mini d-none d-sm-inline-block">

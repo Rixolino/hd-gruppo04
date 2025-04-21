@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Lavoro - HelpDigit</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card card-elevated mb-4">
+                    <div class="card-header">
+                        <h2>Valuta il servizio ricevuto</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Grazie per aver usato HelpDigit! La tua opinione è importante per migliorare i
+                            nostri servizi.</p>
+
+                        <form id="feedback-form" data-order-id="<%= order.id %>">
+                            <div class="form-group">
+                                <label class="d-block">Come valuteresti questo servizio?</label>
+                                <div class="rating-container">
+                                    <% for (let i = 5; i >= 1; i--) { %>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="rating"
+                                                id="rating<%= i %>" value="<%= i %>" <%= i === 5 ? 'checked' : '' %>>
+                                            <label class="form-check-label" for="rating<%= i %>">
+                                                <%= i %> <i class="fas fa-star text-warning"></i>
+                                            </label>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="feedback-comment">Commento (opzionale)</label>
+                                <textarea id="feedback-comment" class="form-control" rows="4"
+                                    placeholder="Condividi la tua esperienza"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane"></i> Invia valutazione
+                            </button>
+                        </form>
+
+                        <!-- Contenitore punti fedeltà (inizialmente nascosto) -->
+                        <div id="loyalty-points-container" class="mt-4 d-none">
+                            <div class="alert alert-success">
+                                <h4><i class="fas fa-award"></i> Grazie per il tuo feedback!</h4>
+                                <p>Hai guadagnato <strong id="earned-points">0</strong> punti fedeltà per questo
+                                    acquisto.</p>
+                                <p>I tuoi punti totali: <strong id="loyalty-points">0</strong></p>
+                            </div>
+                        </div>
+
+                        <!-- Contenitore offerte disponibili (inizialmente nascosto) -->
+                        <div id="available-offers-container" class="mt-4 d-none">
+                            <h4>Offerte disponibili con i tuoi punti</h4>
+                            <div id="available-offers"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+    
+    <script>
+    // Script specifico per la gestione del feedback post-servizio
+    document.addEventListener('DOMContentLoaded', function() {
+      const feedbackForm = document.getElementById('feedback-form');
+      if (!feedbackForm) return;
+      
+      const orderId = feedbackForm.dataset.orderId;
+      
+      feedbackForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Recupera i valori dal form
+        const ratingInput = document.querySelector('input[name="rating"]:checked');
+        if (!ratingInput) {
+          showNotification('Seleziona una valutazione per il servizio', 'warning');
+          return;
+        }
+        
+        const rating = ratingInput.value;
+        const comment = document.getElementById('feedback-comment').value;
+        
+        fetch(`/api/orders/${orderId}/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ rating, comment })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Mostra i punti fedeltà guadagnati
+            document.getElementById('loyalty-points').textContent = data.loyaltyPoints;
+            document.getElementById('earned-points').textContent = data.pointsEarned;
+            document.getElementById('loyalty-points-container').classList.remove('d-none');
+            
+            // Mostra le offerte disponibili
+            if (data.availableOffers && data.availableOffers.length > 0) {
+              const offersContainer = document.getElementById('available-offers');
+              offersContainer.innerHTML = '';
+              
+              data.availableOffers.forEach(offer => {
+                offersContainer.innerHTML += `
+                  <div class="card card-elevated mb-3">
+                    <div class="card-body">
+                      <h5 class="card-title">${offer.title}</h5>
+                      <p class="card-text">${offer.description}</p>
+                      <p class="text-muted">Punti richiesti: ${offer.puntiRichiesti}</p>
+                      <button class="btn btn-primary use-offer-btn" 
+                        data-offer-id="${offer.id}">Usa questa offerta</button>
+                    </div>
+                  </div>
+                `;
+              });
+              
+              document.getElementById('available-offers-container').classList.remove('d-none');
+              
+              // Disabilita il form per evitare invii multipli
+              feedbackForm.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Grazie per il tuo feedback!</div>';
+            }
+          } else {
+            showNotification('Errore nell\'invio del feedback: ' + data.error, 'error');
+          }
+        })
+        .catch(error => {
+          console.error('Errore nella richiesta:', error);
+          showNotification('Si è verificato un errore di connessione.', 'error');
+        });
+      });
+      
+      // Funzione helper per mostrare notifiche
+      function showNotification(message, type) {
+        // Usa la funzione esistente se disponibile, altrimenti crea una notifica semplice
+        if (window.createNotification) {
+          window.createNotification({
+            message: message,
+            type: type
+          });
+        } else {
+          const notificationDiv = document.createElement('div');
+          notificationDiv.className = `alert alert-${type} notification`;
+          notificationDiv.innerHTML = message;
+          document.body.appendChild(notificationDiv);
+          
+          // Stili per la notifica
+          notificationDiv.style.position = 'fixed';
+          notificationDiv.style.top = '20px';
+          notificationDiv.style.right = '20px';
+          notificationDiv.style.zIndex = '9999';
+          notificationDiv.style.maxWidth = '300px';
+          
+          // Rimuovi dopo 5 secondi
+          setTimeout(() => {
+            notificationDiv.style.opacity = '0';
+            setTimeout(() => notificationDiv.remove(), 500);
+          }, 5000);
+        }
+      }
+    });
+    </script>
+</body>
+
+</html>

@@ -9,121 +9,238 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-    <!-- La navbar verrà inserita qui da build.js -->
-    
-    <main class="container py-5">
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h1 class="h3 mb-0">Anteprima del lavoro #<%= order.id %></h1>
-                        <span class="badge badge-light">Completato</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <h4>Servizio: <%= service.name %></h4>
-                            <p class="text-muted"><%= service.description %></p>
+
+
+    <div class="container py-5">
+        <div id="work-preview-container" data-order-id="<%= order.id %>">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card card-elevated mb-4">
+                        <div class="card-header">
+                            <h2>Anteprima del lavoro</h2>
                         </div>
-                        
-                        <hr>
-                        
-                        <div class="row mb-4">
-                            <div class="col-md-8">
-                                <h5 class="mb-3">Anteprima del risultato</h5>
-                                <div class="card">
-                                    <img src="/img/preview/<%= order.id %>.jpg" class="card-img-top" alt="Anteprima del lavoro" onerror="this.onerror=null;this.src='/img/placeholder-preview.jpg';">
-                                    <div class="card-body">
-                                        <p class="card-text">Questa è un'anteprima del lavoro completato secondo le tue specifiche. Per favore, controlla attentamente e scegli se approvare o richiedere modifiche.</p>
-                                    </div>
+                        <div class="card-body">
+                            <% if (order.previewType === 'image') { %>
+                                <img src="<%= order.previewUrl %>" alt="Anteprima del lavoro" class="img-fluid">
+                            <% } else if (order.previewType === 'pdf') { %>
+                                <div class="embed-responsive embed-responsive-1by1">
+                                    <iframe class="embed-responsive-item" src="<%= order.previewUrl %>" allowfullscreen></iframe>
                                 </div>
+                            <% } else { %>
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> 
+                                    L'anteprima non è ancora disponibile. Il team sta lavorando al tuo ordine.
+                                </div>
+                            <% } %>
+                            
+                            <hr>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div>
+                                    <h5>Dettagli servizio:</h5>
+                                    <p><strong>Servizio:</strong> <%= service.name %></p>
+                                    <p><strong>Stato:</strong> 
+                                        <span class="colorblind-indicator" data-mode="<%= user.colorBlindMode || 'none' %>">
+                                            <span class="status-badge status-<%= order.status %>"></span>
+                                        </span>
+                                        <%= order.statusLabel %>
+                                    </p>
+                                    <p><strong>Revisioni disponibili:</strong> <%= revisioni %></p>
+                                </div>
+                                
+                                <% if (order.status === 'completato') { %>
+                                    <div class="d-flex">
+                                        <button id="approve-work" class="btn btn-success btn-lg mr-2">
+                                            <i class="fas fa-check"></i> Approva
+                                        </button>
+                                        <button id="request-revision" class="btn btn-outline-primary btn-lg">
+                                            <i class="fas fa-sync-alt"></i> Richiedi modifiche
+                                        </button>
+                                    </div>
+                                <% } else if (order.status === 'in-lavorazione') { %>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-spinner fa-spin"></i> Il team sta lavorando al tuo ordine
+                                    </div>
+                                <% } else if (order.status === 'in-revisione') { %>
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-tools"></i> Revisione in corso
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form di revisione (nascosto inizialmente) -->
+                    <div id="revision-form-container" class="card card-elevated mb-4 d-none">
+                        <div class="card-header">
+                            <h3>Richiedi modifiche</h3>
+                        </div>
+                        <div class="card-body">
+                            <form id="revision-form">
+                                <div class="form-group">
+                                    <label for="revision-feedback">Descrivi le modifiche richieste:</label>
+                                    <textarea id="revision-feedback" class="form-control" rows="5" 
+                                        placeholder="Spiega dettagliatamente le modifiche necessarie..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Invia richiesta
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <!-- Stato dell'ordine e cronologia delle revisioni -->
+                    <div class="card card-elevated mb-4">
+                        <div class="card-header">
+                            <h3>Stato del servizio</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="colorblind-indicator mr-2" data-mode="<%= user.colorBlindMode || 'none' %>">
+                                    <span class="status-badge status-<%= order.status %>"></span>
+                                </div>
+                                <h5 class="mb-0"><%= order.statusLabel %></h5>
                             </div>
                             
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-header">
-                                        Dettagli Completamento
-                                    </div>
-                                    <div class="card-body">
-                                        <p><strong>Completato il:</strong> <%= new Date().toLocaleDateString('it-IT') %></p>
-                                        <p><strong>Revisioni disponibili:</strong> <%= service.revisions || '1' %></p>
-                                        <p><strong>Note:</strong> Lavoro completato secondo le specifiche richieste.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <form action="/orders/<%= order.id %>/approve" method="post">
-                                    <button type="submit" class="btn btn-success btn-lg btn-block">
-                                        <i class="fas fa-check-circle mr-2"></i>Approva e concludi
-                                    </button>
-                                </form>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <button type="button" class="btn btn-outline-secondary btn-lg btn-block" data-toggle="modal" data-target="#revisionModal">
-                                    <i class="fas fa-edit mr-2"></i>Richiedi modifiche
-                                </button>
-                            </div>
+                            <hr>
+                            
+                            <h5>Cronologia revisioni:</h5>
+                            <% if (order.revisions && order.revisions.length > 0) { %>
+                                <ul class="list-group">
+                                    <% order.revisions.forEach((revision, index) => { %>
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Revisione #<%= index + 1 %></span>
+                                                <small><%= formatDate(revision.createdAt) %></small>
+                                            </div>
+                                            <p class="mb-0 mt-2"><%= revision.feedback %></p>
+                                        </li>
+                                    <% }); %>
+                                </ul>
+                            <% } else { %>
+                                <p>Nessuna revisione richiesta finora.</p>
+                            <% } %>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </main>
-    
-    <!-- Modal per le richieste di modifiche -->
-    <div class="modal fade" id="revisionModal" tabindex="-1" aria-labelledby="revisionModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="revisionModalLabel">Richiedi modifiche</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form action="/orders/<%= order.id %>/revision" method="post" id="revisionForm">
-                        <div class="form-group">
-                            <label for="revisionDetails">Descrivi dettagliatamente le modifiche richieste:</label>
-                            <textarea class="form-control" id="revisionDetails" name="revisionDetails" rows="5" required></textarea>
-                            <small class="form-text text-muted">Sii specifico riguardo le modifiche che desideri. Questo ci aiuterà a soddisfare le tue esigenze in modo preciso.</small>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Aree che necessitano modifiche:</label>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="designChanges" name="areas[]" value="design">
-                                <label class="custom-control-label" for="designChanges">Design/Layout</label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="contentChanges" name="areas[]" value="content">
-                                <label class="custom-control-label" for="contentChanges">Contenuto/Testo</label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="functionalChanges" name="areas[]" value="functional">
-                                <label class="custom-control-label" for="functionalChanges">Funzionalità</label>
-                            </div>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="otherChanges" name="areas[]" value="other">
-                                <label class="custom-control-label" for="otherChanges">Altro</label>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                    <button type="submit" form="revisionForm" class="btn btn-primary">Invia richiesta di modifica</button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Il footer verrà inserito qui da build.js -->
     
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/js/build.js"></script>
+    
+    <script>
+    // Script specifico per anteprima e revisione del lavoro
+    document.addEventListener('DOMContentLoaded', function() {
+      const previewContainer = document.getElementById('work-preview-container');
+      if (!previewContainer) return;
+      
+      const orderId = previewContainer.dataset.orderId;
+      const approveButton = document.getElementById('approve-work');
+      const revisionButton = document.getElementById('request-revision');
+      const revisionForm = document.getElementById('revision-form');
+      
+      // Gestione approvazione lavoro
+      if (approveButton) {
+        approveButton.addEventListener('click', function() {
+          if (confirm('Sei sicuro di voler approvare il lavoro?')) {
+            fetch(`/api/orders/${orderId}/approve`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                showNotification('Lavoro approvato! Il download è disponibile nella dashboard.', 'success');
+                window.location.href = '/dashboard';
+              } else {
+                showNotification('Errore durante l\'approvazione: ' + data.error, 'error');
+              }
+            })
+            .catch(error => {
+              console.error('Errore nella richiesta:', error);
+              showNotification('Si è verificato un errore di connessione.', 'error');
+            });
+          }
+        });
+      }
+      
+      // Gestione richiesta revisione
+      if (revisionButton) {
+        revisionButton.addEventListener('click', function() {
+          // Mostra il form per la revisione
+          document.getElementById('revision-form-container').classList.remove('d-none');
+        });
+      }
+      
+      // Invio del modulo di revisione
+      if (revisionForm) {
+        revisionForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const feedback = document.getElementById('revision-feedback').value;
+          
+          if (!feedback.trim()) {
+            showNotification('Devi fornire un feedback per la revisione', 'warning');
+            return;
+          }
+          
+          fetch(`/api/orders/${orderId}/revision`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ feedback })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              showNotification('Richiesta di revisione inviata!', 'success');
+              document.getElementById('revision-form-container').classList.add('d-none');
+              // Aggiorna la pagina per mostrare la nuova revisione
+              setTimeout(() => window.location.reload(), 1000);
+            } else {
+              showNotification('Errore: ' + data.error, 'error');
+            }
+          })
+          .catch(error => {
+            console.error('Errore nella richiesta:', error);
+            showNotification('Si è verificato un errore di connessione.', 'error');
+          });
+        });
+      }
+      
+      // Funzione helper per mostrare notifiche
+      function showNotification(message, type) {
+        // Usa la funzione esistente se disponibile, altrimenti crea una notifica semplice
+        if (window.createNotification) {
+          window.createNotification({
+            message: message,
+            type: type
+          });
+        } else {
+          const notificationDiv = document.createElement('div');
+          notificationDiv.className = `alert alert-${type} notification`;
+          notificationDiv.innerHTML = message;
+          document.body.appendChild(notificationDiv);
+          
+          // Stili per la notifica
+          notificationDiv.style.position = 'fixed';
+          notificationDiv.style.top = '20px';
+          notificationDiv.style.right = '20px';
+          notificationDiv.style.zIndex = '9999';
+          notificationDiv.style.maxWidth = '300px';
+          
+          // Rimuovi dopo 5 secondi
+          setTimeout(() => {
+            notificationDiv.style.opacity = '0';
+            setTimeout(() => notificationDiv.remove(), 500);
+          }, 5000);
+        }
+      }
+    });
+    </script>
 </body>
 </html>
