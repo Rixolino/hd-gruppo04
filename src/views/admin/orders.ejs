@@ -72,6 +72,7 @@
             display: block;
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
+            position: relative;
         }
 
         .sidebar-item:hover {
@@ -83,6 +84,27 @@
         .sidebar-item.active {
             background: var(--accent);
             color: white;
+        }
+
+        .sidebar-item.active,
+        .sidebar-item.active i,
+        .sidebar-item.active span {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        .sidebar-item:not(.active):hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-item.active::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background-color: white;
         }
 
         .sidebar-item i {
@@ -768,12 +790,6 @@
     <div class="admin-wrapper">
         <!-- Sidebar -->
         <div class="sidebar">
-            <div class="sidebar-header">
-                <a href="/dashboard" class="sidebar-brand">
-                    <i class="fas fa-laptop-code mr-2"></i>
-                    <span>HelpDigit Admin</span>
-                </a>
-            </div>
             <div class="sidebar-menu">
                 <a href="/dashboard" class="sidebar-item">
                     <i class="fas fa-tachometer-alt"></i>
@@ -1137,8 +1153,8 @@
                 <form id="update-status-form" method="POST">
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="status">Stato</label>
-                            <select class="form-control" id="status" name="status" required>
+                            <label for="stato">Stato</label>
+                            <select class="form-control" id="stato" name="stato" required>
                                 <option value="in-attesa">In attesa</option>
                                 <option value="pagamento-in-attesa">In attesa di pagamento</option>
                                 <option value="in-lavorazione">In lavorazione</option>
@@ -1190,11 +1206,11 @@
             updateStatusBtns.forEach(btn => {
                 btn.addEventListener('click', function () {
                     const orderId = this.dataset.id;
-                    const status = this.dataset.status;
+                    const stato = this.dataset.status; // Il dataset usa ancora 'status'
                     const progress = this.dataset.progress;
 
-                    // Imposta i valori nel form
-                    document.getElementById('status').value = status;
+                    // Imposta i valori nel form aggiornato
+                    document.getElementById('stato').value = stato;
                     document.getElementById('progressoLavoro').value = progress;
                     progressValue.textContent = progress + '%';
 

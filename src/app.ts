@@ -1535,12 +1535,24 @@ app.get('/admin/orders', authenticate, isAdmin, async (req: Request, res: Respon
 app.post('/admin/orders/:id/update-status', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { status, progressoLavoro } = req.body;
+    const { stato, progressoLavoro } = req.body;  // Ottieni i valori dalla richiesta
     
+    console.log('Valori ricevuti:', { id, stato, progressoLavoro }); // Debug
+    
+    // Controlla che i valori siano definiti
+    if (!stato) {
+      throw new Error('Il valore dello stato è richiesto');
+    }
+    
+    // Normalizza il valore stato se necessario
+    let normalizedStato = stato;
+    if (stato === 'revisione') normalizedStato = 'in-revisione';
+    
+    // Usa i valori corretti nei parametri
     await sequelize.query(
-      'UPDATE ordini SET status = ?, progressoLavoro = ? WHERE id = ?',
+      'UPDATE ordini SET stato = ?, progressoLavoro = ? WHERE id = ?',
       { 
-        replacements: [status, progressoLavoro || 0, id], 
+        replacements: [normalizedStato, progressoLavoro || 0, id], 
         type: QueryTypes.UPDATE 
       }
     );

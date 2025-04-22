@@ -78,3 +78,32 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     res.status(500).send('Errore nell\'aggiornamento dell\'ordine');
   }
 };
+
+// Aggiorna lo stato di un ordine dall'interfaccia admin
+export const updateOrderStatusAdmin = async (req: Request, res: Response) => {
+  try {
+    const orderId = req.params.id;
+    const { stato, progressoLavoro } = req.body;
+    
+    // Verifica che i valori siano definiti
+    if (stato === undefined || progressoLavoro === undefined) {
+      return res.redirect('/admin/orders?error=Parametri mancanti');
+    }
+
+    // Converti progressoLavoro a numero se necessario
+    const progressoNumerico = parseInt(progressoLavoro, 10);
+    
+    // Aggiorna l'ordine
+    await Order.update({
+      stato,
+      progressoLavoro: progressoNumerico
+    }, {
+      where: { id: orderId }
+    });
+    
+    res.redirect('/admin/orders?success=Ordine aggiornato con successo');
+  } catch (error) {
+    console.error('Errore durante l\'aggiornamento dell\'ordine:', error);
+    res.redirect(`/admin/orders?error=${encodeURIComponent('Errore durante l\'aggiornamento dell\'ordine')}`);
+  }
+};

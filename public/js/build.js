@@ -1515,6 +1515,7 @@ const footer = `
                     .navbar-brand {
                         max-width: 60%;
                         overflow: hidden;
+                        left: 25%;
                     }
                 }
             </style>

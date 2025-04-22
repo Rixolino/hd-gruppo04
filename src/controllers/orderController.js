@@ -15,6 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateOrderStatus = exports.createOrder = exports.getUserOrders = void 0;
 const orderModel_1 = __importDefault(require("../models/orderModel"));
 const userModel_1 = __importDefault(require("../models/userModel"));
+const express_1 = __importDefault(require("express"));
+const router = express_1.default.Router();
+
 // Recupera gli ordini dell'utente corrente
 const getUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -34,6 +37,7 @@ const getUserOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.getUserOrders = getUserOrders;
+
 // Crea un nuovo ordine
 const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -63,6 +67,7 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.createOrder = createOrder;
+
 // Aggiorna lo stato di un ordine
 const updateOrderStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -84,3 +89,34 @@ const updateOrderStatus = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.updateOrderStatus = updateOrderStatus;
+
+// Route per aggiornare lo stato di un ordine da parte dell'admin
+router.post('/admin/orders/:id/update-status', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const orderId = req.params.id;
+        const { stato, progressoLavoro } = req.body;
+        
+        // Verifica che i valori siano definiti
+        if (stato === undefined || progressoLavoro === undefined) {
+            return res.redirect('/admin/orders?error=Parametri mancanti');
+        }
+
+        // Converti progressoLavoro a numero se necessario
+        const progressoNumerico = parseInt(progressoLavoro, 10);
+        
+        // Aggiorna l'ordine
+        yield orderModel_1.default.update({
+            stato,
+            progressoLavoro: progressoNumerico
+        }, {
+            where: { id: orderId }
+        });
+        
+        res.redirect('/admin/orders?success=Ordine aggiornato con successo');
+    } catch (error) {
+        console.error('Errore durante l\'aggiornamento dell\'ordine:', error);
+        res.redirect(`/admin/orders?error=${encodeURIComponent('Errore durante l\'aggiornamento dell\'ordine')}`);
+    }
+}));
+
+module.exports = router;
