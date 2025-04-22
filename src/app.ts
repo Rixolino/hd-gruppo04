@@ -1477,15 +1477,28 @@ app.post('/orders/:id/cancel', authenticate, async (req: Request, res: Response)
 // Pagina di amministrazione degli ordini - solo per admin
 app.get('/admin/orders', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
   try {
-    // Recupera tutti gli ordini con informazioni degli utenti associati
-    const [orders] = await sequelize.query(
-      `SELECT o.*, u.nome, u.cognome, u.email, s.name as serviceName
+    // Prima verifichiamo se ci sono ordini nella tabella
+    const [ordersCheck] = await sequelize.query(
+      `SELECT * FROM ordini LIMIT 5`,
+      { type: QueryTypes.SELECT }
+    );
+    
+    console.log('Verifica ordini:', ordersCheck);
+    
+    // Recupera tutti gli ordini, ma modifica il JOIN per essere più tollerante
+    const orders = await sequelize.query(
+      `SELECT o.*, 
+         u.nome, u.cognome, u.email, 
+         s.name as serviceName,
+         s.revisions
        FROM ordini o
-       JOIN utenti u ON o.utenteId = u.id
-       JOIN services s ON o.servizio = s.id
+       LEFT JOIN utenti u ON o.utenteId = u.id
+       LEFT JOIN services s ON o.servizio COLLATE utf8mb4_general_ci = CAST(s.id AS CHAR) COLLATE utf8mb4_general_ci
        ORDER BY o.createdAt DESC`,
       { type: QueryTypes.SELECT }
     );
+
+    console.log('Ordini recuperati:', orders);
 
     // Recupera le statistiche degli ordini
     const [stats] = await sequelize.query(
@@ -1511,11 +1524,9 @@ app.get('/admin/orders', authenticate, isAdmin, async (req: Request, res: Respon
     });
   } catch (error) {
     console.error('Errore nel recupero degli ordini:', error);
-    res.status(500).render('error', {
-      user: req.user,
-      title: 'Errore',
-      errorMessage: 'Si è verificato un errore nel recupero degli ordini',
-      showLogout: true
+    res.status(500).render('error', { 
+      message: 'Errore nel caricamento degli ordini',
+      error: process.env.NODE_ENV === 'development' ? error : {} 
     });
   }
 });

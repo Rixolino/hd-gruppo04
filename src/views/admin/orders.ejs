@@ -4,228 +4,1132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - HelpDigit</title>
+    <title>Gestione Ordini | HelpDigit Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --info: #3498db;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--primary);
+            color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-brand:hover {
+            color: var(--light);
+            text-decoration: none;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s;
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .sidebar-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .stats-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            border-left: 4px solid;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card.total {
+            border-left-color: var(--info);
+        }
+
+        .stats-card.progress {
+            border-left-color: var(--warning);
+        }
+
+        .stats-card.completed {
+            border-left-color: var(--success);
+        }
+
+        .stats-card.revenue {
+            border-left-color: var(--primary);
+        }
+
+        .stats-card-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: #adb5bd;
+        }
+
+        .stats-card-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .stats-card-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filters-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .orders-table-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-top: none;
+            background-color: #f8f9fa;
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-badge.status-in-attesa {
+            background-color: #ffc107;
+        }
+
+        .status-badge.status-pagamento-in-attesa {
+            background-color: #17a2b8;
+        }
+
+        .status-badge.status-in-lavorazione {
+            background-color: #007bff;
+        }
+
+        .status-badge.status-in-revisione {
+            background-color: #6f42c1;
+        }
+
+        .status-badge.status-completato {
+            background-color: #28a745;
+        }
+
+        .status-badge.status-consegnato {
+            background-color: #20c997;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            background-color: var(--accent);
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-row label {
+            font-weight: 500;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        /* Modal styling */
+        .modal-content {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal-title {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar:not(.collapsed) {
+                width: 70px;
+            }
+
+            .sidebar:not(.collapsed) .sidebar-brand span,
+            .sidebar:not(.collapsed) .sidebar-item span {
+                display: none;
+            }
+
+            .sidebar:not(.collapsed) .sidebar-item i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .sidebar-header {
+                padding: 1rem 0.5rem;
+                text-align: center;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+                margin-left: 0 !important;
+                /* Importante per sovrascrivere altri stili */
+            }
+
+            .sidebar {
+                width: 0;
+                opacity: 0;
+            }
+
+            .sidebar.active {
+                width: 200px;
+                opacity: 1;
+            }
+
+            .sidebar.collapsed.active {
+                width: 60px;
+            }
+
+            .mobile-toggle {
+                display: block;
+            }
+
+            body {
+                overflow-x: hidden;
+            }
+        }
+
+        /* Tema scuro */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .sidebar {
+            background: #1a1a1a;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-theme .sidebar-item {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        body.dark-theme .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-theme .page-header {
+            border-bottom-color: #2d2d2d;
+        }
+
+        body.dark-theme .page-title {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .breadcrumb {
+            background-color: transparent;
+        }
+
+        body.dark-theme .breadcrumb-item.active {
+            color: #adb5bd;
+        }
+
+        body.dark-theme .stats-card {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-theme .stats-card-value {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .stats-card-label {
+            color: #adb5bd;
+        }
+
+        body.dark-theme .filters-card,
+        body.dark-theme .orders-table-card {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-theme .card-header {
+            background-color: #1e1e1e;
+            border-bottom-color: #2d2d2d;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .table {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .table thead th {
+            background-color: #2d2d2d;
+            color: #adb5bd;
+            border-color: #444;
+        }
+
+        body.dark-theme .table td {
+            border-top-color: #2d2d2d;
+        }
+
+        body.dark-theme .table-hover tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-theme .text-muted {
+            color: #adb5bd !important;
+        }
+
+        body.dark-theme .dropdown-menu {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+
+        body.dark-theme .dropdown-item {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .dropdown-item:hover {
+            background-color: #3a3a3a;
+            color: #fff;
+        }
+
+        body.dark-theme .dropdown-divider {
+            border-top-color: #444;
+        }
+
+        body.dark-theme .form-control,
+        body.dark-theme .input-group-text {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .form-control:focus {
+            border-color: var(--accent);
+            background-color: #333;
+        }
+
+        body.dark-theme .input-group-prepend .input-group-text {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #adb5bd;
+        }
+
+        body.dark-theme .modal-content {
+            background-color: #1e1e1e;
+            border-color: #444;
+        }
+
+        body.dark-theme .modal-header {
+            background-color: #2d2d2d;
+            border-bottom-color: #444;
+        }
+
+        body.dark-theme .modal-footer {
+            border-top-color: #444;
+        }
+
+        body.dark-theme .badge-light {
+            background-color: #2d2d2d;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .progress {
+            background-color: #2d2d2d;
+        }
+
+        body.dark-theme .custom-range::-webkit-slider-runnable-track {
+            background-color: #2d2d2d;
+        }
+
+        body.dark-theme .custom-range::-webkit-slider-thumb {
+            background-color: var(--accent);
+        }
+
+        body.dark-theme .btn-outline-secondary {
+            color: #adb5bd;
+            border-color: #444;
+        }
+
+        body.dark-theme .btn-outline-secondary:hover {
+            background-color: #444;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .btn-outline-primary {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        body.dark-theme .btn-outline-info {
+            color: #17a2b8;
+            border-color: #17a2b8;
+        }
+
+        /* Stili per la sidebar compressa */
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar.collapsed .sidebar-brand span,
+        .sidebar.collapsed .sidebar-item span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-item i {
+            margin-right: 0;
+            font-size: 1.2rem;
+        }
+
+        body:not(.mobile-view) .main-content.sidebar-collapsed {
+            margin-left: 60px;
+        }
+
+        .sidebar-toggle {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sidebar-toggle:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* Tema scuro per la sidebar toggle */
+        body.dark-theme .sidebar-toggle {
+            color: #adb5bd;
+            border-color: #444;
+        }
+
+        body.dark-theme .sidebar-toggle:hover {
+            background-color: #444;
+            color: #e6e6e6;
+        }
+
+        /* Migliora la responsività per dispositivi mobili */
+        @media (max-width: 767px) {
+
+            /* Regola la tabella per dispositivi piccoli */
+            .table-responsive {
+                border: 0;
+            }
+
+            #orders-table thead {
+                display: none;
+                /* Nascondi l'header della tabella su dispositivi piccoli */
+            }
+
+            #orders-table tr {
+                margin-bottom: 1rem;
+                display: block;
+                border: 1px solid #dee2e6;
+                border-radius: 0.5rem;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+                background-color: #fff;
+            }
+
+            .dark-theme #orders-table tr {
+                border-color: #444;
+                background-color: #1e1e1e;
+            }
+
+            #orders-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 1rem;
+                border-top: 0;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+            .dark-theme #orders-table td {
+                border-bottom-color: #444;
+            }
+
+            #orders-table td:last-child {
+                border-bottom: 0;
+            }
+
+            #orders-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                width: 35%;
+                text-align: left;
+            }
+
+            /* Adatta le card di filtro */
+            .filters-card .form-group {
+                margin-bottom: 1rem;
+            }
+
+            /* Adatta le statistiche */
+            .stats-card {
+                margin-bottom: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header>div:last-child {
+                margin-top: 1rem;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            /* Migliora la visualizzazione dei filtri */
+            .filters-card .card-body {
+                padding: 1rem;
+            }
+
+            .filter-row {
+                margin: 0 -10px;
+            }
+
+            /* Adatta i pulsanti nelle azioni della tabella */
+            #orders-table .btn-group {
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            #orders-table .btn-group .btn {
+                margin: 2px;
+            }
+        }
+
+        /* Assicura che il footer generato da build.js sia responsive */
+        @media (max-width: 767px) {
+            .modern-footer .footer-brand {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+
+            .modern-footer .social-links {
+                justify-content: center;
+                margin-top: 1rem;
+            }
+
+            .modern-footer .footer-heading {
+                margin-top: 1.5rem;
+            }
+
+            .modern-footer .footer-links,
+            .modern-footer .footer-contact {
+                margin-bottom: 1.5rem;
+            }
+
+            .modern-footer .footer-legal {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+
+            .footer-bottom .text-center.text-md-start {
+                text-align: center !important;
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Fix per la visualizzazione corretta dei dropdown sui dispositivi mobili */
+        @media (max-width: 576px) {
+            .dropdown-menu {
+                position: absolute !important;
+                left: auto !important;
+                right: 0 !important;
+            }
+
+            .table .dropdown-menu {
+                position: absolute !important;
+                left: auto !important;
+                right: 0 !important;
+                transform: translate3d(0px, 38px, 0px) !important;
+            }
+
+            /* Correggi posizione del pulsante toggle su mobile */
+            .page-header>div:last-child {
+                position: absolute;
+                right: 15px;
+                top: 15px;
+            }
+
+            /* Assicura che il pulsante sia visibile */
+            #sidebar-toggle {
+                display: block !important;
+                left: 85% !important;
+                margin-top: 50px;
+            }
+
+            /* Migliora la visualizzazione del titolo della pagina */
+            .page-title {
+                padding-right: 50px;
+                /* Spazio per evitare sovrapposizione con il pulsante */
+            }
+
+            /* Stile specifico per la sidebar su mobile */
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 250px !important;
+                z-index: 1050;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            /* Aggiungi overlay quando la sidebar è aperta */
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
+
+        /* Regola per dispositivi mobili più piccoli */
+        @media (max-width: 400px) {
+            .page-header>div:last-child {
+                right: 10px;
+                top: 10px;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="/dashboard" class="sidebar-brand">
+                    <i class="fas fa-laptop-code mr-2"></i>
+                    <span>HelpDigit Admin</span>
+                </a>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/dashboard" class="sidebar-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/orders" class="sidebar-item active">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Ordini</span>
+                </a>
+                <a href="/admin/services" class="sidebar-item">
+                    <i class="fas fa-concierge-bell"></i>
+                    <span>Servizi</span>
+                </a>
+                <a href="/admin/users" class="sidebar-item">
+                    <i class="fas fa-users"></i>
+                    <span>Utenti</span>
+                </a>
+                <a href="/admin/settings" class="sidebar-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Impostazioni</span>
+                </a>
+                <a href="/logout" class="sidebar-item mt-5">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
 
-    <div class="container-fluid py-4">
-        <div class="row">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1>Gestione Ordini</h1>
-                    <div>
-                        <a href="/dashboard" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left"></i> Dashboard
-                        </a>
-                    </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Gestione Ordini</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent p-0">
+                            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Gestione Ordini</li>
+                        </ol>
+                    </nav>
                 </div>
+                <div>
+                    <button class="btn btn-outline-secondary sidebar-toggle mr-2" id="sidebar-toggle"
+                        title="Mostra/nascondi menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary mr-2 d-none d-md-block" id="mobile-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
 
-                <% if (query && query.success) { %>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <%= query.success %>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                <% } %>
-
-                <% if (req.query.error) { %>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <%= req.query.error %>
+            <% if (query && query.success) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <%= query.success %>
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                    </div>
+                </div>
                 <% } %>
 
-                <!-- Statistiche Dashboard -->
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card card-elevated text-center">
-                            <div class="card-body">
-                                <h5 class="card-title">Ordini totali</h5>
-                                <h2 class="display-4">
-                                    <%= stats.totalOrders || 0 %>
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card card-elevated text-center">
-                            <div class="card-body">
-                                <h5 class="card-title">In lavorazione</h5>
-                                <h2 class="display-4">
-                                    <%= stats.inProgressOrders || 0 %>
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card card-elevated text-center">
-                            <div class="card-body">
-                                <h5 class="card-title">Completati</h5>
-                                <h2 class="display-4">
-                                    <%= stats.completedOrders || 0 %>
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card card-elevated text-center">
-                            <div class="card-body">
-                                <h5 class="card-title">Ricavi totali</h5>
-                                <h2 class="display-4">€<%= (stats.totalRevenue || 0).toFixed(2) %>
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filtri -->
-                <div class="card card-elevated mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Filtri</h5>
-                        <form id="filter-form" class="row">
-                            <div class="col-md-3 form-group">
-                                <label for="filter-status">Stato</label>
-                                <select id="filter-status" class="form-control">
-                                    <option value="">Tutti gli stati</option>
-                                    <option value="in-attesa">In attesa</option>
-                                    <option value="pagamento-in-attesa">In attesa di pagamento</option>
-                                    <option value="in-lavorazione">In lavorazione</option>
-                                    <option value="in-revisione">In revisione</option>
-                                    <option value="completato">Completato</option>
-                                    <option value="consegnato">Consegnato</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 form-group">
-                                <label for="filter-service">Servizio</label>
-                                <input type="text" id="filter-service" class="form-control"
-                                    placeholder="Filtra per servizio">
-                            </div>
-                            <div class="col-md-3 form-group">
-                                <label for="filter-user">Cliente</label>
-                                <input type="text" id="filter-user" class="form-control"
-                                    placeholder="Nome o email cliente">
-                            </div>
-                            <div class="col-md-3 form-group">
-                                <label>&nbsp;</label>
-                                <button type="button" id="apply-filters"
-                                    class="btn btn-primary btn-block">
-                                    <i class="fas fa-filter"></i> Applica filtri
+                    <% if (req.query.error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            <%= req.query.error %>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
                                 </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Tabella Ordini -->
-                <div class="card card-elevated">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="orders-table" class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Servizio</th>
-                                        <th>Stato</th>
-                                        <th>Prezzo</th>
-                                        <th>Data Richiesta</th>
-                                        <th>Progresso</th>
-                                        <th>Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% if (orders && orders.length> 0) { %>
-                                        <% orders.forEach(order=> { %>
-                                            <tr class="order-row"
-                                                data-status="<%= order.status || order.stato %>"
-                                                data-service="<%= order.serviceName %>"
-                                                data-user="<%= `${order.nome} ${order.cognome} ${order.email}`.toLowerCase() %>">
-                                                <td>
-                                                    <%= order.id %>
-                                                </td>
-                                                <td>
-                                                    <div><strong>
-                                                            <%= order.nome %>
-                                                                <%= order.cognome %>
-                                                        </strong></div>
-                                                    <small class="text-muted">
-                                                        <%= order.email %>
-                                                    </small>
-                                                </td>
-                                                <td>
-                                                    <%= order.serviceName %>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="colorblind-indicator mr-2"
-                                                            data-mode="<%= user.colorBlindMode || 'none' %>">
-                                                            <span
-                                                                class="status-badge status-<%= order.status || order.stato %>"></span>
-                                                        </div>
-                                                        <%= order.status || order.stato %>
-                                                    </div>
-                                                </td>
-                                                <td>€<%= parseFloat(order.prezzo).toFixed(2) %>
-                                                </td>
-                                                <td>
-                                                    <%= new Date(order.dataRichiesta ||
-                                                        order.createdAt).toLocaleDateString('it-IT') %>
-                                                </td>
-                                                <td>
-                                                    <div class="progress" style="height: 20px;">
-                                                        <div class="progress-bar" role="progressbar"
-                                                            data-progress="<%= order.progressoLavoro %>"
-                                                            aria-valuemin="0" aria-valuemax="100">
-                                                            <%= order.progressoLavoro %>%
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex">
-                                                        <button
-                                                            class="btn btn-sm btn-primary mr-1 update-status-btn"
-                                                            data-toggle="modal"
-                                                            data-target="#updateStatusModal"
-                                                            data-id="<%= order.id %>"
-                                                            data-status="<%= order.status || order.stato %>"
-                                                            data-progress="<%= order.progressoLavoro %>">
-                                                            <i class="fas fa-edit"></i>
-                                                        </button>
-                                                        <a href="/orders/<%= order.id %>"
-                                                            class="btn btn-sm btn-info mr-1"
-                                                            target="_blank">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <% }); %>
-                                                <% } else { %>
-                                                    <tr>
-                                                        <td colspan="8" class="text-center">Nessun
-                                                            ordine trovato</td>
-                                                    </tr>
-                                                    <% } %>
-                                </tbody>
-                            </table>
                         </div>
-                    </div>
-                </div>
-            </div>
+                        <% } %>
+
+                            <!-- Statistiche Dashboard -->
+                            <div class="row mb-4">
+                                <div class="col-md-3 mb-3">
+                                    <div class="stats-card total p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-card-icon">
+                                                <i class="fas fa-clipboard-list"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-label">Ordini totali</div>
+                                                <div class="stats-card-value">
+                                                    <%= stats.totalOrders || 0 %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stats-card progress p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-card-icon">
+                                                <i class="fas fa-spinner"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-label">In lavorazione</div>
+                                                <div class="stats-card-value">
+                                                    <%= stats.inProgressOrders || 0 %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stats-card completed p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-card-icon">
+                                                <i class="fas fa-check-circle"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-label">Completati</div>
+                                                <div class="stats-card-value">
+                                                    <%= stats.completedOrders || 0 %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stats-card revenue p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-card-icon">
+                                                <i class="fas fa-euro-sign"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-label">Ricavi totali</div>
+                                                <div class="stats-card-value">€<%= (stats.totalRevenue || 0).toFixed(2)
+                                                        %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Filtri -->
+                            <div class="filters-card mb-4">
+                                <div class="card-header">
+                                    <i class="fas fa-filter mr-2"></i> Filtri
+                                </div>
+                                <div class="card-body">
+                                    <form id="filter-form" class="row filter-row">
+                                        <div class="col-md-3 form-group">
+                                            <label for="filter-status">Stato</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text bg-white">
+                                                        <i class="fas fa-tag"></i>
+                                                    </span>
+                                                </div>
+                                                <select id="filter-status" class="form-control">
+                                                    <option value="">Tutti gli stati</option>
+                                                    <option value="in-attesa">In attesa</option>
+                                                    <option value="pagamento-in-attesa">In attesa di pagamento</option>
+                                                    <option value="in-lavorazione">In lavorazione</option>
+                                                    <option value="in-revisione">In revisione</option>
+                                                    <option value="completato">Completato</option>
+                                                    <option value="consegnato">Consegnato</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label for="filter-service">Servizio</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text bg-white">
+                                                        <i class="fas fa-concierge-bell"></i>
+                                                    </span>
+                                                </div>
+                                                <input type="text" id="filter-service" class="form-control"
+                                                    placeholder="Filtra per servizio">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label for="filter-user">Cliente</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text bg-white">
+                                                        <i class="fas fa-user"></i>
+                                                    </span>
+                                                </div>
+                                                <input type="text" id="filter-user" class="form-control"
+                                                    placeholder="Nome o email cliente">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 form-group">
+                                            <label>&nbsp;</label>
+                                            <button type="button" id="apply-filters" class="btn btn-primary btn-block">
+                                                <i class="fas fa-filter"></i> Applica filtri
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Tabella Ordini -->
+                            <div class="orders-table-card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fas fa-list mr-2"></i> Elenco Ordini
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="false">
+                                                <i class="fas fa-cog"></i> Azioni
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right"
+                                                aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#"><i class="fas fa-file-excel mr-2"></i>
+                                                    Esporta in Excel</a>
+                                                <a class="dropdown-item" href="#"><i class="fas fa-file-pdf mr-2"></i>
+                                                    Esporta in PDF</a>
+                                                <a class="dropdown-item" href="#"><i class="fas fa-print mr-2"></i>
+                                                    Stampa</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table id="orders-table" class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Cliente</th>
+                                                    <th>Servizio</th>
+                                                    <th>Stato</th>
+                                                    <th>Prezzo</th>
+                                                    <th>Data Richiesta</th>
+                                                    <th>Progresso</th>
+                                                    <th>Azioni</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (orders && orders.length> 0) { %>
+                                                    <% orders.forEach(order=> { %>
+                                                        <tr class="order-row"
+                                                            data-status="<%= order.status || order.stato %>"
+                                                            data-service="<%= order.serviceName %>"
+                                                            data-user="<%= `${order.nome} ${order.cognome} ${order.email}`.toLowerCase() %>">
+                                                            <td data-label="ID"><span class="badge badge-light">#<%=
+                                                                        order.id %></span></td>
+                                                            <td data-label="Cliente">
+                                                                <div><strong>
+                                                                        <%= order.nome %>
+                                                                            <%= order.cognome %>
+                                                                    </strong></div>
+                                                                <small class="text-muted">
+                                                                    <%= order.email %>
+                                                                </small>
+                                                            </td>
+                                                            <td data-label="Servizio">
+                                                                <%= order.serviceName %>
+                                                            </td>
+                                                            <td data-label="Stato">
+                                                                <div class="d-flex align-items-center">
+                                                                    <div class="colorblind-indicator mr-2"
+                                                                        data-mode="<%= user.colorBlindMode || 'none' %>">
+                                                                        <span
+                                                                            class="status-badge status-<%= order.status || order.stato %>"></span>
+                                                                    </div>
+                                                                    <%= order.status || order.stato %>
+                                                                </div>
+                                                            </td>
+                                                            <td data-label="Prezzo">€<%=
+                                                                    parseFloat(order.prezzo).toFixed(2) %>
+                                                            </td>
+                                                            <td data-label="Data">
+                                                                <div>
+                                                                    <%= new Date(order.dataRichiesta ||
+                                                                        order.createdAt).toLocaleDateString('it-IT') %>
+                                                                </div>
+                                                                <small class="text-muted">
+                                                                    <%= new Date(order.dataRichiesta ||
+                                                                        order.createdAt).toLocaleTimeString('it-IT') %>
+                                                                </small>
+                                                            </td>
+                                                            <td data-label="Progresso" style="width: 150px">
+                                                                <div class="progress">
+                                                                    <div class="progress-bar" role="progressbar"
+                                                                        data-progress="<%= order.progressoLavoro %>"
+                                                                        aria-valuemin="0" aria-valuemax="100">
+                                                                    </div>
+                                                                </div>
+                                                                <small class="text-muted">
+                                                                    <%= order.progressoLavoro %>%
+                                                                </small>
+                                                            </td>
+                                                            <td data-label="Azioni">
+                                                                <div class="btn-group">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-primary update-status-btn"
+                                                                        data-toggle="modal"
+                                                                        data-target="#updateStatusModal"
+                                                                        data-id="<%= order.id %>"
+                                                                        data-status="<%= order.status || order.stato %>"
+                                                                        data-progress="<%= order.progressoLavoro %>">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+                                                                    <a href="/orders/<%= order.id %>"
+                                                                        class="btn btn-sm btn-outline-info"
+                                                                        target="_blank">
+                                                                        <i class="fas fa-eye"></i>
+                                                                    </a>
+                                                                    <button type="button"
+                                                                        class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split"
+                                                                        data-toggle="dropdown" aria-haspopup="true"
+                                                                        aria-expanded="false">
+                                                                        <span class="sr-only">Azioni</span>
+                                                                    </button>
+                                                                    <div class="dropdown-menu dropdown-menu-right">
+                                                                        <a class="dropdown-item" href="#"><i
+                                                                                class="fas fa-file-invoice mr-2"></i>
+                                                                            Dettagli fattura</a>
+                                                                        <a class="dropdown-item" href="#"><i
+                                                                                class="fas fa-envelope mr-2"></i>
+                                                                            Contatta cliente</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                        <a class="dropdown-item text-danger" href="#"><i
+                                                                                class="fas fa-trash-alt mr-2"></i>
+                                                                            Elimina</a>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <% }); %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="8" class="text-center py-4">
+                                                                        <div class="my-5">
+                                                                            <i
+                                                                                class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                                                            <p class="text-muted">Nessun ordine trovato
+                                                                            </p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
         </div>
     </div>
 
     <!-- Modal Update Status -->
     <div class="modal fade" id="updateStatusModal" tabindex="-1" aria-labelledby="updateStatusModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="updateStatusModalLabel">Aggiorna stato ordine</h5>
+                    <h5 class="modal-title" id="updateStatusModalLabel"><i class="fas fa-edit mr-2"></i>Aggiorna stato
+                        ordine</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -249,20 +1153,27 @@
                                 max="100" step="5">
                             <div class="d-flex justify-content-between">
                                 <span>0%</span>
-                                <span id="progressValue">0%</span>
+                                <span id="progressValue" class="font-weight-bold">0%</span>
                                 <span>100%</span>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                        <button type="submit" class="btn btn-primary">Salva</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> Salva
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script src="/js/build.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Gestione aggiornamento stato ordine
@@ -320,13 +1231,194 @@
                     }
                 });
             });
-        });
-    </script>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
-    <script src="/js/build.js"></script>
+            // Gestione sidebar su mobile
+            const sidebarToggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            // Crea un overlay per la sidebar mobile
+            const overlay = document.createElement('div');
+            overlay.className = 'sidebar-overlay';
+            document.body.appendChild(overlay);
+
+            // Verifica se c'è una preferenza salvata
+            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+            // Applica stato iniziale
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+            }
+
+            sidebarToggleBtn.addEventListener('click', function () {
+                if (window.innerWidth <= 768) {
+                    // Comportamento per dispositivi mobili (toggle active/non-active)
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+
+                    // Impedisci lo scroll del body quando la sidebar è aperta
+                    if (sidebar.classList.contains('active')) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                } else {
+                    // Comportamento desktop (collapsed/non-collapsed)
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('sidebar-collapsed');
+
+                    const isNowCollapsed = sidebar.classList.contains('collapsed');
+
+                    // Aggiorna l'icona e il tooltip
+                    if (isNowCollapsed) {
+                        sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                        sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+                    } else {
+                        sidebarToggleBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                        sidebarToggleBtn.setAttribute('title', 'Comprimi menu');
+                    }
+
+                    // Salva la preferenza
+                    localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+                }
+                
+                // Aggiorna il layout del footer
+                updateFooterLayout();
+            });
+
+            // Chiudi la sidebar quando si clicca sull'overlay
+            overlay.addEventListener('click', function () {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+                
+                // Aggiorna il layout del footer quando si chiude la sidebar con l'overlay
+                updateFooterLayout();
+            });
+
+            // Gestisci la responsività quando si ridimensiona la finestra
+            window.addEventListener('resize', function () {
+                if (window.innerWidth > 768) {
+                    // Passa alla modalità desktop
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+
+                    if (sidebar.classList.contains('active')) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+                
+                // Aggiorna il layout del footer quando si ridimensiona la finestra
+                updateFooterLayout();
+            });
+
+            // Gestione toggle sidebar
+            const mobileToggle = document.getElementById('mobile-toggle');
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('active');
+                });
+            }
+
+            // Inizializza le barre di progresso 
+            document.querySelectorAll('.progress-bar').forEach(progressBar => {
+                const progress = progressBar.getAttribute('data-progress');
+
+                // Imposta la larghezza dinamicamente
+                progressBar.style.width = progress + '%';
+
+                // Cambia il colore in base al progresso
+                if (progress < 25) {
+                    progressBar.classList.add('bg-danger');
+                } else if (progress < 75) {
+                    progressBar.classList.add('bg-warning');
+                } else {
+                    progressBar.classList.add('bg-success');
+                }
+            });
+
+            // Gestione della responsività del footer generato da build.js
+            function handleFooterResponsiveness() {
+                const footer = document.querySelector('.modern-footer');
+                if (footer) {
+                    // Assicurati che il footer sia responsive, aggiungendo classi necessarie se mancanti
+                    const footerColumns = footer.querySelectorAll('.col-lg-4, .col-lg-2');
+                    footerColumns.forEach(column => {
+                        if (!column.classList.contains('col-md-6')) {
+                            column.classList.add('col-md-6');
+                        }
+                        if (!column.classList.contains('col-sm-12')) {
+                            column.classList.add('col-sm-12');
+                        }
+                    });
+
+                    // Aggiusta il padding per schermi più piccoli
+                    if (window.innerWidth < 768) {
+                        footer.style.paddingLeft = '15px';
+                        footer.style.paddingRight = '15px';
+                    } else {
+                        footer.style.paddingLeft = '';
+                        footer.style.paddingRight = '';
+                    }
+                }
+            }
+
+            // Esegui immediatamente e poi ogni volta che la finestra viene ridimensionata
+            handleFooterResponsiveness();
+            window.addEventListener('resize', handleFooterResponsiveness);
+
+            // Observer per il footer che potrebbe essere aggiunto dinamicamente
+            const bodyObserver = new MutationObserver(mutations => {
+                mutations.forEach(mutation => {
+                    if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                        for (let node of mutation.addedNodes) {
+                            if (node.classList && node.classList.contains('modern-footer')) {
+                                handleFooterResponsiveness();
+                                updateFooterLayout(); // Aggiunto: imposta il layout iniziale del footer
+                                break;
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Osserva il body per il footer aggiunto dinamicamente
+            bodyObserver.observe(document.body, { childList: true });
+            
+            // Imposta il layout iniziale del footer se è già presente
+            setTimeout(updateFooterLayout, 100);
+        });
+
+        // Aggiungi questa funzione dopo la funzione handleFooterResponsiveness esistente
+        function updateFooterLayout() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const footer = document.querySelector('.modern-footer');
+            
+            if (!footer) return; // Se il footer non è presente, esci dalla funzione
+            
+            // Gestisci la posizione del footer in base allo stato della sidebar
+            if (window.innerWidth > 768) {
+                // Su desktop
+                if (sidebar.classList.contains('collapsed')) {
+                    // Sidebar compressa
+                    footer.style.marginLeft = '60px';
+                    footer.style.width = 'calc(100% - 60px)';
+                } else {
+                    // Sidebar espansa
+                    footer.style.marginLeft = '250px';
+                    footer.style.width = 'calc(100% - 250px)';
+                }
+            } else {
+                // Su mobile
+                footer.style.marginLeft = '0';
+                footer.style.width = '100%';
+            }
+        }
+    </script>
 </body>
 
 </html>
