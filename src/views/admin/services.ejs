@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Servizi | HelpDigit Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --info: #3498db;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--primary);
+            color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-brand:hover {
+            color: var(--light);
+            text-decoration: none;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s;
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .sidebar-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .stats-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            border-left: 4px solid;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card.total {
+            border-left-color: var(--info);
+        }
+
+        .stats-card.categories {
+            border-left-color: var(--warning);
+        }
+
+        .stats-card.popular {
+            border-left-color: var(--success);
+        }
+
+        .stats-card.revenue {
+            border-left-color: var(--primary);
+        }
+
+        .stats-card-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: #adb5bd;
+        }
+
+        .stats-card-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .stats-card-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filters-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .services-table-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-top: none;
+            background-color: #f8f9fa;
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .category-badge.category-digitalizzazione {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .category-badge.category-grafica {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .category-badge.category-supporto {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .category-badge.category-consulenza {
+            background-color: #fd7e14;
+            color: white;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            background-color: var(--accent);
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-row label {
+            font-weight: 500;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        /* Modal styling */
+        .modal-content {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal-title {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Stili per la sidebar compressa */
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar.collapsed .sidebar-brand span,
+        .sidebar.collapsed .sidebar-item span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-item i {
+            margin-right: 0;
+            font-size: 1.2rem;
+        }
+
+        body:not(.mobile-view) .main-content.sidebar-collapsed {
+            margin-left: 60px;
+        }
+
+        .sidebar-toggle {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sidebar-toggle:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* Tema scuro */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .sidebar {
+            background: #1a1a1a;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-theme .sidebar-item {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        body.dark-theme .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-theme .page-header {
+            border-bottom-color: #2d2d2d;
+        }
+
+        body.dark-theme .page-title {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .breadcrumb {
+            background-color: transparent;
+        }
+
+        body.dark-theme .breadcrumb-item.active {
+            color: #adb5bd;
+        }
+
+        body.dark-theme .stats-card {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-theme .stats-card-value {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .stats-card-label {
+            color: #adb5bd;
+        }
+
+        body.dark-theme .filters-card,
+        body.dark-theme .services-table-card {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-theme .card-header {
+            background-color: #1e1e1e;
+            border-bottom-color: #2d2d2d;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .table {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .table thead th {
+            background-color: #2d2d2d;
+            color: #adb5bd;
+            border-color: #444;
+        }
+
+        body.dark-theme .table td {
+            border-top-color: #2d2d2d;
+        }
+
+        body.dark-theme .table-hover tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-theme .text-muted {
+            color: #adb5bd !important;
+        }
+
+        body.dark-theme .dropdown-menu {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+
+        body.dark-theme .dropdown-item {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .dropdown-item:hover {
+            background-color: #3a3a3a;
+            color: #fff;
+        }
+
+        body.dark-theme .dropdown-divider {
+            border-top-color: #444;
+        }
+
+        body.dark-theme .form-control,
+        body.dark-theme .input-group-text {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .form-control:focus {
+            border-color: var(--accent);
+            background-color: #333;
+        }
+
+        body.dark-theme .input-group-prepend .input-group-text {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #adb5bd;
+        }
+
+        body.dark-theme .modal-content {
+            background-color: #1e1e1e;
+            border-color: #444;
+        }
+
+        body.dark-theme .modal-header {
+            background-color: #2d2d2d;
+            border-bottom-color: #444;
+        }
+
+        body.dark-theme .modal-footer {
+            border-top-color: #444;
+        }
+
+        body.dark-theme .badge-light {
+            background-color: #2d2d2d;
+            color: #e6e6e6;
+        }
+
+        /* Stili per il selettore di icone */
+        .icon-picker-dropdown {
+            position: absolute;
+            z-index: 1000;
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            margin-top: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        body.dark-theme .icon-picker-dropdown {
+            background: #2d2d2d;
+            border-color: #444;
+            color: #e6e6e6;
+        }
+
+        .icon-picker-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        @media (max-width: 576px) {
+            .icon-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .icon-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        body.dark-theme .icon-item {
+            border-color: #444;
+        }
+
+        .icon-item:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.1);
+        }
+
+        body.dark-theme .icon-item:hover {
+            background-color: #3a3a3a;
+        }
+
+        .icon-item.selected {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        body.dark-theme .icon-item.selected {
+            background-color: #0d47a1;
+            border-color: #2196f3;
+        }
+
+        .icon-item i {
+            font-size: 18px;
+        }
+
+        .icon-group {
+            margin-bottom: 20px;
+        }
+
+        .icon-group-title {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        body.dark-theme .icon-group-title {
+            color: #adb5bd;
+            border-bottom-color: #444;
+        }
+
+        /* Responsività per dispositivi mobili */
+        @media (max-width: 767px) {
+            .table-responsive {
+                border: 0;
+            }
+
+            #services-table thead {
+                display: none;
+            }
+
+            #services-table tr {
+                margin-bottom: 1rem;
+                display: block;
+                border: 1px solid #dee2e6;
+                border-radius: 0.5rem;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+                background-color: #fff;
+            }
+
+            .dark-theme #services-table tr {
+                border-color: #444;
+                background-color: #1e1e1e;
+            }
+
+            #services-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 1rem;
+                border-top: 0;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+            .dark-theme #services-table td {
+                border-bottom-color: #444;
+            }
+
+            #services-table td:last-child {
+                border-bottom: 0;
+            }
+
+            #services-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                width: 35%;
+                text-align: left;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                width: 0;
+                opacity: 0;
+            }
+
+            .sidebar.active {
+                width: 200px;
+                opacity: 1;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header>div:last-child {
+                margin-top: 1rem;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dropdown-menu {
+                position: absolute !important;
+                left: auto !important;
+                right: 0 !important;
+            }
+
+            .page-header>div:last-child {
+                position: absolute;
+                right: 15px;
+                top: 15px;
+            }
+
+            #sidebar-toggle {
+                display: block !important;
+                left: 85% !important;
+                margin-top: 50px;
+            }
+
+            .page-title {
+                padding-right: 50px;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 250px !important;
+                z-index: 1050;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a href="/dashboard" class="sidebar-brand">
+                    <i class="fas fa-laptop-code mr-2"></i>
+                    <span>HelpDigit Admin</span>
+                </a>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/dashboard" class="sidebar-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/orders" class="sidebar-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Ordini</span>
+                </a>
+                <a href="/admin/services" class="sidebar-item active">
+                    <i class="fas fa-concierge-bell"></i>
+                    <span>Servizi</span>
+                </a>
+                <a href="/admin/users" class="sidebar-item">
+                    <i class="fas fa-users"></i>
+                    <span>Utenti</span>
+                </a>
+                <a href="/admin/settings" class="sidebar-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Impostazioni</span>
+                </a>
+                <a href="/logout" class="sidebar-item mt-5">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Gestione Servizi</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent p-0">
+                            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Gestione Servizi</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <button class="btn btn-outline-secondary sidebar-toggle mr-2" id="sidebar-toggle"
+                        title="Mostra/nascondi menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="btn btn-primary" id="add-service-btn" data-toggle="modal" data-target="#serviceModal">
+                        <i class="fas fa-plus"></i> Nuovo Servizio
+                    </button>
+                </div>
+            </div>
+
+            <% if (query && query.success) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <%= query.success %>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+            <% } %>
+
+            <% if (query && query.error) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <%= query.error %>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+            <% } %>
+
+            <!-- Statistiche Dashboard -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card total p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-card-icon">
+                                <i class="fas fa-concierge-bell"></i>
+                            </div>
+                            <div>
+                                <div class="stats-card-label">Servizi totali</div>
+                                <div class="stats-card-value">
+                                    <%= stats.totalServices || 0 %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card categories p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-card-icon">
+                                <i class="fas fa-tags"></i>
+                            </div>
+                            <div>
+                                <div class="stats-card-label">Categorie</div>
+                                <div class="stats-card-value">
+                                    <%= stats.totalCategories || 0 %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card popular p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-card-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div>
+                                <div class="stats-card-label">Più richiesto</div>
+                                <div class="stats-card-value">
+                                    <%= stats.mostPopularService ? stats.mostPopularService.count : 0 %>
+                                </div>
+                                <small class="text-muted">
+                                    <%= stats.mostPopularService ? stats.mostPopularService.name : 'Nessun servizio' %>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card revenue p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-card-icon">
+                                <i class="fas fa-euro-sign"></i>
+                            </div>
+                            <div>
+                                <div class="stats-card-label">Prezzo medio</div>
+                                <div class="stats-card-value">€<%= stats.averagePrice ? stats.averagePrice.toFixed(2) : '0.00' %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtri -->
+            <div class="filters-card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-filter mr-2"></i> Filtri
+                </div>
+                <div class="card-body">
+                    <form id="filter-form" class="row filter-row">
+                        <div class="col-md-4 form-group">
+                            <label for="filter-category">Categoria</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-tag"></i>
+                                    </span>
+                                </div>
+                                <select id="filter-category" class="form-control">
+                                    <option value="">Tutte le categorie</option>
+                                    <% categories.forEach(category => { %>
+                                        <option value="<%= category %>"><%= category %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="filter-name">Nome servizio</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                </div>
+                                <input type="text" id="filter-name" class="form-control" placeholder="Cerca per nome">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>&nbsp;</label>
+                            <button type="button" id="apply-filters" class="btn btn-primary btn-block">
+                                <i class="fas fa-filter"></i> Applica filtri
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabella Servizi -->
+            <div class="services-table-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-list mr-2"></i> Elenco Servizi
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-cog"></i> Azioni
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="#"><i class="fas fa-file-excel mr-2"></i>
+                                    Esporta in Excel</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-file-pdf mr-2"></i>
+                                    Esporta in PDF</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-print mr-2"></i>
+                                    Stampa</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table id="services-table" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Categoria</th>
+                                    <th>Prezzo</th>
+                                    <th>Tempo consegna</th>
+                                    <th>Revisioni</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (services && services.length > 0) { %>
+                                    <% services.forEach(service => { %>
+                                        <tr class="service-row" data-category="<%= service.category.toLowerCase() %>"
+                                            data-name="<%= service.name.toLowerCase() %>">
+                                            <td data-label="ID"><span class="badge badge-light">#<%= service.id %></span></td>
+                                            <td data-label="Nome">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="<%= service.icon %> mr-2"></i>
+                                                    <div>
+                                                        <strong><%= service.name %></strong>
+                                                        <div class="small text-muted text-truncate" style="max-width: 200px;">
+                                                            <%= service.description %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td data-label="Categoria">
+                                                <span class="category-badge category-<%= service.category.toLowerCase() %>">
+                                                    <%= service.category %>
+                                                </span>
+                                            </td>
+                                            <td data-label="Prezzo">€<%= parseFloat(service.price).toFixed(2) %></td>
+                                            <td data-label="Tempo consegna"><%= service.deliveryTime %></td>
+                                            <td data-label="Revisioni"><%= service.revisions %></td>
+                                            <td data-label="Azioni">
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm btn-outline-primary edit-service-btn"
+                                                        data-toggle="modal" data-target="#serviceModal"
+                                                        data-id="<%= service.id %>"
+                                                        data-name="<%= service.name %>"
+                                                        data-description="<%= service.description %>"
+                                                        data-price="<%= service.price %>"
+                                                        data-category="<%= service.category %>"
+                                                        data-icon="<%= service.icon %>"
+                                                        data-delivery-time="<%= service.deliveryTime %>"
+                                                        data-revisions="<%= service.revisions %>">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <a href="/services/<%= service.id %>" class="btn btn-sm btn-outline-info"
+                                                        target="_blank">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-service-btn"
+                                                        data-id="<%= service.id %>" data-name="<%= service.name %>">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <div class="my-5">
+                                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                                <p class="text-muted">Nessun servizio trovato</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Servizio (Aggiungi/Modifica) -->
+    <div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="serviceModalLabel"><i class="fas fa-concierge-bell mr-2"></i><span id="modal-title-action">Aggiungi</span> Servizio</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="service-form" method="POST">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id">ID (Codice univoco)</label>
+                                    <input type="text" class="form-control" id="id" name="id" required>
+                                    <small class="form-text text-muted">
+                                        Codice univoco per il servizio (es. "consulenza", "supporto-pc")
+                                    </small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Nome</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="price">Prezzo (€)</label>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="price" name="price" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="category">Categoria</label>
+                                    <select class="form-control" id="category" name="category" required>
+                                        <option value="Digitalizzazione">Digitalizzazione</option>
+                                        <option value="Grafica">Grafica</option>
+                                        <option value="Supporto">Supporto</option>
+                                        <option value="Consulenza">Consulenza</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="icon">Icona (classe FontAwesome)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i id="icon-preview" class="fas fa-concierge-bell"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="icon" name="icon" value="fa-concierge-bell" required>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary" id="open-icon-picker">
+                                                <i class="fas fa-smile"></i> Scegli
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">Es. fa-paint-brush, fa-file-import</small>
+                                    
+                                    <!-- Icon picker dropdown -->
+                                    <div id="icon-picker" class="icon-picker-dropdown d-none">
+                                        <div class="icon-picker-search mb-2">
+                                            <input type="text" class="form-control form-control-sm" id="icon-search" placeholder="Cerca icone...">
+                                        </div>
+                                        <div class="icon-picker-categories">
+                                            <button class="btn btn-sm btn-primary active" data-category="all">Tutte</button>
+                                            <button class="btn btn-sm btn-outline-primary" data-category="interface">Interfaccia</button>
+                                            <button class="btn btn-sm btn-outline-primary" data-category="business">Business</button>
+                                            <button class="btn btn-sm btn-outline-primary" data-category="design">Design</button>
+                                            <button class="btn btn-sm btn-outline-primary" data-category="communication">Comunicazione</button>
+                                        </div>
+                                        <div class="icon-picker-grid">
+                                            <!-- Categorie icone -->
+                                            <div class="icon-group" data-category="interface">
+                                                <h6 class="icon-group-title">Interfaccia</h6>
+                                                <div class="icon-grid">
+                                                    <div class="icon-item" data-icon="fa-home"><i class="fas fa-home"></i></div>
+                                                    <div class="icon-item" data-icon="fa-user"><i class="fas fa-user"></i></div>
+                                                    <div class="icon-item" data-icon="fa-cog"><i class="fas fa-cog"></i></div>
+                                                    <div class="icon-item" data-icon="fa-search"><i class="fas fa-search"></i></div>
+                                                    <div class="icon-item" data-icon="fa-bell"><i class="fas fa-bell"></i></div>
+                                                    <div class="icon-item" data-icon="fa-envelope"><i class="fas fa-envelope"></i></div>
+                                                    <div class="icon-item" data-icon="fa-star"><i class="fas fa-star"></i></div>
+                                                    <div class="icon-item" data-icon="fa-heart"><i class="fas fa-heart"></i></div>
+                                                    <div class="icon-item" data-icon="fa-check"><i class="fas fa-check"></i></div>
+                                                    <div class="icon-item" data-icon="fa-times"><i class="fas fa-times"></i></div>
+                                                    <div class="icon-item" data-icon="fa-plus"><i class="fas fa-plus"></i></div>
+                                                    <div class="icon-item" data-icon="fa-minus"><i class="fas fa-minus"></i></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="icon-group" data-category="business">
+                                                <h6 class="icon-group-title">Business</h6>
+                                                <div class="icon-grid">
+                                                    <div class="icon-item" data-icon="fa-chart-line"><i class="fas fa-chart-line"></i></div>
+                                                    <div class="icon-item" data-icon="fa-chart-pie"><i class="fas fa-chart-pie"></i></div>
+                                                    <div class="icon-item" data-icon="fa-chart-bar"><i class="fas fa-chart-bar"></i></div>
+                                                    <div class="icon-item" data-icon="fa-briefcase"><i class="fas fa-briefcase"></i></div>
+                                                    <div class="icon-item" data-icon="fa-handshake"><i class="fas fa-handshake"></i></div>
+                                                    <div class="icon-item" data-icon="fa-file-invoice"><i class="fas fa-file-invoice"></i></div>
+                                                    <div class="icon-item" data-icon="fa-file-signature"><i class="fas fa-file-signature"></i></div>
+                                                    <div class="icon-item" data-icon="fa-tasks"><i class="fas fa-tasks"></i></div>
+                                                    <div class="icon-item" data-icon="fa-clipboard-list"><i class="fas fa-clipboard-list"></i></div>
+                                                    <div class="icon-item" data-icon="fa-project-diagram"><i class="fas fa-project-diagram"></i></div>
+                                                    <div class="icon-item" data-icon="fa-calculator"><i class="fas fa-calculator"></i></div>
+                                                    <div class="icon-item" data-icon="fa-euro-sign"><i class="fas fa-euro-sign"></i></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="icon-group" data-category="design">
+                                                <h6 class="icon-group-title">Design</h6>
+                                                <div class="icon-grid">
+                                                    <div class="icon-item" data-icon="fa-paint-brush"><i class="fas fa-paint-brush"></i></div>
+                                                    <div class="icon-item" data-icon="fa-palette"><i class="fas fa-palette"></i></div>
+                                                    <div class="icon-item" data-icon="fa-pencil-alt"><i class="fas fa-pencil-alt"></i></div>
+                                                    <div class="icon-item" data-icon="fa-pen-nib"><i class="fas fa-pen-nib"></i></div>
+                                                    <div class="icon-item" data-icon="fa-vector-square"><i class="fas fa-vector-square"></i></div>
+                                                    <div class="icon-item" data-icon="fa-crop"><i class="fas fa-crop"></i></div>
+                                                    <div class="icon-item" data-icon="fa-images"><i class="fas fa-images"></i></div>
+                                                    <div class="icon-item" data-icon="fa-photo-video"><i class="fas fa-photo-video"></i></div>
+                                                    <div class="icon-item" data-icon="fa-object-group"><i class="fas fa-object-group"></i></div>
+                                                    <div class="icon-item" data-icon="fa-ruler-combined"><i class="fas fa-ruler-combined"></i></div>
+                                                    <div class="icon-item" data-icon="fa-drafting-compass"><i class="fas fa-drafting-compass"></i></div>
+                                                    <div class="icon-item" data-icon="fa-fill-drip"><i class="fas fa-fill-drip"></i></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="icon-group" data-category="communication">
+                                                <h6 class="icon-group-title">Comunicazione</h6>
+                                                <div class="icon-grid">
+                                                    <div class="icon-item" data-icon="fa-comment"><i class="fas fa-comment"></i></div>
+                                                    <div class="icon-item" data-icon="fa-comments"><i class="fas fa-comments"></i></div>
+                                                    <div class="icon-item" data-icon="fa-phone"><i class="fas fa-phone"></i></div>
+                                                    <div class="icon-item" data-icon="fa-mobile-alt"><i class="fas fa-mobile-alt"></i></div>
+                                                    <div class="icon-item" data-icon="fa-headset"><i class="fas fa-headset"></i></div>
+                                                    <div class="icon-item" data-icon="fa-envelope-open-text"><i class="fas fa-envelope-open-text"></i></div>
+                                                    <div class="icon-item" data-icon="fa-paper-plane"><i class="fas fa-paper-plane"></i></div>
+                                                    <div class="icon-item" data-icon="fa-bullhorn"><i class="fas fa-bullhorn"></i></div>
+                                                    <div class="icon-item" data-icon="fa-share-alt"><i class="fas fa-share-alt"></i></div>
+                                                    <div class="icon-item" data-icon="fa-rss"><i class="fas fa-rss"></i></div>
+                                                    <div class="icon-item" data-icon="fa-video"><i class="fas fa-video"></i></div>
+                                                    <div class="icon-item" data-icon="fa-microphone"><i class="fas fa-microphone"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="deliveryTime">Tempo di consegna</label>
+                                    <input type="text" class="form-control" id="deliveryTime" name="deliveryTime" required>
+                                    <small class="form-text text-muted">Es. "3-5 giorni lavorativi"</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="revisions">Revisioni</label>
+                                    <input type="text" class="form-control" id="revisions" name="revisions" required>
+                                    <small class="form-text text-muted">Es. "2 revisioni gratuite", "Illimitate"</small>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="description">Descrizione</label>
+                                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="form-method" name="_method" value="POST">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> <span id="save-button-text">Salva</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Conferma Eliminazione -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-danger mr-2"></i>Conferma eliminazione</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Sei sicuro di voler eliminare il servizio <strong id="delete-service-name"></strong>?</p>
+                    <p class="text-danger">Questa azione è irreversibile.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                    <form id="delete-form" method="POST">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt mr-1"></i> Elimina
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script src="/js/build.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Gestione modale servizio (aggiunta/modifica)
+            const serviceModal = document.getElementById('serviceModal');
+            const serviceForm = document.getElementById('service-form');
+            const addServiceBtn = document.getElementById('add-service-btn');
+            const editServiceBtns = document.querySelectorAll('.edit-service-btn');
+            const iconInput = document.getElementById('icon');
+            const iconPreview = document.getElementById('icon-preview');
+            const modalTitleAction = document.getElementById('modal-title-action');
+            const saveButtonText = document.getElementById('save-button-text');
+            const formMethod = document.getElementById('form-method');
+
+            // Aggiorna l'anteprima dell'icona quando l'utente modifica l'input
+            iconInput.addEventListener('input', function() {
+                const iconClass = this.value;
+                iconPreview.className = '';
+                
+                if (iconClass.startsWith('fa-')) {
+                    iconPreview.className = 'fas ' + iconClass;
+                } else {
+                    iconPreview.className = iconClass;
+                }
+            });
+
+            // Configurazione per nuovo servizio
+            addServiceBtn.addEventListener('click', function() {
+                modalTitleAction.textContent = 'Aggiungi';
+                saveButtonText.textContent = 'Salva';
+                serviceForm.reset();
+                serviceForm.action = '/admin/services/create';
+                formMethod.value = 'POST';
+                document.getElementById('id').readOnly = false;
+                iconPreview.className = 'fas fa-concierge-bell';
+            });
+
+            // Configurazione per modifica servizio
+            editServiceBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const serviceId = this.dataset.id;
+                    const serviceName = this.dataset.name;
+                    const serviceDescription = this.dataset.description;
+                    const servicePrice = this.dataset.price;
+                    const serviceCategory = this.dataset.category;
+                    const serviceIcon = this.dataset.icon;
+                    const serviceDeliveryTime = this.dataset.deliveryTime;
+                    const serviceRevisions = this.dataset.revisions;
+
+                    modalTitleAction.textContent = 'Modifica';
+                    saveButtonText.textContent = 'Aggiorna';
+                    
+                    // Imposta i valori del form
+                    document.getElementById('id').value = serviceId;
+                    document.getElementById('id').readOnly = true;
+                    document.getElementById('name').value = serviceName;
+                    document.getElementById('description').value = serviceDescription;
+                    document.getElementById('price').value = servicePrice;
+                    document.getElementById('category').value = serviceCategory;
+                    document.getElementById('icon').value = serviceIcon;
+                    document.getElementById('deliveryTime').value = serviceDeliveryTime;
+                    document.getElementById('revisions').value = serviceRevisions;
+                    
+                    // Aggiorna l'anteprima dell'icona
+                    iconPreview.className = '';
+                    if (serviceIcon.startsWith('fa-')) {
+                        iconPreview.className = 'fas ' + serviceIcon;
+                    } else {
+                        iconPreview.className = serviceIcon;
+                    }
+                    
+                    // Aggiorna l'action del form e il metodo
+                    serviceForm.action = `/admin/services/edit/${serviceId}`;
+                    formMethod.value = 'PUT';
+                });
+            });
+            
+            // Gestione modale conferma eliminazione
+            const deleteServiceBtns = document.querySelectorAll('.delete-service-btn');
+            const deleteForm = document.getElementById('delete-form');
+            const deleteServiceName = document.getElementById('delete-service-name');
+            
+            deleteServiceBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const serviceId = this.dataset.id;
+                    const serviceName = this.dataset.name;
+                    
+                    deleteServiceName.textContent = serviceName;
+                    deleteForm.action = `/admin/services/delete/${serviceId}`;
+                    
+                    $('#deleteConfirmModal').modal('show');
+                });
+            });
+
+            // Gestione filtri
+            const applyFiltersBtn = document.getElementById('apply-filters');
+            const filterCategory = document.getElementById('filter-category');
+            const filterName = document.getElementById('filter-name');
+            const serviceRows = document.querySelectorAll('.service-row');
+
+            applyFiltersBtn.addEventListener('click', function() {
+                const categoryFilter = filterCategory.value.toLowerCase();
+                const nameFilter = filterName.value.toLowerCase();
+
+                serviceRows.forEach(row => {
+                    const rowCategory = row.dataset.category;
+                    const rowName = row.dataset.name;
+
+                    const matchCategory = !categoryFilter || rowCategory === categoryFilter;
+                    const matchName = !nameFilter || rowName.includes(nameFilter);
+
+                    if (matchCategory && matchName) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+
+            // Gestione sidebar su mobile e responsive
+            const sidebarToggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            // Crea un overlay per la sidebar mobile
+            const overlay = document.createElement('div');
+            overlay.className = 'sidebar-overlay';
+            document.body.appendChild(overlay);
+
+            // Verifica se c'è una preferenza salvata
+            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+            // Applica stato iniziale
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+            }
+
+            sidebarToggleBtn.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    // Comportamento per dispositivi mobili (toggle active/non-active)
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+
+                    // Impedisci lo scroll del body quando la sidebar è aperta
+                    if (sidebar.classList.contains('active')) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                } else {
+                    // Comportamento desktop (collapsed/non-collapsed)
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('sidebar-collapsed');
+
+                    const isNowCollapsed = sidebar.classList.contains('collapsed');
+
+                    // Aggiorna l'icona e il tooltip
+                    if (isNowCollapsed) {
+                        sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                        sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+                    } else {
+                        sidebarToggleBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                        sidebarToggleBtn.setAttribute('title', 'Comprimi menu');
+                    }
+
+                    // Salva la preferenza
+                    localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+                }
+                
+                // Aggiorna il layout del footer
+                updateFooterLayout();
+            });
+
+            // Chiudi la sidebar quando si clicca sull'overlay
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+                
+                // Aggiorna il layout del footer quando si chiude la sidebar con l'overlay
+                updateFooterLayout();
+            });
+
+            // Gestisci la responsività quando si ridimensiona la finestra
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    // Passa alla modalità desktop
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+
+                    if (sidebar.classList.contains('active')) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+                
+                // Aggiorna il layout del footer quando si ridimensiona la finestra
+                updateFooterLayout();
+            });
+
+            // Funzione per aggiornare il layout del footer
+            function updateFooterLayout() {
+                const footer = document.querySelector('.modern-footer');
+                
+                if (!footer) return; // Se il footer non è presente, esci dalla funzione
+                
+                // Gestisci la posizione del footer in base allo stato della sidebar
+                if (window.innerWidth > 768) {
+                    // Su desktop
+                    if (sidebar.classList.contains('collapsed')) {
+                        // Sidebar compressa
+                        footer.style.marginLeft = '60px';
+                        footer.style.width = 'calc(100% - 60px)';
+                    } else {
+                        // Sidebar espansa
+                        footer.style.marginLeft = '250px';
+                        footer.style.width = 'calc(100% - 250px)';
+                    }
+                } else {
+                    // Su mobile
+                    footer.style.marginLeft = '0';
+                    footer.style.width = '100%';
+                }
+            }
+            
+            // Imposta il layout iniziale del footer se è già presente
+            setTimeout(updateFooterLayout, 100);
+
+            // Gestione del selettore di icone
+            const iconPicker = document.getElementById('icon-picker');
+            const openIconPickerBtn = document.getElementById('open-icon-picker');
+            const iconItems = document.querySelectorAll('.icon-item');
+            const iconSearch = document.getElementById('icon-search');
+            const categoryButtons = document.querySelectorAll('.icon-picker-categories button');
+
+            // Apertura e chiusura del selettore
+            openIconPickerBtn.addEventListener('click', function() {
+                iconPicker.classList.toggle('d-none');
+            });
+
+            // Chiusura del selettore quando si clicca fuori
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('#icon-picker') && 
+                    !event.target.closest('#open-icon-picker') && 
+                    !iconPicker.classList.contains('d-none')) {
+                    iconPicker.classList.add('d-none');
+                }
+            });
+
+            // Selezione dell'icona
+            iconItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const iconClass = this.dataset.icon;
+                    
+                    // Rimuovi la selezione precedente
+                    document.querySelectorAll('.icon-item.selected').forEach(el => {
+                        el.classList.remove('selected');
+                    });
+                    
+                    // Aggiungi la classe selected all'icona selezionata
+                    this.classList.add('selected');
+                    
+                    // Aggiorna l'input e l'anteprima
+                    iconInput.value = iconClass;
+                    iconPreview.className = 'fas ' + iconClass;
+                    
+                    // Chiudi il selettore
+                    iconPicker.classList.add('d-none');
+                });
+            });
+
+            // Ricerca icone
+            iconSearch.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                iconItems.forEach(item => {
+                    const iconName = item.dataset.icon.toLowerCase();
+                    
+                    if (iconName.includes(searchTerm) || searchTerm === '') {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Filtro per categorie
+            categoryButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const category = this.dataset.category;
+                    
+                    // Aggiorna i pulsanti attivi
+                    categoryButtons.forEach(b => {
+                        b.classList.remove('btn-primary');
+                        b.classList.add('btn-outline-primary');
+                        b.classList.remove('active');
+                    });
+                    this.classList.remove('btn-outline-primary');
+                    this.classList.add('btn-primary');
+                    this.classList.add('active');
+                    
+                    // Mostra/nascondi gruppi in base alla categoria
+                    if (category === 'all') {
+                        document.querySelectorAll('.icon-group').forEach(group => {
+                            group.style.display = 'block';
+                        });
+                    } else {
+                        document.querySelectorAll('.icon-group').forEach(group => {
+                            if (group.dataset.category === category) {
+                                group.style.display = 'block';
+                            } else {
+                                group.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1552,6 +1552,171 @@ app.post('/admin/orders/:id/update-status', authenticate, isAdmin, async (req: R
   }
 });
 
+// Aggiungi questo codice dopo la route '/admin/orders'
+
+// Pagina di amministrazione dei servizi - solo per admin
+app.get('/admin/services', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Recupera tutti i servizi
+    const services = await ServiceModel.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Recupera le statistiche dei servizi
+    const totalServices = await ServiceModel.count();
+    
+    // Recupera il numero di categorie uniche
+    const categories = await ServiceModel.findAll({
+      attributes: [[sequelize.fn('DISTINCT', sequelize.col('category')), 'category']],
+      raw: true
+    });
+    const totalCategories = categories.length;
+    
+    // Estrai la lista delle categorie per il filtro
+    const categoryList = categories.map((item: any) => item.category);
+
+    // Calcola il prezzo medio dei servizi
+    const [averagePriceResult] = await sequelize.query(
+      'SELECT AVG(price) as averagePrice FROM services',
+      { type: QueryTypes.SELECT }
+    );
+
+    // Modifica questa parte per convertire averagePrice in un numero
+    const averagePrice = averagePriceResult ? Number((averagePriceResult as any).averagePrice) : 0;
+
+    // Trova il servizio più popolare (con più ordini)
+    const [popularServiceResult] = await sequelize.query(
+      `SELECT s.id, s.name, COUNT(o.id) as count 
+       FROM services s
+       LEFT JOIN ordini o ON CAST(o.servizio AS CHAR) = CAST(s.id AS CHAR)
+       GROUP BY s.id, s.name
+       ORDER BY count DESC
+       LIMIT 1`,
+      { type: QueryTypes.SELECT }
+    );
+
+    const stats = {
+      totalServices,
+      totalCategories,
+      averagePrice, // Ora questo sarà un vero valore numerico
+      mostPopularService: popularServiceResult || { name: 'N/A', count: 0 }
+    };
+
+    res.render('admin/services', {
+      user: req.user,
+      services: services || [],
+      categories: categoryList,
+      stats,
+      title: 'Gestione Servizi - Admin',
+      query: req.query
+    });
+  } catch (error) {
+    console.error('Errore nel recupero dei servizi:', error);
+    res.status(500).render('error', { 
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Errore nel caricamento dei servizi',
+      showLogout: true,
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+// Route per creare un nuovo servizio
+app.post('/admin/services/create', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id, name, description, price, category, icon, deliveryTime, revisions } = req.body;
+    
+    // Verifica se l'ID è già in uso
+    const existingService = await ServiceModel.findByPk(id);
+    if (existingService) {
+      return res.redirect('/admin/services?error=ID servizio già in uso');
+    }
+    
+    // Crea un nuovo servizio
+    await ServiceModel.create({
+      id,
+      name,
+      description, 
+      price: parseFloat(price),
+      category,
+      icon,
+      deliveryTime,
+      revisions
+    });
+    
+    res.redirect('/admin/services?success=Servizio creato con successo');
+  } catch (error) {
+    console.error('Errore nella creazione del servizio:', error);
+    res.redirect(`/admin/services?error=Errore nella creazione del servizio: ${(error as Error).message}`);
+  }
+});
+
+// Route per modificare un servizio esistente
+app.post('/admin/services/edit/:id', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceId = req.params.id;
+    const { name, description, price, category, icon, deliveryTime, revisions } = req.body;
+    
+    // Verifica se il servizio esiste
+    const service = await ServiceModel.findByPk(serviceId);
+    if (!service) {
+      return res.redirect('/admin/services?error=Servizio non trovato');
+    }
+    
+    // Aggiorna il servizio
+    await service.update({
+      name,
+      description,
+      price: parseFloat(price),
+      category,
+      icon,
+      deliveryTime,
+      revisions
+    });
+    
+    res.redirect('/admin/services?success=Servizio aggiornato con successo');
+  } catch (error) {
+    console.error('Errore nell\'aggiornamento del servizio:', error);
+    res.redirect(`/admin/services?error=Errore nell'aggiornamento del servizio: ${(error as Error).message}`);
+  }
+});
+
+// Route per eliminare un servizio
+app.post('/admin/services/delete/:id', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const serviceId = req.params.id;
+    
+    // Verifica se il servizio esiste
+    const service = await ServiceModel.findByPk(serviceId);
+    if (!service) {
+      return res.redirect('/admin/services?error=Servizio non trovato');
+    }
+    
+    // Verifica se ci sono ordini collegati a questo servizio
+    const relatedOrders = await sequelize.query(
+      'SELECT COUNT(*) as count FROM ordini WHERE servizio = ?',
+      {
+        replacements: [serviceId],
+        type: QueryTypes.SELECT
+      }
+    );
+    
+    const orderCount = (relatedOrders[0] as any).count;
+    if (orderCount > 0) {
+      return res.redirect(`/admin/services?error=Impossibile eliminare il servizio: è collegato a ${orderCount} ordini`);
+    }
+    
+    // Elimina il servizio
+    await service.destroy();
+    
+    res.redirect('/admin/services?success=Servizio eliminato con successo');
+  } catch (error) {
+    console.error('Errore nell\'eliminazione del servizio:', error);
+    res.redirect(`/admin/services?error=Errore nell'eliminazione del servizio: ${(error as Error).message}`);
+  }
+});
+
 // Gestione pagina 404 - deve essere sempre DOPO tutte le route ma PRIMA dei middleware di gestione errori
 app.use((req: Request, res: Response) => {
   res.status(404).render('error', {
