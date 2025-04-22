@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Utenti | HelpDigit Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --info: #3498db;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--primary);
+            color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-brand:hover {
+            color: var(--light);
+            text-decoration: none;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .sidebar-item {
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s;
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            position: relative;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-item.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .sidebar-item.active,
+        .sidebar-item.active i,
+        .sidebar-item.active span {
+            color: white !important;
+            font-weight: 500;
+        }
+
+        .sidebar-item:not(.active):hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-item.active::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background-color: white;
+        }
+
+        .sidebar-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .stats-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+            border-left: 4px solid;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-card.total {
+            border-left-color: var(--info);
+        }
+
+        .stats-card.categories {
+            border-left-color: var(--warning);
+        }
+
+        .stats-card.popular {
+            border-left-color: var(--success);
+        }
+
+        .stats-card.revenue {
+            border-left-color: var(--primary);
+        }
+
+        .stats-card-icon {
+            font-size: 2rem;
+            margin-right: 1rem;
+            color: #adb5bd;
+        }
+
+        .stats-card-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .stats-card-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .filters-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .services-table-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            border-top: none;
+            background-color: #f8f9fa;
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .category-badge.category-digitalizzazione {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .category-badge.category-grafica {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .category-badge.category-supporto {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .category-badge.category-consulenza {
+            background-color: #fd7e14;
+            color: white;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar {
+            background-color: var(--accent);
+            border-radius: 4px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-row label {
+            font-weight: 500;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            padding: 0.5rem 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        /* Modal styling */
+        .modal-content {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .modal-title {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Stili per la sidebar compressa */
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar.collapsed .sidebar-brand span,
+        .sidebar.collapsed .sidebar-item span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-item i {
+            margin-right: 0;
+            font-size: 1.2rem;
+        }
+
+        body:not(.mobile-view) .main-content.sidebar-collapsed {
+            margin-left: 60px;
+        }
+
+        .sidebar-toggle {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .sidebar-toggle:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        /* Tema scuro */
+        body.dark-theme {
+            background-color: #121212;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .sidebar {
+            background: #1a1a1a;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-theme .sidebar-item {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        body.dark-theme .sidebar-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-theme .page-header {
+            border-bottom-color: #2d2d2d;
+        }
+
+        body.dark-theme .page-title {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .breadcrumb {
+            background-color: transparent;
+        }
+
+        body.dark-theme .breadcrumb-item.active {
+            color: #adb5bd;
+        }
+
+        body.dark-theme .stats-card {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-theme .stats-card-value {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .stats-card-label {
+            color: #adb5bd;
+        }
+
+        body.dark-theme .filters-card,
+        body.dark-theme .services-table-card {
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        body.dark-theme .card-header {
+            background-color: #1e1e1e;
+            border-bottom-color: #2d2d2d;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .table {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .table thead th {
+            background-color: #2d2d2d;
+            color: #adb5bd;
+            border-color: #444;
+        }
+
+        body.dark-theme .table td {
+            border-top-color: #2d2d2d;
+        }
+
+        body.dark-theme .table-hover tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-theme .text-muted {
+            color: #adb5bd !important;
+        }
+
+        body.dark-theme .dropdown-menu {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+
+        body.dark-theme .dropdown-item {
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .dropdown-item:hover {
+            background-color: #3a3a3a;
+            color: #fff;
+        }
+
+        body.dark-theme .dropdown-divider {
+            border-top-color: #444;
+        }
+
+        body.dark-theme .form-control,
+        body.dark-theme .input-group-text {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #e6e6e6;
+        }
+
+        body.dark-theme .form-control:focus {
+            border-color: var(--accent);
+            background-color: #333;
+        }
+
+        body.dark-theme .input-group-prepend .input-group-text {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #adb5bd;
+        }
+
+        body.dark-theme .modal-content {
+            background-color: #1e1e1e;
+            border-color: #444;
+        }
+
+        body.dark-theme .modal-header {
+            background-color: #2d2d2d;
+            border-bottom-color: #444;
+        }
+
+        body.dark-theme .modal-footer {
+            border-top-color: #444;
+        }
+
+        body.dark-theme .badge-light {
+            background-color: #2d2d2d;
+            color: #e6e6e6;
+        }
+
+        /* Stili per il selettore di icone */
+        .icon-picker-dropdown {
+            position: absolute;
+            z-index: 1000;
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            margin-top: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        body.dark-theme .icon-picker-dropdown {
+            background: #2d2d2d;
+            border-color: #444;
+            color: #e6e6e6;
+        }
+
+        .icon-picker-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+
+        @media (max-width: 576px) {
+            .icon-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .icon-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        body.dark-theme .icon-item {
+            border-color: #444;
+        }
+
+        .icon-item:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.1);
+        }
+
+        body.dark-theme .icon-item:hover {
+            background-color: #3a3a3a;
+        }
+
+        .icon-item.selected {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        body.dark-theme .icon-item.selected {
+            background-color: #0d47a1;
+            border-color: #2196f3;
+        }
+
+        .icon-item i {
+            font-size: 18px;
+        }
+
+        .icon-group {
+            margin-bottom: 20px;
+        }
+
+        .icon-group-title {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        body.dark-theme .icon-group-title {
+            color: #adb5bd;
+            border-bottom-color: #444;
+        }
+
+        /* Responsività per dispositivi mobili */
+        @media (max-width: 767px) {
+            .table-responsive {
+                border: 0;
+            }
+
+            #services-table thead {
+                display: none;
+            }
+
+            #services-table tr {
+                margin-bottom: 1rem;
+                display: block;
+                border: 1px solid #dee2e6;
+                border-radius: 0.5rem;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+                background-color: #fff;
+            }
+
+            .dark-theme #services-table tr {
+                border-color: #444;
+                background-color: #1e1e1e;
+            }
+
+            #services-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 1rem;
+                border-top: 0;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+            .dark-theme #services-table td {
+                border-bottom-color: #444;
+            }
+
+            #services-table td:last-child {
+                border-bottom: 0;
+            }
+
+            #services-table td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                width: 35%;
+                text-align: left;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                width: 0;
+                opacity: 0;
+            }
+
+            .sidebar.active {
+                width: 200px;
+                opacity: 1;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-header>div:last-child {
+                margin-top: 1rem;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dropdown-menu {
+                position: absolute !important;
+                left: auto !important;
+                right: 0 !important;
+            }
+
+            .page-header>div:last-child {
+                position: absolute;
+                right: 15px;
+                top: 15px;
+            }
+
+            #sidebar-toggle {
+                display: block !important;
+                left: 85% !important;
+                margin-top: 50px;
+            }
+
+            .page-title {
+                padding-right: 50px;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 250px !important;
+                z-index: 1050;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+
+        /* Regole per visualizzazione responsive dei pulsanti */
+        .mobile-only-btn {
+            display: none;
+        }
+
+        @media (max-width: 576px) {
+            .mobile-only-btn {
+                display: block;
+                position: absolute;
+                left: 25%;
+                bottom: 0.5%;
+                z-index: 1000;
+            }
+
+            .desktop-only-btn {
+                display: none;
+            }
+        }
+
+        /* Ottimizzazioni responsive generali */
+        @media (max-width: 1200px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .page-header {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        @media (max-width: 991px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-card {
+                margin-bottom: 15px;
+            }
+
+            .page-header {
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .main-content {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-menu">
+                <a href="/dashboard" class="sidebar-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/orders" class="sidebar-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Ordini</span>
+                </a>
+                <a href="/admin/services" class="sidebar-item">
+                    <i class="fas fa-concierge-bell"></i>
+                    <span>Servizi</span>
+                </a>
+                <a href="/admin/users" class="sidebar-item active">
+                    <i class="fas fa-users"></i>
+                    <span>Utenti</span>
+                </a>
+                <a href="/admin/settings" class="sidebar-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Impostazioni</span>
+                </a>
+                <a href="/logout" class="sidebar-item mt-5">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Gestione Utenti</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent p-0">
+                            <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Gestione Utenti</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <button class="btn btn-outline-secondary sidebar-toggle mr-2" id="sidebar-toggle"
+                        title="Mostra/nascondi menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="btn btn-primary desktop-only-btn" id="add-user-btn" data-toggle="modal" data-target="#userModal">
+                        <i class="fas fa-user-plus"></i> Nuovo Utente
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pulsante mobile Nuovo Utente -->
+            <button class="btn btn-primary mobile-only-btn" id="add-user-mobile-btn" data-toggle="modal" data-target="#userModal">
+                <i class="fas fa-user-plus"></i> Nuovo Utente
+            </button>
+
+            <% if (query && query.success) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <%= query.success %>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <% } %>
+
+            <% if (query && query.error) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <%= query.error %>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <% } %>
+
+            <!-- Statistiche Dashboard -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card total p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="stats-card-label">Utenti totali</div>
+                                <div class="stats-card-value">
+                                    <%= stats.totalUsers || 0 %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card active p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-card-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div>
+                                <div class="stats-card-label">Utenti attivi</div>
+                                <div class="stats-card-value">
+                                    <%= stats.activeUsers || 0 %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card admin p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-card-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div>
+                                <div class="stats-card-label">Amministratori</div>
+                                <div class="stats-card-value">
+                                    <%= stats.adminUsers || 0 %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card recent p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-card-icon">
+                                <i class="fas fa-calendar-day"></i>
+                            </div>
+                            <div>
+                                <div class="stats-card-label">Ultimo accesso</div>
+                                <div class="stats-card-value" style="font-size: 1.4rem;">
+                                    <%= stats.lastLogin ? new Date(stats.lastLogin).toLocaleDateString('it-IT') : 'N/D' %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtri -->
+            <div class="filters-card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-filter mr-2"></i> Filtri
+                </div>
+                <div class="card-body">
+                    <form id="filter-form" class="row filter-row">
+                        <div class="col-md-4 form-group">
+                            <label for="filter-role">Ruolo</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-user-tag"></i>
+                                    </span>
+                                </div>
+                                <select id="filter-role" class="form-control">
+                                    <option value="">Tutti i ruoli</option>
+                                    <option value="admin">Amministratore</option>
+                                    <option value="user">Utente</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="filter-search">Nome/Email</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                </div>
+                                <input type="text" id="filter-search" class="form-control" placeholder="Cerca...">
+                            </div>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>&nbsp;</label>
+                            <button type="button" id="apply-filters" class="btn btn-primary btn-block">
+                                <i class="fas fa-filter"></i> Applica filtri
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabella Utenti -->
+            <div class="users-table-card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-list mr-2"></i> Elenco Utenti
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-cog"></i> Azioni
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" href="#"><i class="fas fa-file-excel mr-2"></i>
+                                    Esporta in Excel</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-file-pdf mr-2"></i>
+                                    Esporta in PDF</a>
+                                <a class="dropdown-item" href="#"><i class="fas fa-print mr-2"></i>
+                                    Stampa</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table id="users-table" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome/Cognome</th>
+                                    <th>Email</th>
+                                    <th>Ruolo</th>
+                                    <th>Stato</th>
+                                    <th>Data registrazione</th>
+                                    <th>Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (users && users.length > 0) { %>
+                                    <% users.forEach(user => { %>
+                                        <tr class="user-row" 
+                                            data-role="<%= user.isAdmin ? 'admin' : 'user' %>"
+                                            data-search="<%= user.nome.toLowerCase() + ' ' + user.cognome.toLowerCase() + ' ' + user.email.toLowerCase() %>"
+                                            data-status="<%= user.attivo ? 'active' : 'inactive' %>">
+                                            <td data-label="ID"><span class="badge badge-light">#<%= user.id %></span></td>
+                                            <td data-label="Nome/Cognome">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar mr-2 bg-light rounded-circle text-center" style="width: 32px; height: 32px; line-height: 32px;">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                    <div>
+                                                        <strong><%= user.nome %> <%= user.cognome %></strong>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td data-label="Email"><%= user.email %></td>
+                                            <td data-label="Ruolo">
+                                                <span class="role-badge role-<%= user.isAdmin ? 'admin' : 'user' %>">
+                                                    <%= user.isAdmin ? 'Amministratore' : 'Utente' %>
+                                                </span>
+                                            </td>
+                                            <td data-label="Stato">
+                                                <span class="status-badge status-<%= user.attivo ? 'active' : 'inactive' %>">
+                                                    <%= user.attivo ? 'Attivo' : 'Inattivo' %>
+                                                </span>
+                                            </td>
+                                            <td data-label="Data registrazione">
+                                                <%= new Date(user.createdAt).toLocaleDateString('it-IT') %>
+                                            </td>
+                                            <td data-label="Azioni">
+                                                <div class="btn-group">
+                                                    <button class="btn btn-sm btn-outline-primary edit-user-btn"
+                                                        data-toggle="modal" data-target="#userModal"
+                                                        data-id="<%= user.id %>"
+                                                        data-nome="<%= user.nome %>"
+                                                        data-cognome="<%= user.cognome %>"
+                                                        data-email="<%= user.email %>"
+                                                        data-isadmin="<%= user.isAdmin ? 'true' : 'false' %>"
+                                                        data-attivo="<%= user.attivo ? 'true' : 'false' %>">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-<%= user.attivo ? 'warning' : 'success' %> toggle-status-btn"
+                                                        data-id="<%= user.id %>" 
+                                                        data-active="<%= user.attivo ? 'true' : 'false' %>"
+                                                        data-nome="<%= user.nome %> <%= user.cognome %>">
+                                                        <i class="fas <%= user.attivo ? 'fa-user-slash' : 'fa-user-check' %>"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn"
+                                                        data-id="<%= user.id %>" data-nome="<%= user.nome %> <%= user.cognome %>">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <div class="my-5">
+                                                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                                <p class="text-muted">Nessun utente trovato</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Utente (Aggiungi/Modifica) -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel"><i class="fas fa-user mr-2"></i><span id="modal-title-action">Aggiungi</span> Utente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="user-form" method="POST">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="nome">Nome</label>
+                                    <input type="text" class="form-control" id="nome" name="nome" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cognome">Cognome</label>
+                                    <input type="text" class="form-control" id="cognome" name="cognome" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Ruolo</label>
+                                    <select class="form-control" id="role" name="isAdmin">
+                                        <option value="false">Utente</option>
+                                        <option value="true">Amministratore</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="active">Stato</label>
+                                    <select class="form-control" id="active" name="attivo">
+                                        <option value="true">Attivo</option>
+                                        <option value="false">Inattivo</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="password-container">
+                                    <label for="password">Password (solo per nuovi utenti)</label>
+                                    <input type="password" class="form-control" id="password" name="password">
+                                    <small class="form-text text-muted">Lasciare vuoto per mantenere la password esistente durante la modifica.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" id="form-method" name="_method" value="POST">
+                        <input type="hidden" id="user-id" name="id" value="">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save mr-1"></i> <span id="save-button-text">Salva</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Conferma Eliminazione -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-danger mr-2"></i>Conferma eliminazione</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Sei sicuro di voler eliminare l'utente <strong id="delete-user-name"></strong>?</p>
+                    <p class="text-danger">Questa azione è irreversibile e cancellerà anche tutti i dati associati a questo utente.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                    <form id="delete-form" method="POST" action="">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt mr-1"></i> Elimina
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Conferma Cambio Stato -->
+    <div class="modal fade" id="toggleStatusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-user-shield text-warning mr-2"></i><span id="toggle-status-title">Disattiva utente</span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p><span id="toggle-status-message">Sei sicuro di voler disattivare l'utente</span> <strong id="toggle-user-name"></strong>?</p>
+                    <p id="toggle-status-warning" class="text-warning">L'utente non potrà più accedere alla piattaforma fino a quando non sarà riattivato.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                    <form id="toggle-status-form" method="POST">
+                        <input type="hidden" name="_method" value="PATCH">
+                        <input type="hidden" id="toggle-status-value" name="attivo" value="">
+                        <button type="submit" class="btn btn-warning" id="toggle-status-btn">
+                            <i class="fas fa-user-slash mr-1" id="toggle-status-icon"></i> <span id="toggle-status-btn-text">Disattiva</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script src="/js/build.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Gestione modale utente (aggiunta/modifica)
+            const userModal = document.getElementById('userModal');
+            const userForm = document.getElementById('user-form');
+            const addUserBtn = document.getElementById('add-user-btn');
+            const addUserMobileBtn = document.getElementById('add-user-mobile-btn');
+            const editUserBtns = document.querySelectorAll('.edit-user-btn');
+            const modalTitleAction = document.getElementById('modal-title-action');
+            const saveButtonText = document.getElementById('save-button-text');
+            const formMethod = document.getElementById('form-method');
+            const userId = document.getElementById('user-id');
+            const passwordContainer = document.getElementById('password-container');
+
+            // Configurazione per nuovo utente
+            const setupNewUserModal = () => {
+                modalTitleAction.textContent = 'Aggiungi';
+                saveButtonText.textContent = 'Salva';
+                userForm.reset();
+                userForm.action = '/admin/users/create';
+                formMethod.value = 'POST';
+                userId.value = '';
+                passwordContainer.style.display = 'block';
+                document.getElementById('password').setAttribute('required', 'required');
+            };
+
+            addUserBtn.addEventListener('click', setupNewUserModal);
+            addUserMobileBtn.addEventListener('click', setupNewUserModal);
+
+            // Configurazione per modifica utente
+            editUserBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const nome = this.dataset.nome;
+                    const cognome = this.dataset.cognome;
+                    const email = this.dataset.email;
+                    const isAdmin = this.dataset.isadmin === 'true';
+                    const attivo = this.dataset.attivo === 'true';
+
+                    modalTitleAction.textContent = 'Modifica';
+                    saveButtonText.textContent = 'Aggiorna';
+                    
+                    // Imposta i valori del form
+                    document.getElementById('nome').value = nome;
+                    document.getElementById('cognome').value = cognome;
+                    document.getElementById('email').value = email;
+                    document.getElementById('role').value = isAdmin.toString();
+                    document.getElementById('active').value = attivo.toString();
+                    userId.value = id;
+                    
+                    // Nascondi il campo password per le modifiche
+                    passwordContainer.style.display = 'block';
+                    document.getElementById('password').removeAttribute('required');
+                    
+                    // Aggiorna l'action del form e il metodo
+                    userForm.action = `/admin/users/${id}/update`;
+                    formMethod.value = 'PUT';
+                });
+            });
+            
+            // Gestione modale conferma eliminazione
+            const deleteUserBtns = document.querySelectorAll('.delete-user-btn');
+            const deleteForm = document.getElementById('delete-form');
+            const deleteUserName = document.getElementById('delete-user-name');
+
+            deleteUserBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const userId = this.dataset.id;
+                    const userName = this.dataset.nome;
+                    
+                    deleteUserName.textContent = userName;
+                    deleteForm.action = `/admin/users/${userId}/delete`;
+                    
+                    $('#deleteConfirmModal').modal('show');
+                });
+            });
+
+            deleteForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Aggiungiamo un feedback visivo prima dell'invio
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Eliminazione...';
+                
+                // Invia la richiesta usando fetch con il metodo DELETE
+                fetch(this.action, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else {
+                        window.location.href = '/admin/users?success=Utente eliminato con successo';
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore durante l\'eliminazione:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-trash-alt mr-1"></i> Elimina';
+                    alert('Si è verificato un errore durante l\'eliminazione dell\'utente.');
+                });
+            });
+
+            // Gestione modale cambio stato
+            const toggleStatusBtns = document.querySelectorAll('.toggle-status-btn');
+            const toggleStatusForm = document.getElementById('toggle-status-form');
+            const toggleUserName = document.getElementById('toggle-user-name');
+            const toggleStatusTitle = document.getElementById('toggle-status-title');
+            const toggleStatusMessage = document.getElementById('toggle-status-message');
+            const toggleStatusWarning = document.getElementById('toggle-status-warning');
+            const toggleStatusBtn = document.getElementById('toggle-status-btn');
+            const toggleStatusBtnText = document.getElementById('toggle-status-btn-text');
+            const toggleStatusIcon = document.getElementById('toggle-status-icon');
+            const toggleStatusValue = document.getElementById('toggle-status-value');
+            
+            toggleStatusBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const userId = this.dataset.id;
+                    const userName = this.dataset.nome;
+                    const isActive = this.dataset.active === 'true';
+                    
+                    toggleUserName.textContent = userName;
+                    toggleStatusForm.action = `/admin/users/${userId}/toggle-status`;
+                    toggleStatusValue.value = (!isActive).toString();
+                    
+                    if (isActive) {
+                        // Disattivazione
+                        toggleStatusTitle.textContent = 'Disattiva utente';
+                        toggleStatusMessage.textContent = 'Sei sicuro di voler disattivare l\'utente';
+                        toggleStatusWarning.textContent = 'L\'utente non potrà più accedere alla piattaforma fino a quando non sarà riattivato.';
+                        toggleStatusWarning.className = 'text-warning';
+                        toggleStatusBtn.className = 'btn btn-warning';
+                        toggleStatusBtnText.textContent = 'Disattiva';
+                        toggleStatusIcon.className = 'fas fa-user-slash mr-1';
+                    } else {
+                        // Attivazione
+                        toggleStatusTitle.textContent = 'Attiva utente';
+                        toggleStatusMessage.textContent = 'Sei sicuro di voler attivare l\'utente';
+                        toggleStatusWarning.textContent = 'L\'utente potrà nuovamente accedere alla piattaforma.';
+                        toggleStatusWarning.className = 'text-success';
+                        toggleStatusBtn.className = 'btn btn-success';
+                        toggleStatusBtnText.textContent = 'Attiva';
+                        toggleStatusIcon.className = 'fas fa-user-check mr-1';
+                    }
+                    
+                    $('#toggleStatusModal').modal('show');
+                });
+            });
+
+            // Gestione filtri
+            const applyFiltersBtn = document.getElementById('apply-filters');
+            const filterRole = document.getElementById('filter-role');
+            const filterSearch = document.getElementById('filter-search');
+            const userRows = document.querySelectorAll('.user-row');
+
+            applyFiltersBtn.addEventListener('click', function() {
+                const roleFilter = filterRole.value.toLowerCase();
+                const searchFilter = filterSearch.value.toLowerCase();
+
+                userRows.forEach(row => {
+                    const rowRole = row.dataset.role;
+                    const rowSearch = row.dataset.search;
+                    const rowStatus = row.dataset.status;
+
+                    const matchRole = !roleFilter || rowRole === roleFilter;
+                    const matchSearch = !searchFilter || rowSearch.includes(searchFilter);
+
+                    if (matchRole && matchSearch) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+
+            // Gestione sidebar su mobile e responsive
+            const sidebarToggleBtn = document.getElementById('sidebar-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            // Crea un overlay per la sidebar mobile
+            const overlay = document.createElement('div');
+            overlay.className = 'sidebar-overlay';
+            document.body.appendChild(overlay);
+
+            // Verifica se c'è una preferenza salvata
+            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+            // Applica stato iniziale
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+            }
+
+            sidebarToggleBtn.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    // Comportamento per dispositivi mobili (toggle active/non-active)
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+
+                    // Impedisci lo scroll del body quando la sidebar è aperta
+                    if (sidebar.classList.contains('active')) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                } else {
+                    // Comportamento desktop (collapsed/non-collapsed)
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('sidebar-collapsed');
+
+                    const isNowCollapsed = sidebar.classList.contains('collapsed');
+
+                    // Aggiorna l'icona e il tooltip
+                    if (isNowCollapsed) {
+                        sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                        sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+                    } else {
+                        sidebarToggleBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                        sidebarToggleBtn.setAttribute('title', 'Comprimi menu');
+                    }
+
+                    // Salva la preferenza
+                    localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+                }
+                
+                // Aggiorna il layout del footer
+                updateFooterLayout();
+            });
+
+            // Chiudi la sidebar quando si clicca sull'overlay
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+                
+                // Aggiorna il layout del footer quando si chiude la sidebar con l'overlay
+                updateFooterLayout();
+            });
+
+            // Gestisci la responsività quando si ridimensiona la finestra
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 768) {
+                    // Passa alla modalità desktop
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+
+                    if (sidebar.classList.contains('active')) {
+                        sidebar.classList.remove('active');
+                    }
+                }
+                
+                // Aggiorna il layout del footer quando si ridimensiona la finestra
+                updateFooterLayout();
+            });
+
+            // Funzione per aggiornare il layout del footer
+            function updateFooterLayout() {
+                const footer = document.querySelector('.modern-footer');
+                
+                if (!footer) return; // Se il footer non è presente, esci dalla funzione
+                
+                // Gestisci la posizione del footer in base allo stato della sidebar
+                if (window.innerWidth > 768) {
+                    // Su desktop
+                    if (sidebar.classList.contains('collapsed')) {
+                        // Sidebar compressa
+                        footer.style.marginLeft = '60px';
+                        footer.style.width = 'calc(100% - 60px)';
+                    } else {
+                        // Sidebar espansa
+                        footer.style.marginLeft = '250px';
+                        footer.style.width = 'calc(100% - 250px)';
+                    }
+                } else {
+                    // Su mobile
+                    footer.style.marginLeft = '0';
+                    footer.style.width = '100%';
+                }
+            }
+            
+            // Imposta il layout iniziale del footer se è già presente
+            setTimeout(updateFooterLayout, 100);
+        });
+    </script>
+</body>
+
+</html>

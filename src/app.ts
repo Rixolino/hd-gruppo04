@@ -1729,6 +1729,197 @@ app.post('/admin/services/delete/:id', authenticate, isAdmin, async (req: Reques
   }
 });
 
+// Aggiungi questa route dopo le altre route di amministrazione (admin/orders, admin/services)
+
+// Pagina di amministrazione degli utenti - solo per admin
+app.get('/admin/users', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Recupera tutti gli utenti dal database
+    const users = await UserModel.findAll({
+      order: [['createdAt', 'DESC']]
+    });
+
+    // Calcola le statistiche degli utenti
+    const totalUsers = await UserModel.count();
+    
+    // Usa il campo 'isDeleted' invertito invece di 'attivo'
+    const activeUsers = await sequelize.query(
+      'SELECT COUNT(*) as count FROM utenti WHERE isDeleted = 0 OR isDeleted IS NULL',
+      { type: QueryTypes.SELECT }
+    ).then(result => (result[0] as any).count || 0);
+    
+    const adminUsers = await UserModel.count({ where: { isAdmin: true } });
+    
+    const stats = {
+      totalUsers,
+      activeUsers,
+      adminUsers
+    };
+
+    res.render('admin/users', {
+      user: req.user,
+      users: users || [],
+      stats,
+      title: 'Gestione Utenti - Admin',
+      query: req.query
+    });
+  } catch (error) {
+    console.error('Errore nel recupero degli utenti:', error);
+    res.status(500).render('error', { 
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Errore nel caricamento degli utenti',
+      showLogout: true,
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
+  }
+});
+
+// Creazione di un nuovo utente
+app.post('/admin/users/create', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { nome, cognome, email, password, isAdmin, attivo } = req.body;
+    
+    // Verifica se l'email è già in uso
+    const existingUser = await UserModel.findOne({ where: { email } });
+    if (existingUser) {
+      return res.redirect('/admin/users?error=Email già in uso');
+    }
+    
+    // Hash della password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    // Crea un nuovo utente - usa isDeleted al posto di attivo
+    await UserModel.create({
+      nome,
+      cognome,
+      email,
+      password: hashedPassword,
+      isAdmin: isAdmin === 'true',
+      isDeleted: attivo !== 'true', // Inverte la logica: attivo=true -> isDeleted=false
+      puntifedelta: 0, // Imposta il valore iniziale dei punti fedeltà
+      settings: {} // Impostazioni predefinite vuote
+    });
+    
+    res.redirect('/admin/users?success=Utente creato con successo');
+  } catch (error) {
+    console.error('Errore nella creazione dell\'utente:', error);
+    res.redirect(`/admin/users?error=Errore nella creazione dell'utente: ${(error as Error).message}`);
+  }
+});
+
+// Aggiornamento di un utente esistente
+app.put('/admin/users/:id/update', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.id;
+    const { nome, cognome, email, password, isAdmin, attivo } = req.body;
+    
+    // Verifica se l'utente esiste
+    const user = await UserModel.findByPk(userId);
+    if (!user) {
+      return res.redirect('/admin/users?error=Utente non trovato');
+    }
+    
+    // Verifica se l'email è già in uso da un altro utente
+    if (email !== user.email) {
+      const existingUser = await UserModel.findOne({ where: { email } });
+      if (existingUser && existingUser.id !== user.id) {
+        return res.redirect('/admin/users?error=Email già in uso da un altro utente');
+      }
+    }
+    
+    // Prepara i dati da aggiornare
+    const updateData: any = {
+      nome,
+      cognome,
+      email,
+      isAdmin: isAdmin === 'true',
+      isDeleted: attivo !== 'true' // Inverte la logica: attivo=true -> isDeleted=false
+    };
+    
+    // Aggiorna la password solo se fornita
+    if (password && password.trim() !== '') {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
+    }
+    
+    // Aggiorna l'utente
+    await user.update(updateData);
+    
+    res.redirect('/admin/users?success=Utente aggiornato con successo');
+  } catch (error) {
+    console.error('Errore nell\'aggiornamento dell\'utente:', error);
+    res.redirect(`/admin/users?error=Errore nell'aggiornamento dell'utente: ${(error as Error).message}`);
+  }
+});
+
+// Cambio stato di un utente (attivo/inattivo)
+app.patch('/admin/users/:id/toggle-status', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.id;
+    const { attivo } = req.body;
+    
+    // Verifica se l'utente esiste
+    const user = await UserModel.findByPk(userId);
+    if (!user) {
+      return res.redirect('/admin/users?error=Utente non trovato');
+    }
+    
+    // Aggiorna lo stato dell'utente - usa isDeleted al posto di attivo
+    await user.update({ 
+      isDeleted: attivo !== 'true'  // Inverte la logica: attivo=true -> isDeleted=false
+    });
+    
+    const nuovoStato = attivo === 'true' ? 'attivato' : 'disattivato';
+    res.redirect(`/admin/users?success=Utente ${nuovoStato} con successo`);
+  } catch (error) {
+    console.error('Errore nel cambio di stato dell\'utente:', error);
+    res.redirect(`/admin/users?error=Errore nel cambio di stato dell'utente: ${(error as Error).message}`);
+  }
+});
+
+// Eliminazione di un utente
+app.delete('/admin/users/:id/delete', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.id;
+    
+    // Verifica se l'utente esiste
+    const user = await UserModel.findByPk(userId);
+    if (!user) {
+      return res.redirect('/admin/users?error=Utente non trovato');
+    }
+    
+    // Verifica che l'utente non sia l'amministratore corrente
+    if (user.id === req.user.userId) {
+      return res.redirect('/admin/users?error=Non puoi eliminare il tuo account');
+    }
+    
+    // Verifica se ci sono ordini collegati all'utente
+    const orderCount = await OrderModel.count({ where: { utenteId: userId } });
+    
+    if (orderCount > 0) {
+      // Se ci sono ordini, anonimizza l'utente invece di eliminarlo
+      await user.update({
+        nome: 'Utente',
+        cognome: 'Cancellato',
+        email: `deleted_${userId}@example.com`,
+        isDeleted: true
+      });
+      
+      return res.redirect('/admin/users?success=Utente anonimizzato con successo');
+    }
+    
+    // Se non ci sono ordini, elimina l'utente
+    await user.destroy();
+    
+    res.redirect('/admin/users?success=Utente eliminato con successo');
+  } catch (error) {
+    console.error('Errore nell\'eliminazione dell\'utente:', error);
+    res.redirect(`/admin/users?error=Errore nell'eliminazione dell'utente: ${(error as Error).message}`);
+  }
+});
+
 // Gestione pagina 404 - deve essere sempre DOPO tutte le route ma PRIMA dei middleware di gestione errori
 app.use((req: Request, res: Response) => {
   res.status(404).render('error', {
