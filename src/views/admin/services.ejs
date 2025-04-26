@@ -805,14 +805,16 @@
                         title="Mostra/nascondi menu">
                         <i class="fas fa-bars"></i>
                     </button>
-                    <button class="btn btn-primary desktop-only-btn" id="add-service-btn" data-toggle="modal" data-target="#serviceModal">
+                    <button class="btn btn-primary desktop-only-btn" id="add-service-btn" data-toggle="modal"
+                        data-target="#serviceModal">
                         <i class="fas fa-plus"></i> Nuovo Servizio
                     </button>
                 </div>
             </div>
 
             <!-- Pulsante mobile Nuovo Servizio -->
-            <button class="btn btn-primary mobile-only-btn" id="add-service-mobile-btn" data-toggle="modal" data-target="#serviceModal">
+            <button class="btn btn-primary mobile-only-btn" id="add-service-mobile-btn" data-toggle="modal"
+                data-target="#serviceModal">
                 <i class="fas fa-plus"></i> Nuovo Servizio
             </button>
 
@@ -824,231 +826,256 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                 </div>
-            <% } %>
+                <% } %>
 
-            <% if (query && query.error) { %>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
-                    <%= query.error %>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                </div>
-            <% } %>
+                    <% if (query && query.error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            <%= query.error %>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <% } %>
 
-            <!-- Statistiche Dashboard -->
-            <div class="row mb-4">
-                <div class="col-md-3 mb-3">
-                    <div class="stats-card total p-3">
-                        <div class="d-flex align-items-center">
-                            <div class="stats-card-icon">
-                                <i class="fas fa-concierge-bell"></i>
-                            </div>
-                            <div>
-                                <div class="stats-card-label">Servizi totali</div>
-                                <div class="stats-card-value">
-                                    <%= stats.totalServices || 0 %>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="stats-card categories p-3">
-                        <div class="d-flex align-items-center">
-                            <div class="stats-card-icon">
-                                <i class="fas fa-tags"></i>
-                            </div>
-                            <div>
-                                <div class="stats-card-label">Categorie</div>
-                                <div class="stats-card-value">
-                                    <%= stats.totalCategories || 0 %>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="stats-card popular p-3">
-                        <div class="d-flex align-items-center">
-                            <div class="stats-card-icon">
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <div>
-                                <div class="stats-card-label">Più richiesto</div>
-                                <div class="stats-card-value">
-                                    <%= stats.mostPopularService ? stats.mostPopularService.count : 0 %>
-                                </div>
-                                <small class="text-muted">
-                                    <%= stats.mostPopularService ? stats.mostPopularService.name : 'Nessun servizio' %>
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="stats-card revenue p-3">
-                        <div class="d-flex align-items-center">
-                            <div class="stats-card-icon">
-                                <i class="fas fa-euro-sign"></i>
-                            </div>
-                            <div>
-                                <div class="stats-card-label">Prezzo medio</div>
-                                <div class="stats-card-value">€<%= stats.averagePrice ? stats.averagePrice.toFixed(2) : '0.00' %>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filtri -->
-            <div class="filters-card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-filter mr-2"></i> Filtri
-                </div>
-                <div class="card-body">
-                    <form id="filter-form" class="row filter-row">
-                        <div class="col-md-4 form-group">
-                            <label for="filter-category">Categoria</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white">
-                                        <i class="fas fa-tag"></i>
-                                    </span>
-                                </div>
-                                <select id="filter-category" class="form-control">
-                                    <option value="">Tutte le categorie</option>
-                                    <% categories.forEach(category => { %>
-                                        <option value="<%= category %>"><%= category %></option>
-                                    <% }); %>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label for="filter-name">Nome servizio</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white">
-                                        <i class="fas fa-search"></i>
-                                    </span>
-                                </div>
-                                <input type="text" id="filter-name" class="form-control" placeholder="Cerca per nome">
-                            </div>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label>&nbsp;</label>
-                            <button type="button" id="apply-filters" class="btn btn-primary btn-block">
-                                <i class="fas fa-filter"></i> Applica filtri
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Tabella Servizi -->
-            <div class="services-table-card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <i class="fas fa-list mr-2"></i> Elenco Servizi
-                        </div>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
-                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-cog"></i> Azioni
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" href="#"><i class="fas fa-file-excel mr-2"></i>
-                                    Esporta in Excel</a>
-                                <a class="dropdown-item" href="#"><i class="fas fa-file-pdf mr-2"></i>
-                                    Esporta in PDF</a>
-                                <a class="dropdown-item" href="#"><i class="fas fa-print mr-2"></i>
-                                    Stampa</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table id="services-table" class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nome</th>
-                                    <th>Categoria</th>
-                                    <th>Prezzo</th>
-                                    <th>Tempo consegna</th>
-                                    <th>Revisioni</th>
-                                    <th>Azioni</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (services && services.length > 0) { %>
-                                    <% services.forEach(service => { %>
-                                        <tr class="service-row" data-category="<%= service.category.toLowerCase() %>"
-                                            data-name="<%= service.name.toLowerCase() %>">
-                                            <td data-label="ID"><span class="badge badge-light">#<%= service.id %></span></td>
-                                            <td data-label="Nome">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="<%= service.icon %> mr-2"></i>
-                                                    <div>
-                                                        <strong><%= service.name %></strong>
-                                                        <div class="small text-muted text-truncate" style="max-width: 200px;">
-                                                            <%= service.description %>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td data-label="Categoria">
-                                                <span class="category-badge category-<%= service.category.toLowerCase() %>">
-                                                    <%= service.category %>
-                                                </span>
-                                            </td>
-                                            <td data-label="Prezzo">€<%= parseFloat(service.price).toFixed(2) %></td>
-                                            <td data-label="Tempo consegna"><%= service.deliveryTime %></td>
-                                            <td data-label="Revisioni"><%= service.revisions %></td>
-                                            <td data-label="Azioni">
-                                                <div class="btn-group">
-                                                    <button class="btn btn-sm btn-outline-primary edit-service-btn"
-                                                        data-toggle="modal" data-target="#serviceModal"
-                                                        data-id="<%= service.id %>"
-                                                        data-name="<%= service.name %>"
-                                                        data-description="<%= service.description %>"
-                                                        data-price="<%= service.price %>"
-                                                        data-category="<%= service.category %>"
-                                                        data-icon="<%= service.icon %>"
-                                                        data-delivery-time="<%= service.deliveryTime %>"
-                                                        data-revisions="<%= service.revisions %>">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <a href="/services/<%= service.id %>" class="btn btn-sm btn-outline-info"
-                                                        target="_blank">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-service-btn"
-                                                        data-id="<%= service.id %>" data-name="<%= service.name %>">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                                <% } else { %>
-                                    <tr>
-                                        <td colspan="7" class="text-center py-4">
-                                            <div class="my-5">
-                                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                                <p class="text-muted">Nessun servizio trovato</p>
+                            <!-- Statistiche Dashboard -->
+                            <div class="row mb-4">
+                                <div class="col-md-3 mb-3">
+                                    <div class="stats-card total p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-card-icon">
+                                                <i class="fas fa-concierge-bell"></i>
                                             </div>
-                                        </td>
-                                    </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                                            <div>
+                                                <div class="stats-card-label">Servizi totali</div>
+                                                <div class="stats-card-value">
+                                                    <%= stats.totalServices || 0 %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stats-card categories p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-card-icon">
+                                                <i class="fas fa-tags"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-label">Categorie</div>
+                                                <div class="stats-card-value">
+                                                    <%= stats.totalCategories || 0 %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stats-card popular p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-card-icon">
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-label">Più richiesto</div>
+                                                <div class="stats-card-value">
+                                                    <%= stats.mostPopularService ? stats.mostPopularService.count : 0 %>
+                                                </div>
+                                                <small class="text-muted">
+                                                    <%= stats.mostPopularService ? stats.mostPopularService.name
+                                                        : 'Nessun servizio' %>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stats-card revenue p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="stats-card-icon">
+                                                <i class="fas fa-euro-sign"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stats-card-label">Prezzo medio</div>
+                                                <div class="stats-card-value">€<%= stats.averagePrice ?
+                                                        stats.averagePrice.toFixed(2) : '0.00' %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Filtri -->
+                            <div class="filters-card mb-4">
+                                <div class="card-header">
+                                    <i class="fas fa-filter mr-2"></i> Filtri
+                                </div>
+                                <div class="card-body">
+                                    <form id="filter-form" class="row filter-row">
+                                        <div class="col-md-4 form-group">
+                                            <label for="filter-category">Categoria</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text bg-white">
+                                                        <i class="fas fa-tag"></i>
+                                                    </span>
+                                                </div>
+                                                <select id="filter-category" class="form-control">
+                                                    <option value="">Tutte le categorie</option>
+                                                    <% categories.forEach(category=> { %>
+                                                        <option value="<%= category %>">
+                                                            <%= category %>
+                                                        </option>
+                                                        <% }); %>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 form-group">
+                                            <label for="filter-name">Nome servizio</label>
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text bg-white">
+                                                        <i class="fas fa-search"></i>
+                                                    </span>
+                                                </div>
+                                                <input type="text" id="filter-name" class="form-control"
+                                                    placeholder="Cerca per nome">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 form-group">
+                                            <label>&nbsp;</label>
+                                            <button type="button" id="apply-filters" class="btn btn-primary btn-block">
+                                                <i class="fas fa-filter"></i> Applica filtri
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Tabella Servizi -->
+                            <div class="services-table-card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="fas fa-list mr-2"></i> Elenco Servizi
+                                        </div>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="false">
+                                                <i class="fas fa-cog"></i> Azioni
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right"
+                                                aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#"><i class="fas fa-file-excel mr-2"></i>
+                                                    Esporta in Excel</a>
+                                                <a class="dropdown-item" href="#"><i class="fas fa-file-pdf mr-2"></i>
+                                                    Esporta in PDF</a>
+                                                <a class="dropdown-item" href="#"><i class="fas fa-print mr-2"></i>
+                                                    Stampa</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table id="services-table" class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Nome</th>
+                                                    <th>Categoria</th>
+                                                    <th>Prezzo</th>
+                                                    <th>Tempo consegna</th>
+                                                    <th>Revisioni</th>
+                                                    <th>Azioni</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% if (services && services.length> 0) { %>
+                                                    <% services.forEach(service=> { %>
+                                                        <tr class="service-row"
+                                                            data-category="<%= service.category.toLowerCase() %>"
+                                                            data-name="<%= service.name.toLowerCase() %>">
+                                                            <td data-label="ID"><span class="badge badge-light">#<%=
+                                                                        service.id %></span></td>
+                                                            <td data-label="Nome">
+                                                                <div class="d-flex align-items-center">
+                                                                    <i class="<%= service.icon %> mr-2"></i>
+                                                                    <div>
+                                                                        <strong>
+                                                                            <%= service.name %>
+                                                                        </strong>
+                                                                        <div class="small text-muted text-truncate"
+                                                                            style="max-width: 200px;">
+                                                                            <%= service.description %>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td data-label="Categoria">
+                                                                <span
+                                                                    class="category-badge category-<%= service.category.toLowerCase() %>">
+                                                                    <%= service.category %>
+                                                                </span>
+                                                            </td>
+                                                            <td data-label="Prezzo">€<%=
+                                                                    parseFloat(service.price).toFixed(2) %>
+                                                            </td>
+                                                            <td data-label="Tempo consegna">
+                                                                <%= service.deliveryTime %>
+                                                            </td>
+                                                            <td data-label="Revisioni">
+                                                                <%= service.revisions %>
+                                                            </td>
+                                                            <td data-label="Azioni">
+                                                                <div class="btn-group">
+                                                                    <button
+                                                                        class="btn btn-sm btn-outline-primary edit-service-btn"
+                                                                        data-toggle="modal" data-target="#serviceModal"
+                                                                        data-id="<%= service.id %>"
+                                                                        data-name="<%= service.name %>"
+                                                                        data-description="<%= service.description %>"
+                                                                        data-price="<%= service.price %>"
+                                                                        data-category="<%= service.category %>"
+                                                                        data-icon="<%= service.icon %>"
+                                                                        data-delivery-time="<%= service.deliveryTime %>"
+                                                                        data-revisions="<%= service.revisions %>">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </button>
+                                                                    <a href="/services/<%= service.id %>"
+                                                                        class="btn btn-sm btn-outline-info"
+                                                                        target="_blank">
+                                                                        <i class="fas fa-eye"></i>
+                                                                    </a>
+                                                                    <button type="button"
+                                                                        class="btn btn-sm btn-outline-danger delete-service-btn"
+                                                                        data-id="<%= service.id %>"
+                                                                        data-name="<%= service.name %>">
+                                                                        <i class="fas fa-trash-alt"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <% }); %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="7" class="text-center py-4">
+                                                                        <div class="my-5">
+                                                                            <i
+                                                                                class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                                                            <p class="text-muted">Nessun servizio
+                                                                                trovato</p>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
         </div>
     </div>
 
@@ -1057,7 +1084,8 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="serviceModalLabel"><i class="fas fa-concierge-bell mr-2"></i><span id="modal-title-action">Aggiungi</span> Servizio</h5>
+                    <h5 class="modal-title" id="serviceModalLabel"><i class="fas fa-concierge-bell mr-2"></i><span
+                            id="modal-title-action">Aggiungi</span> Servizio</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1079,7 +1107,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="price">Prezzo (€)</label>
-                                    <input type="number" step="0.01" min="0" class="form-control" id="price" name="price" required>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="price"
+                                        name="price" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="category">Categoria</label>
@@ -1096,100 +1125,157 @@
                                     <label for="icon">Icona (classe FontAwesome)</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text"><i id="icon-preview" class="fas fa-concierge-bell"></i></span>
+                                            <span class="input-group-text"><i id="icon-preview"
+                                                    class="fas fa-concierge-bell"></i></span>
                                         </div>
-                                        <input type="text" class="form-control" id="icon" name="icon" value="fa-concierge-bell" required>
+                                        <input type="text" class="form-control" id="icon" name="icon"
+                                            value="fa-concierge-bell" required>
                                         <div class="input-group-append">
-                                            <button type="button" class="btn btn-outline-secondary" id="open-icon-picker">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                id="open-icon-picker">
                                                 <i class="fas fa-smile"></i> Scegli
                                             </button>
                                         </div>
                                     </div>
                                     <small class="form-text text-muted">Es. fa-paint-brush, fa-file-import</small>
-                                    
+
                                     <!-- Icon picker dropdown -->
                                     <div id="icon-picker" class="icon-picker-dropdown d-none">
                                         <div class="icon-picker-search mb-2">
-                                            <input type="text" class="form-control form-control-sm" id="icon-search" placeholder="Cerca icone...">
+                                            <input type="text" class="form-control form-control-sm" id="icon-search"
+                                                placeholder="Cerca icone...">
                                         </div>
                                         <div class="icon-picker-categories">
-                                            <button class="btn btn-sm btn-primary active" data-category="all">Tutte</button>
-                                            <button class="btn btn-sm btn-outline-primary" data-category="interface">Interfaccia</button>
-                                            <button class="btn btn-sm btn-outline-primary" data-category="business">Business</button>
-                                            <button class="btn btn-sm btn-outline-primary" data-category="design">Design</button>
-                                            <button class="btn btn-sm btn-outline-primary" data-category="communication">Comunicazione</button>
+                                            <button class="btn btn-sm btn-primary active"
+                                                data-category="all">Tutte</button>
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                data-category="interface">Interfaccia</button>
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                data-category="business">Business</button>
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                data-category="design">Design</button>
+                                            <button class="btn btn-sm btn-outline-primary"
+                                                data-category="communication">Comunicazione</button>
                                         </div>
                                         <div class="icon-picker-grid">
                                             <!-- Categorie icone -->
                                             <div class="icon-group" data-category="interface">
                                                 <h6 class="icon-group-title">Interfaccia</h6>
                                                 <div class="icon-grid">
-                                                    <div class="icon-item" data-icon="fa-home"><i class="fas fa-home"></i></div>
-                                                    <div class="icon-item" data-icon="fa-user"><i class="fas fa-user"></i></div>
-                                                    <div class="icon-item" data-icon="fa-cog"><i class="fas fa-cog"></i></div>
-                                                    <div class="icon-item" data-icon="fa-search"><i class="fas fa-search"></i></div>
-                                                    <div class="icon-item" data-icon="fa-bell"><i class="fas fa-bell"></i></div>
-                                                    <div class="icon-item" data-icon="fa-envelope"><i class="fas fa-envelope"></i></div>
-                                                    <div class="icon-item" data-icon="fa-star"><i class="fas fa-star"></i></div>
-                                                    <div class="icon-item" data-icon="fa-heart"><i class="fas fa-heart"></i></div>
-                                                    <div class="icon-item" data-icon="fa-check"><i class="fas fa-check"></i></div>
-                                                    <div class="icon-item" data-icon="fa-times"><i class="fas fa-times"></i></div>
-                                                    <div class="icon-item" data-icon="fa-plus"><i class="fas fa-plus"></i></div>
-                                                    <div class="icon-item" data-icon="fa-minus"><i class="fas fa-minus"></i></div>
+                                                    <div class="icon-item" data-icon="fa-home"><i
+                                                            class="fas fa-home"></i></div>
+                                                    <div class="icon-item" data-icon="fa-user"><i
+                                                            class="fas fa-user"></i></div>
+                                                    <div class="icon-item" data-icon="fa-cog"><i class="fas fa-cog"></i>
+                                                    </div>
+                                                    <div class="icon-item" data-icon="fa-search"><i
+                                                            class="fas fa-search"></i></div>
+                                                    <div class="icon-item" data-icon="fa-bell"><i
+                                                            class="fas fa-bell"></i></div>
+                                                    <div class="icon-item" data-icon="fa-envelope"><i
+                                                            class="fas fa-envelope"></i></div>
+                                                    <div class="icon-item" data-icon="fa-star"><i
+                                                            class="fas fa-star"></i></div>
+                                                    <div class="icon-item" data-icon="fa-heart"><i
+                                                            class="fas fa-heart"></i></div>
+                                                    <div class="icon-item" data-icon="fa-check"><i
+                                                            class="fas fa-check"></i></div>
+                                                    <div class="icon-item" data-icon="fa-times"><i
+                                                            class="fas fa-times"></i></div>
+                                                    <div class="icon-item" data-icon="fa-plus"><i
+                                                            class="fas fa-plus"></i></div>
+                                                    <div class="icon-item" data-icon="fa-minus"><i
+                                                            class="fas fa-minus"></i></div>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="icon-group" data-category="business">
                                                 <h6 class="icon-group-title">Business</h6>
                                                 <div class="icon-grid">
-                                                    <div class="icon-item" data-icon="fa-chart-line"><i class="fas fa-chart-line"></i></div>
-                                                    <div class="icon-item" data-icon="fa-chart-pie"><i class="fas fa-chart-pie"></i></div>
-                                                    <div class="icon-item" data-icon="fa-chart-bar"><i class="fas fa-chart-bar"></i></div>
-                                                    <div class="icon-item" data-icon="fa-briefcase"><i class="fas fa-briefcase"></i></div>
-                                                    <div class="icon-item" data-icon="fa-handshake"><i class="fas fa-handshake"></i></div>
-                                                    <div class="icon-item" data-icon="fa-file-invoice"><i class="fas fa-file-invoice"></i></div>
-                                                    <div class="icon-item" data-icon="fa-file-signature"><i class="fas fa-file-signature"></i></div>
-                                                    <div class="icon-item" data-icon="fa-tasks"><i class="fas fa-tasks"></i></div>
-                                                    <div class="icon-item" data-icon="fa-clipboard-list"><i class="fas fa-clipboard-list"></i></div>
-                                                    <div class="icon-item" data-icon="fa-project-diagram"><i class="fas fa-project-diagram"></i></div>
-                                                    <div class="icon-item" data-icon="fa-calculator"><i class="fas fa-calculator"></i></div>
-                                                    <div class="icon-item" data-icon="fa-euro-sign"><i class="fas fa-euro-sign"></i></div>
+                                                    <div class="icon-item" data-icon="fa-chart-line"><i
+                                                            class="fas fa-chart-line"></i></div>
+                                                    <div class="icon-item" data-icon="fa-chart-pie"><i
+                                                            class="fas fa-chart-pie"></i></div>
+                                                    <div class="icon-item" data-icon="fa-chart-bar"><i
+                                                            class="fas fa-chart-bar"></i></div>
+                                                    <div class="icon-item" data-icon="fa-briefcase"><i
+                                                            class="fas fa-briefcase"></i></div>
+                                                    <div class="icon-item" data-icon="fa-handshake"><i
+                                                            class="fas fa-handshake"></i></div>
+                                                    <div class="icon-item" data-icon="fa-file-invoice"><i
+                                                            class="fas fa-file-invoice"></i></div>
+                                                    <div class="icon-item" data-icon="fa-file-signature"><i
+                                                            class="fas fa-file-signature"></i></div>
+                                                    <div class="icon-item" data-icon="fa-tasks"><i
+                                                            class="fas fa-tasks"></i></div>
+                                                    <div class="icon-item" data-icon="fa-clipboard-list"><i
+                                                            class="fas fa-clipboard-list"></i></div>
+                                                    <div class="icon-item" data-icon="fa-project-diagram"><i
+                                                            class="fas fa-project-diagram"></i></div>
+                                                    <div class="icon-item" data-icon="fa-calculator"><i
+                                                            class="fas fa-calculator"></i></div>
+                                                    <div class="icon-item" data-icon="fa-euro-sign"><i
+                                                            class="fas fa-euro-sign"></i></div>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="icon-group" data-category="design">
                                                 <h6 class="icon-group-title">Design</h6>
                                                 <div class="icon-grid">
-                                                    <div class="icon-item" data-icon="fa-paint-brush"><i class="fas fa-paint-brush"></i></div>
-                                                    <div class="icon-item" data-icon="fa-palette"><i class="fas fa-palette"></i></div>
-                                                    <div class="icon-item" data-icon="fa-pencil-alt"><i class="fas fa-pencil-alt"></i></div>
-                                                    <div class="icon-item" data-icon="fa-pen-nib"><i class="fas fa-pen-nib"></i></div>
-                                                    <div class="icon-item" data-icon="fa-vector-square"><i class="fas fa-vector-square"></i></div>
-                                                    <div class="icon-item" data-icon="fa-crop"><i class="fas fa-crop"></i></div>
-                                                    <div class="icon-item" data-icon="fa-images"><i class="fas fa-images"></i></div>
-                                                    <div class="icon-item" data-icon="fa-photo-video"><i class="fas fa-photo-video"></i></div>
-                                                    <div class="icon-item" data-icon="fa-object-group"><i class="fas fa-object-group"></i></div>
-                                                    <div class="icon-item" data-icon="fa-ruler-combined"><i class="fas fa-ruler-combined"></i></div>
-                                                    <div class="icon-item" data-icon="fa-drafting-compass"><i class="fas fa-drafting-compass"></i></div>
-                                                    <div class="icon-item" data-icon="fa-fill-drip"><i class="fas fa-fill-drip"></i></div>
+                                                    <div class="icon-item" data-icon="fa-paint-brush"><i
+                                                            class="fas fa-paint-brush"></i></div>
+                                                    <div class="icon-item" data-icon="fa-palette"><i
+                                                            class="fas fa-palette"></i></div>
+                                                    <div class="icon-item" data-icon="fa-pencil-alt"><i
+                                                            class="fas fa-pencil-alt"></i></div>
+                                                    <div class="icon-item" data-icon="fa-pen-nib"><i
+                                                            class="fas fa-pen-nib"></i></div>
+                                                    <div class="icon-item" data-icon="fa-vector-square"><i
+                                                            class="fas fa-vector-square"></i></div>
+                                                    <div class="icon-item" data-icon="fa-crop"><i
+                                                            class="fas fa-crop"></i></div>
+                                                    <div class="icon-item" data-icon="fa-images"><i
+                                                            class="fas fa-images"></i></div>
+                                                    <div class="icon-item" data-icon="fa-photo-video"><i
+                                                            class="fas fa-photo-video"></i></div>
+                                                    <div class="icon-item" data-icon="fa-object-group"><i
+                                                            class="fas fa-object-group"></i></div>
+                                                    <div class="icon-item" data-icon="fa-ruler-combined"><i
+                                                            class="fas fa-ruler-combined"></i></div>
+                                                    <div class="icon-item" data-icon="fa-drafting-compass"><i
+                                                            class="fas fa-drafting-compass"></i></div>
+                                                    <div class="icon-item" data-icon="fa-fill-drip"><i
+                                                            class="fas fa-fill-drip"></i></div>
                                                 </div>
                                             </div>
-                                            
+
                                             <div class="icon-group" data-category="communication">
                                                 <h6 class="icon-group-title">Comunicazione</h6>
                                                 <div class="icon-grid">
-                                                    <div class="icon-item" data-icon="fa-comment"><i class="fas fa-comment"></i></div>
-                                                    <div class="icon-item" data-icon="fa-comments"><i class="fas fa-comments"></i></div>
-                                                    <div class="icon-item" data-icon="fa-phone"><i class="fas fa-phone"></i></div>
-                                                    <div class="icon-item" data-icon="fa-mobile-alt"><i class="fas fa-mobile-alt"></i></div>
-                                                    <div class="icon-item" data-icon="fa-headset"><i class="fas fa-headset"></i></div>
-                                                    <div class="icon-item" data-icon="fa-envelope-open-text"><i class="fas fa-envelope-open-text"></i></div>
-                                                    <div class="icon-item" data-icon="fa-paper-plane"><i class="fas fa-paper-plane"></i></div>
-                                                    <div class="icon-item" data-icon="fa-bullhorn"><i class="fas fa-bullhorn"></i></div>
-                                                    <div class="icon-item" data-icon="fa-share-alt"><i class="fas fa-share-alt"></i></div>
-                                                    <div class="icon-item" data-icon="fa-rss"><i class="fas fa-rss"></i></div>
-                                                    <div class="icon-item" data-icon="fa-video"><i class="fas fa-video"></i></div>
-                                                    <div class="icon-item" data-icon="fa-microphone"><i class="fas fa-microphone"></i></div>
+                                                    <div class="icon-item" data-icon="fa-comment"><i
+                                                            class="fas fa-comment"></i></div>
+                                                    <div class="icon-item" data-icon="fa-comments"><i
+                                                            class="fas fa-comments"></i></div>
+                                                    <div class="icon-item" data-icon="fa-phone"><i
+                                                            class="fas fa-phone"></i></div>
+                                                    <div class="icon-item" data-icon="fa-mobile-alt"><i
+                                                            class="fas fa-mobile-alt"></i></div>
+                                                    <div class="icon-item" data-icon="fa-headset"><i
+                                                            class="fas fa-headset"></i></div>
+                                                    <div class="icon-item" data-icon="fa-envelope-open-text"><i
+                                                            class="fas fa-envelope-open-text"></i></div>
+                                                    <div class="icon-item" data-icon="fa-paper-plane"><i
+                                                            class="fas fa-paper-plane"></i></div>
+                                                    <div class="icon-item" data-icon="fa-bullhorn"><i
+                                                            class="fas fa-bullhorn"></i></div>
+                                                    <div class="icon-item" data-icon="fa-share-alt"><i
+                                                            class="fas fa-share-alt"></i></div>
+                                                    <div class="icon-item" data-icon="fa-rss"><i class="fas fa-rss"></i>
+                                                    </div>
+                                                    <div class="icon-item" data-icon="fa-video"><i
+                                                            class="fas fa-video"></i></div>
+                                                    <div class="icon-item" data-icon="fa-microphone"><i
+                                                            class="fas fa-microphone"></i></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1197,7 +1283,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="deliveryTime">Tempo di consegna</label>
-                                    <input type="text" class="form-control" id="deliveryTime" name="deliveryTime" required>
+                                    <input type="text" class="form-control" id="deliveryTime" name="deliveryTime"
+                                        required>
                                     <small class="form-text text-muted">Es. "3-5 giorni lavorativi"</small>
                                 </div>
                                 <div class="form-group">
@@ -1209,7 +1296,8 @@
                             <div class="col-12">
                                 <div class="form-group">
                                     <label for="description">Descrizione</label>
-                                    <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                                    <textarea class="form-control" id="description" name="description" rows="3"
+                                        required></textarea>
                                 </div>
                             </div>
                         </div>
@@ -1231,7 +1319,8 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-danger mr-2"></i>Conferma eliminazione</h5>
+                    <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-danger mr-2"></i>Conferma
+                        eliminazione</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -1272,10 +1361,10 @@
             const formMethod = document.getElementById('form-method');
 
             // Aggiorna l'anteprima dell'icona quando l'utente modifica l'input
-            iconInput.addEventListener('input', function() {
+            iconInput.addEventListener('input', function () {
                 const iconClass = this.value;
                 iconPreview.className = '';
-                
+
                 if (iconClass.startsWith('fa-')) {
                     iconPreview.className = 'fas ' + iconClass;
                 } else {
@@ -1284,7 +1373,7 @@
             });
 
             // Configurazione per nuovo servizio
-            addServiceBtn.addEventListener('click', function() {
+            addServiceBtn.addEventListener('click', function () {
                 modalTitleAction.textContent = 'Aggiungi';
                 saveButtonText.textContent = 'Salva';
                 serviceForm.reset();
@@ -1296,7 +1385,7 @@
 
             // Configurazione per modifica servizio
             editServiceBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const serviceId = this.dataset.id;
                     const serviceName = this.dataset.name;
                     const serviceDescription = this.dataset.description;
@@ -1308,7 +1397,7 @@
 
                     modalTitleAction.textContent = 'Modifica';
                     saveButtonText.textContent = 'Aggiorna';
-                    
+
                     // Imposta i valori del form
                     document.getElementById('id').value = serviceId;
                     document.getElementById('id').readOnly = true;
@@ -1319,7 +1408,7 @@
                     document.getElementById('icon').value = serviceIcon;
                     document.getElementById('deliveryTime').value = serviceDeliveryTime;
                     document.getElementById('revisions').value = serviceRevisions;
-                    
+
                     // Aggiorna l'anteprima dell'icona
                     iconPreview.className = '';
                     if (serviceIcon.startsWith('fa-')) {
@@ -1327,26 +1416,26 @@
                     } else {
                         iconPreview.className = serviceIcon;
                     }
-                    
+
                     // Aggiorna l'action del form e il metodo
                     serviceForm.action = `/admin/services/edit/${serviceId}`;
                     formMethod.value = 'PUT';
                 });
             });
-            
+
             // Gestione modale conferma eliminazione
             const deleteServiceBtns = document.querySelectorAll('.delete-service-btn');
             const deleteForm = document.getElementById('delete-form');
             const deleteServiceName = document.getElementById('delete-service-name');
-            
+
             deleteServiceBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const serviceId = this.dataset.id;
                     const serviceName = this.dataset.name;
-                    
+
                     deleteServiceName.textContent = serviceName;
                     deleteForm.action = `/admin/services/delete/${serviceId}`;
-                    
+
                     $('#deleteConfirmModal').modal('show');
                 });
             });
@@ -1357,7 +1446,7 @@
             const filterName = document.getElementById('filter-name');
             const serviceRows = document.querySelectorAll('.service-row');
 
-            applyFiltersBtn.addEventListener('click', function() {
+            applyFiltersBtn.addEventListener('click', function () {
                 const categoryFilter = filterCategory.value.toLowerCase();
                 const nameFilter = filterName.value.toLowerCase();
 
@@ -1397,7 +1486,7 @@
                 sidebarToggleBtn.setAttribute('title', 'Espandi menu');
             }
 
-            sidebarToggleBtn.addEventListener('click', function() {
+            sidebarToggleBtn.addEventListener('click', function () {
                 if (window.innerWidth <= 768) {
                     // Comportamento per dispositivi mobili (toggle active/non-active)
                     sidebar.classList.toggle('active');
@@ -1428,23 +1517,23 @@
                     // Salva la preferenza
                     localStorage.setItem('sidebarCollapsed', isNowCollapsed);
                 }
-                
+
                 // Aggiorna il layout del footer
                 updateFooterLayout();
             });
 
             // Chiudi la sidebar quando si clicca sull'overlay
-            overlay.addEventListener('click', function() {
+            overlay.addEventListener('click', function () {
                 sidebar.classList.remove('active');
                 overlay.classList.remove('active');
                 document.body.style.overflow = '';
-                
+
                 // Aggiorna il layout del footer quando si chiude la sidebar con l'overlay
                 updateFooterLayout();
             });
 
             // Gestisci la responsività quando si ridimensiona la finestra
-            window.addEventListener('resize', function() {
+            window.addEventListener('resize', function () {
                 if (window.innerWidth > 768) {
                     // Passa alla modalità desktop
                     overlay.classList.remove('active');
@@ -1454,17 +1543,17 @@
                         sidebar.classList.remove('active');
                     }
                 }
-                
-                // Aggiorna il layout del footer quando si ridimensiona la finestra
+
+                // Aggiorna il layout del footer quando si ridimaensiona la finestra
                 updateFooterLayout();
             });
 
             // Funzione per aggiornare il layout del footer
             function updateFooterLayout() {
                 const footer = document.querySelector('.modern-footer');
-                
+
                 if (!footer) return; // Se il footer non è presente, esci dalla funzione
-                
+
                 // Gestisci la posizione del footer in base allo stato della sidebar
                 if (window.innerWidth > 768) {
                     // Su desktop
@@ -1483,7 +1572,7 @@
                     footer.style.width = '100%';
                 }
             }
-            
+
             // Imposta il layout iniziale del footer se è già presente
             setTimeout(updateFooterLayout, 100);
 
@@ -1495,14 +1584,14 @@
             const categoryButtons = document.querySelectorAll('.icon-picker-categories button');
 
             // Apertura e chiusura del selettore
-            openIconPickerBtn.addEventListener('click', function() {
+            openIconPickerBtn.addEventListener('click', function () {
                 iconPicker.classList.toggle('d-none');
             });
 
             // Chiusura del selettore quando si clicca fuori
-            document.addEventListener('click', function(event) {
-                if (!event.target.closest('#icon-picker') && 
-                    !event.target.closest('#open-icon-picker') && 
+            document.addEventListener('click', function (event) {
+                if (!event.target.closest('#icon-picker') &&
+                    !event.target.closest('#open-icon-picker') &&
                     !iconPicker.classList.contains('d-none')) {
                     iconPicker.classList.add('d-none');
                 }
@@ -1510,33 +1599,33 @@
 
             // Selezione dell'icona
             iconItems.forEach(item => {
-                item.addEventListener('click', function() {
+                item.addEventListener('click', function () {
                     const iconClass = this.dataset.icon;
-                    
+
                     // Rimuovi la selezione precedente
                     document.querySelectorAll('.icon-item.selected').forEach(el => {
                         el.classList.remove('selected');
                     });
-                    
+
                     // Aggiungi la classe selected all'icona selezionata
                     this.classList.add('selected');
-                    
+
                     // Aggiorna l'input e l'anteprima
                     iconInput.value = iconClass;
                     iconPreview.className = 'fas ' + iconClass;
-                    
+
                     // Chiudi il selettore
                     iconPicker.classList.add('d-none');
                 });
             });
 
             // Ricerca icone
-            iconSearch.addEventListener('input', function() {
+            iconSearch.addEventListener('input', function () {
                 const searchTerm = this.value.toLowerCase();
-                
+
                 iconItems.forEach(item => {
                     const iconName = item.dataset.icon.toLowerCase();
-                    
+
                     if (iconName.includes(searchTerm) || searchTerm === '') {
                         item.style.display = 'flex';
                     } else {
@@ -1547,9 +1636,9 @@
 
             // Filtro per categorie
             categoryButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function () {
                     const category = this.dataset.category;
-                    
+
                     // Aggiorna i pulsanti attivi
                     categoryButtons.forEach(b => {
                         b.classList.remove('btn-primary');
@@ -1559,7 +1648,7 @@
                     this.classList.remove('btn-outline-primary');
                     this.classList.add('btn-primary');
                     this.classList.add('active');
-                    
+
                     // Mostra/nascondi gruppi in base alla categoria
                     if (category === 'all') {
                         document.querySelectorAll('.icon-group').forEach(group => {

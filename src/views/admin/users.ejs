@@ -1070,6 +1070,36 @@
         pointer-events: none;
     }
 }
+
+/* Stili per il footer moderno */
+.modern-footer {
+    padding: 1rem 1.5rem;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    transition: all 0.3s;
+    z-index: 900;
+}
+/* Posizionamento base su desktop */
+@media (min-width: 769px) {
+    .modern-footer {
+        margin-left: 250px;
+        width: calc(100% - 250px);
+    }
+    
+    .sidebar.collapsed ~ .main-content .modern-footer {
+        margin-left: 60px;
+        width: calc(100% - 60px);
+    }
+}
+
+/* Posizionamento su mobile */
+@media (max-width: 768px) {
+    .modern-footer {
+        margin-left: 0;
+        width: 100%;
+    }
+}
     </style>
 </head>
 
@@ -1690,7 +1720,7 @@
                 sidebarToggleBtn.setAttribute('title', 'Espandi menu');
             }
 
-            sidebarToggleBtn.addEventListener('click', function() {
+            sidebarToggleBtn.addEventListener('click', function () {
                 if (window.innerWidth <= 768) {
                     // Comportamento per dispositivi mobili (toggle active/non-active)
                     sidebar.classList.toggle('active');
@@ -1721,23 +1751,23 @@
                     // Salva la preferenza
                     localStorage.setItem('sidebarCollapsed', isNowCollapsed);
                 }
-                
+
                 // Aggiorna il layout del footer
                 updateFooterLayout();
             });
 
             // Chiudi la sidebar quando si clicca sull'overlay
-            overlay.addEventListener('click', function() {
+            overlay.addEventListener('click', function () {
                 sidebar.classList.remove('active');
                 overlay.classList.remove('active');
                 document.body.style.overflow = '';
-                
+
                 // Aggiorna il layout del footer quando si chiude la sidebar con l'overlay
                 updateFooterLayout();
             });
 
             // Gestisci la responsività quando si ridimensiona la finestra
-            window.addEventListener('resize', function() {
+            window.addEventListener('resize', function () {
                 if (window.innerWidth > 768) {
                     // Passa alla modalità desktop
                     overlay.classList.remove('active');
@@ -1747,7 +1777,7 @@
                         sidebar.classList.remove('active');
                     }
                 }
-                
+
                 // Aggiorna il layout del footer quando si ridimensiona la finestra
                 updateFooterLayout();
             });
@@ -1755,9 +1785,9 @@
             // Funzione per aggiornare il layout del footer
             function updateFooterLayout() {
                 const footer = document.querySelector('.modern-footer');
-                
+
                 if (!footer) return; // Se il footer non è presente, esci dalla funzione
-                
+
                 // Gestisci la posizione del footer in base allo stato della sidebar
                 if (window.innerWidth > 768) {
                     // Su desktop
@@ -1776,7 +1806,7 @@
                     footer.style.width = '100%';
                 }
             }
-            
+
             // Imposta il layout iniziale del footer se è già presente
             setTimeout(updateFooterLayout, 100);
 
