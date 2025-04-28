@@ -806,6 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li class="nav-item"><a class="nav-link animated-link" href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link animated-link" href="/about"><i class="fas fa-info-circle"></i> Chi Siamo</a></li>
                 <li class="nav-item"><a class="nav-link animated-link" href="/services"><i class="fas fa-cogs"></i> Servizi</a></li>
+                 <li class="nav-item"><a class="nav-link animated-link" href="/contact"><i class="fas fa-envelope"></i> Contatti</a></li>
                 ${isAdminUser ? `<li class="nav-item"><a class="nav-link animated-link" href="/admin/orders"><i class="fas fa-clipboard-list"></i> Admin Dashboard</a></li>` : ''}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

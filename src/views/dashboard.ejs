@@ -147,14 +147,6 @@
                                 
                                 <% if (order.stato === 'in-lavorazione' && order.progressoLavoro) { %>
                                 <div class="progress mb-3">
-                                  <div class="progress-bar progress-bar-dynamic" 
-                                       data-progress="<%= order.progressoLavoro %>" 
-                                       role="progressbar" 
-                                       aria-valuenow="<%= order.progressoLavoro %>" 
-                                       aria-valuemin="0" 
-                                       aria-valuemax="100">
-                                    <%= order.progressoLavoro %>%
-                                  </div>
                                 </div>
                                 <% } %>
                                 
@@ -301,12 +293,6 @@
                     console.error('Errore nel recupero dei servizi:', error);
                     $('#servicesContainer').html('<div class="alert alert-danger">Errore nel recupero dei servizi.</div>');
                 }
-            });
-
-            // Inizializza le barre di progresso dinamiche
-            $('.progress-bar-dynamic').each(function() {
-                const progress = $(this).data('progress');
-                $(this).css('width', progress + '%').attr('aria-valuenow', progress).text(progress + '%');
             });
         });
     </script>
