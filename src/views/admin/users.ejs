@@ -31,17 +31,33 @@
             min-height: 100vh;
         }
 
-        .sidebar {
-            width: 250px;
-            background: var(--primary);
-            color: white;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            height: 100%;
-            overflow-y: auto;
-            transition: all 0.3s;
-            z-index: 1000;
-        }
+        /* Stili migliorati per la sidebar */
+.sidebar {
+    width: 250px;
+    background: var(--primary);
+    color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    height: 100%;
+    overflow-y: auto;
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+/* Stili per la sidebar compressa su desktop */
+.sidebar.collapsed {
+    width: 60px;
+}
+
+.sidebar.collapsed .sidebar-brand span,
+.sidebar.collapsed .sidebar-item span {
+    display: none;
+}
+
+.sidebar.collapsed .sidebar-item i {
+    margin-right: 0;
+    font-size: 1.2rem;
+}
 
         .sidebar-header {
             padding: 1.5rem 1rem;
@@ -118,6 +134,19 @@
             margin-left: 250px;
             padding: 2rem;
             transition: all 0.3s;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 60px;
+            width: calc(100% - 60px);
+        }
+
+        @media (max-width: 768px) {
+            .main-content,
+            .main-content.sidebar-collapsed {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
         }
 
         .page-header {
@@ -314,34 +343,42 @@
             font-weight: 600;
         }
 
-        /* Stili per la sidebar compressa */
-        .sidebar.collapsed {
-            width: 60px;
-        }
+        /* Regole per dispositivi mobili */
+        @media (max-width: 768px) {
+    .main-content {
+        margin-left: 0 !important;
+        padding: 1rem;
+    }
 
-        .sidebar.collapsed .sidebar-brand span,
-        .sidebar.collapsed .sidebar-item span {
-            display: none;
-        }
+    .sidebar {
+        width: 0;
+        transform: translateX(-100%);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
 
-        .sidebar.collapsed .sidebar-item i {
-            margin-right: 0;
-            font-size: 1.2rem;
-        }
+    .sidebar.active {
+        width: 250px !important;
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
 
-        body:not(.mobile-view) .main-content.sidebar-collapsed {
-            margin-left: 60px;
-        }
+/* Overlay per mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
 
-        .sidebar-toggle {
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .sidebar-toggle:hover {
-            background-color: var(--accent);
-            color: white;
-        }
+.sidebar-overlay.active {
+    display: block;
+}
 
         /* Tema scuro */
         body.dark-theme {
@@ -632,11 +669,13 @@
 
             .sidebar {
                 width: 0;
+                transform: translateX(-100%);
                 opacity: 0;
             }
 
             .sidebar.active {
-                width: 200px;
+                width: 250px !important;
+                transform: translateX(0);
                 opacity: 1;
             }
 
@@ -1073,31 +1112,22 @@
 
 /* Stili per il footer moderno */
 .modern-footer {
-    padding: 1rem 1.5rem;
-    position: fixed;
-    bottom: 0;
-    right: 0;
+    margin-left: 250px;
+    width: calc(100% - 250px);
     transition: all 0.3s;
-    z-index: 900;
-}
-/* Posizionamento base su desktop */
-@media (min-width: 769px) {
-    .modern-footer {
-        margin-left: 250px;
-        width: calc(100% - 250px);
-    }
-    
-    .sidebar.collapsed ~ .main-content .modern-footer {
-        margin-left: 60px;
-        width: calc(100% - 60px);
-    }
 }
 
-/* Posizionamento su mobile */
+.sidebar.collapsed ~ .main-content .modern-footer,
+.main-content.sidebar-collapsed ~ .modern-footer,
+body .modern-footer.sidebar-collapsed {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+}
+
 @media (max-width: 768px) {
     .modern-footer {
-        margin-left: 0;
-        width: 100%;
+        margin-left: 0 !important;
+        width: 100% !important;
     }
 }
     </style>
@@ -1519,392 +1549,550 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
     <script src="/js/build.js"></script>
     <script>
+        // --- CODICE AGGIUNTO PER DEBUG SIDEBAR ---
         document.addEventListener('DOMContentLoaded', function () {
-            // Gestione modale utente (aggiunta/modifica)
-            const userModal = document.getElementById('userModal');
-            const userForm = document.getElementById('user-form');
-            const addUserBtn = document.getElementById('add-user-btn');
-            const addUserMobileBtn = document.getElementById('add-user-mobile-btn');
-            const editUserBtns = document.querySelectorAll('.edit-user-btn');
-            const modalTitleAction = document.getElementById('modal-title-action');
-            const saveButtonText = document.getElementById('save-button-text');
-            const formMethod = document.getElementById('form-method');
-            const userId = document.getElementById('user-id');
-            const passwordContainer = document.getElementById('password-container');
-
-            // Configurazione per nuovo utente
-            const setupNewUserModal = () => {
-                modalTitleAction.textContent = 'Aggiungi';
-                saveButtonText.textContent = 'Salva';
-                userForm.reset();
-                userForm.action = '/admin/users/create';
-                formMethod.value = 'POST';
-                userId.value = '';
-                passwordContainer.style.display = 'block';
-                document.getElementById('password').setAttribute('required', 'required');
-            };
-
-            addUserBtn.addEventListener('click', setupNewUserModal);
-            addUserMobileBtn.addEventListener('click', setupNewUserModal);
-
-            // Configurazione per modifica utente
-            editUserBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = this.dataset.id;
-                    const nome = this.dataset.nome;
-                    const cognome = this.dataset.cognome;
-                    const email = this.dataset.email;
-                    const isAdmin = this.dataset.isadmin === 'true';
-                    const attivo = this.dataset.attivo === 'true';
-
-                    modalTitleAction.textContent = 'Modifica';
-                    saveButtonText.textContent = 'Aggiorna';
-                    
-                    // Imposta i valori del form
-                    document.getElementById('nome').value = nome;
-                    document.getElementById('cognome').value = cognome;
-                    document.getElementById('email').value = email;
-                    document.getElementById('role').value = isAdmin.toString();
-                    document.getElementById('active').value = attivo.toString();
-                    userId.value = id;
-                    
-                    // Nascondi il campo password per le modifiche
-                    passwordContainer.style.display = 'block';
-                    document.getElementById('password').removeAttribute('required');
-                    
-                    // Aggiorna l'action del form e il metodo
-                    userForm.action = `/admin/users/${id}/update`;
-                    formMethod.value = 'PUT';
-                });
-            });
-            
-            // Gestione modale conferma eliminazione
-            const deleteUserBtns = document.querySelectorAll('.delete-user-btn');
-            const deleteForm = document.getElementById('delete-form');
-            const deleteUserName = document.getElementById('delete-user-name');
-
-            deleteUserBtns.forEach(btn => {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const userId = this.dataset.id;
-                    const userName = this.dataset.nome;
-                    
-                    deleteUserName.textContent = userName;
-                    deleteForm.action = `/admin/users/${userId}/delete`;
-                    
-                    $('#deleteConfirmModal').modal('show');
-                });
-            });
-
-            deleteForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Aggiungiamo un feedback visivo prima dell'invio
-                const submitBtn = this.querySelector('button[type="submit"]');
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Eliminazione...';
-                
-                // Invia la richiesta usando fetch con il metodo DELETE
-                fetch(this.action, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include'
-                })
-                .then(response => {
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                    } else {
-                        window.location.href = '/admin/users?success=Utente eliminato con successo';
-                    }
-                })
-                .catch(error => {
-                    console.error('Errore durante l\'eliminazione:', error);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fas fa-trash-alt mr-1"></i> Elimina';
-                    alert('Si è verificato un errore durante l\'eliminazione dell\'utente.');
-                });
-            });
-
-            // Gestione modale cambio stato
-            const toggleStatusBtns = document.querySelectorAll('.toggle-status-btn');
-            const toggleStatusForm = document.getElementById('toggle-status-form');
-            const toggleUserName = document.getElementById('toggle-user-name');
-            const toggleStatusTitle = document.getElementById('toggle-status-title');
-            const toggleStatusMessage = document.getElementById('toggle-status-message');
-            const toggleStatusWarning = document.getElementById('toggle-status-warning');
-            const toggleStatusBtn = document.getElementById('toggle-status-btn');
-            const toggleStatusBtnText = document.getElementById('toggle-status-btn-text');
-            const toggleStatusIcon = document.getElementById('toggle-status-icon');
-            const toggleStatusValue = document.getElementById('toggle-status-value');
-            
-            toggleStatusBtns.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const userId = this.dataset.id;
-                    const userName = this.dataset.nome;
-                    const isActive = this.dataset.active === 'true';
-                    
-                    toggleUserName.textContent = userName;
-                    toggleStatusForm.action = `/admin/users/${userId}/toggle-status`;
-                    toggleStatusValue.value = (!isActive).toString();
-                    
-                    if (isActive) {
-                        // Disattivazione
-                        toggleStatusTitle.textContent = 'Disattiva utente';
-                        toggleStatusMessage.textContent = 'Sei sicuro di voler disattivare l\'utente';
-                        toggleStatusWarning.textContent = 'L\'utente non potrà più accedere alla piattaforma fino a quando non sarà riattivato.';
-                        toggleStatusWarning.className = 'text-warning';
-                        toggleStatusBtn.className = 'btn btn-warning';
-                        toggleStatusBtnText.textContent = 'Disattiva';
-                        toggleStatusIcon.className = 'fas fa-user-slash mr-1';
-                    } else {
-                        // Attivazione
-                        toggleStatusTitle.textContent = 'Attiva utente';
-                        toggleStatusMessage.textContent = 'Sei sicuro di voler attivare l\'utente';
-                        toggleStatusWarning.textContent = 'L\'utente potrà nuovamente accedere alla piattaforma.';
-                        toggleStatusWarning.className = 'text-success';
-                        toggleStatusBtn.className = 'btn btn-success';
-                        toggleStatusBtnText.textContent = 'Attiva';
-                        toggleStatusIcon.className = 'fas fa-user-check mr-1';
-                    }
-                    
-                    $('#toggleStatusModal').modal('show');
-                });
-            });
-
-            // Gestione filtri
-            const applyFiltersBtn = document.getElementById('apply-filters');
-            const filterRole = document.getElementById('filter-role');
-            const filterSearch = document.getElementById('filter-search');
-            const userRows = document.querySelectorAll('.user-row');
-
-            applyFiltersBtn.addEventListener('click', function() {
-                const roleFilter = filterRole.value.toLowerCase();
-                const searchFilter = filterSearch.value.toLowerCase();
-
-                userRows.forEach(row => {
-                    const rowRole = row.dataset.role;
-                    const rowSearch = row.dataset.search;
-                    const rowStatus = row.dataset.status;
-
-                    const matchRole = !roleFilter || rowRole === roleFilter;
-                    const matchSearch = !searchFilter || rowSearch.includes(searchFilter);
-
-                    if (matchRole && matchSearch) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
-
             // Gestione sidebar su mobile e responsive
             const sidebarToggleBtn = document.getElementById('sidebar-toggle');
             const sidebar = document.querySelector('.sidebar');
             const mainContent = document.querySelector('.main-content');
 
-            // Crea un overlay per la sidebar mobile
-            const overlay = document.createElement('div');
-            overlay.className = 'sidebar-overlay';
-            document.body.appendChild(overlay);
-
-            // Verifica se c'è una preferenza salvata
-            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-
-            // Applica stato iniziale
-            if (isSidebarCollapsed) {
-                sidebar.classList.add('collapsed');
-                mainContent.classList.add('sidebar-collapsed');
-                sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
-                sidebarToggleBtn.setAttribute('title', 'Espandi menu');
-            }
-
-            sidebarToggleBtn.addEventListener('click', function () {
-                if (window.innerWidth <= 768) {
-                    // Comportamento per dispositivi mobili (toggle active/non-active)
-                    sidebar.classList.toggle('active');
-                    overlay.classList.toggle('active');
-
-                    // Impedisci lo scroll del body quando la sidebar è aperta
-                    if (sidebar.classList.contains('active')) {
-                        document.body.style.overflow = 'hidden';
-                    } else {
-                        document.body.style.overflow = '';
-                    }
-                } else {
-                    // Comportamento desktop (collapsed/non-collapsed)
-                    sidebar.classList.toggle('collapsed');
-                    mainContent.classList.toggle('sidebar-collapsed');
-
-                    const isNowCollapsed = sidebar.classList.contains('collapsed');
-
-                    // Aggiorna l'icona e il tooltip
-                    if (isNowCollapsed) {
-                        sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
-                        sidebarToggleBtn.setAttribute('title', 'Espandi menu');
-                    } else {
-                        sidebarToggleBtn.innerHTML = '<i class="fas fa-compress"></i>';
-                        sidebarToggleBtn.setAttribute('title', 'Comprimi menu');
-                    }
-
-                    // Salva la preferenza
-                    localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+            // Verifica se gli elementi sono stati trovati correttamente
+            if (sidebarToggleBtn && sidebar && mainContent) {
+                console.log('Elementi sidebar trovati correttamente');
+                
+                // Crea un overlay per la sidebar mobile se non esiste già
+                let overlay = document.querySelector('.sidebar-overlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.className = 'sidebar-overlay';
+                    document.body.appendChild(overlay);
                 }
 
-                // Aggiorna il layout del footer
-                updateFooterLayout();
-            });
+                // Verifica se c'è una preferenza salvata
+                const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 
-            // Chiudi la sidebar quando si clicca sull'overlay
-            overlay.addEventListener('click', function () {
-                sidebar.classList.remove('active');
+                // Applica stato iniziale
+                if (isSidebarCollapsed && window.innerWidth > 768) {
+                    sidebar.classList.add('collapsed');
+                    mainContent.classList.add('sidebar-collapsed');
+                    sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                    sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+                }
+
+                // Aggiungi l'event listener con log per debug
+                sidebarToggleBtn.addEventListener('click', function () {
+                    console.log('Clic sul pulsante sidebar-toggle');
+                    
+                    if (window.innerWidth <= 768) {
+                        // Comportamento per dispositivi mobili
+                        console.log('Modalità mobile: toggle classe active');
+                        sidebar.classList.toggle('active');
+                        overlay.classList.toggle('active');
+
+                        // Controlla se la sidebar è ora attiva
+                        if (sidebar.classList.contains('active')) {
+                            document.body.style.overflow = 'hidden';
+                            console.log('Sidebar attivata su mobile');
+                        } else {
+                            document.body.style.overflow = '';
+                            console.log('Sidebar disattivata su mobile');
+                        }
+                    } else {
+                        // Comportamento desktop
+                        console.log('Modalità desktop: toggle classe collapsed');
+                        sidebar.classList.toggle('collapsed');
+                        mainContent.classList.toggle('sidebar-collapsed');
+
+                        const isNowCollapsed = sidebar.classList.contains('collapsed');
+
+                        // Aggiorna l'icona e il tooltip
+                        if (isNowCollapsed) {
+                            sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                            sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+                            console.log('Sidebar collassata su desktop');
+                        } else {
+                            sidebarToggleBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                            sidebarToggleBtn.setAttribute('title', 'Comprimi menu');
+                            console.log('Sidebar espansa su desktop');
+                        }
+
+                        // Salva la preferenza
+                        localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+                    }
+
+                    // Aggiorna il layout del footer
+                    if (typeof updateFooterLayout === 'function') {
+                        updateFooterLayout();
+                    }
+                });
+
+                // Assicura che l'evento click funzioni
+                console.log('Event listener per sidebar-toggle registrato');
+            } else {
+                console.error('Elementi per la sidebar non trovati:', {
+                    sidebarToggleBtn: !!sidebarToggleBtn,
+                    sidebar: !!sidebar,
+                    mainContent: !!mainContent
+                });
+            }
+        });
+        // --- FINE CODICE AGGIUNTO ---
+        // Gestione modale utente (aggiunta/modifica)
+        const userModal = document.getElementById('userModal');
+        const userForm = document.getElementById('user-form');
+        const addUserBtn = document.getElementById('add-user-btn');
+        const addUserMobileBtn = document.getElementById('add-user-mobile-btn');
+        const editUserBtns = document.querySelectorAll('.edit-user-btn');
+        const modalTitleAction = document.getElementById('modal-title-action');
+        const saveButtonText = document.getElementById('save-button-text');
+        const formMethod = document.getElementById('form-method');
+        const userId = document.getElementById('user-id');
+        const passwordContainer = document.getElementById('password-container');
+
+        // Configurazione per nuovo utente
+        const setupNewUserModal = () => {
+            modalTitleAction.textContent = 'Aggiungi';
+            saveButtonText.textContent = 'Salva';
+            userForm.reset();
+            userForm.action = '/admin/users/create';
+            formMethod.value = 'POST';
+            userId.value = '';
+            passwordContainer.style.display = 'block';
+            document.getElementById('password').setAttribute('required', 'required');
+        };
+
+        addUserBtn.addEventListener('click', setupNewUserModal);
+        addUserMobileBtn.addEventListener('click', setupNewUserModal);
+
+        // Configurazione per modifica utente
+        editUserBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.id;
+                const nome = this.dataset.nome;
+                const cognome = this.dataset.cognome;
+                const email = this.dataset.email;
+                const isAdmin = this.dataset.isadmin === 'true';
+                const attivo = this.dataset.attivo === 'true';
+
+                modalTitleAction.textContent = 'Modifica';
+                saveButtonText.textContent = 'Aggiorna';
+                
+                // Imposta i valori del form
+                document.getElementById('nome').value = nome;
+                document.getElementById('cognome').value = cognome;
+                document.getElementById('email').value = email;
+                document.getElementById('role').value = isAdmin.toString();
+                document.getElementById('active').value = attivo.toString();
+                userId.value = id;
+                
+                // Nascondi il campo password per le modifiche
+                passwordContainer.style.display = 'block';
+                document.getElementById('password').removeAttribute('required');
+                
+                // Aggiorna l'action del form e il metodo
+                userForm.action = `/admin/users/${id}/update`;
+                formMethod.value = 'PUT';
+            });
+        });
+        
+        // Gestione modale conferma eliminazione
+        const deleteUserBtns = document.querySelectorAll('.delete-user-btn');
+        const deleteForm = document.getElementById('delete-form');
+        const deleteUserName = document.getElementById('delete-user-name');
+
+        deleteUserBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const userId = this.dataset.id;
+                const userName = this.dataset.nome;
+                
+                deleteUserName.textContent = userName;
+                deleteForm.action = `/admin/users/${userId}/delete`;
+                
+                $('#deleteConfirmModal').modal('show');
+            });
+        });
+
+        deleteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Aggiungiamo un feedback visivo prima dell'invio
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Eliminazione...';
+            
+            // Invia la richiesta usando fetch con il metodo DELETE
+            fetch(this.action, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    window.location.href = '/admin/users?success=Utente eliminato con successo';
+                }
+            })
+            .catch(error => {
+                console.error('Errore durante l\'eliminazione:', error);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-trash-alt mr-1"></i> Elimina';
+                alert('Si è verificato un errore durante l\'eliminazione dell\'utente.');
+            });
+        });
+
+        // Gestione modale cambio stato
+        const toggleStatusBtns = document.querySelectorAll('.toggle-status-btn');
+        const toggleStatusForm = document.getElementById('toggle-status-form');
+        const toggleUserName = document.getElementById('toggle-user-name');
+        const toggleStatusTitle = document.getElementById('toggle-status-title');
+        const toggleStatusMessage = document.getElementById('toggle-status-message');
+        const toggleStatusWarning = document.getElementById('toggle-status-warning');
+        const toggleStatusBtn = document.getElementById('toggle-status-btn');
+        const toggleStatusBtnText = document.getElementById('toggle-status-btn-text');
+        const toggleStatusIcon = document.getElementById('toggle-status-icon');
+        const toggleStatusValue = document.getElementById('toggle-status-value');
+        
+        toggleStatusBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const userId = this.dataset.id;
+                const userName = this.dataset.nome;
+                const isActive = this.dataset.active === 'true';
+                
+                toggleUserName.textContent = userName;
+                toggleStatusForm.action = `/admin/users/${userId}/toggle-status`;
+                toggleStatusValue.value = (!isActive).toString();
+                
+                if (isActive) {
+                    // Disattivazione
+                    toggleStatusTitle.textContent = 'Disattiva utente';
+                    toggleStatusMessage.textContent = 'Sei sicuro di voler disattivare l\'utente';
+                    toggleStatusWarning.textContent = 'L\'utente non potrà più accedere alla piattaforma fino a quando non sarà riattivato.';
+                    toggleStatusWarning.className = 'text-warning';
+                    toggleStatusBtn.className = 'btn btn-warning';
+                    toggleStatusBtnText.textContent = 'Disattiva';
+                    toggleStatusIcon.className = 'fas fa-user-slash mr-1';
+                } else {
+                    // Attivazione
+                    toggleStatusTitle.textContent = 'Attiva utente';
+                    toggleStatusMessage.textContent = 'Sei sicuro di voler attivare l\'utente';
+                    toggleStatusWarning.textContent = 'L\'utente potrà nuovamente accedere alla piattaforma.';
+                    toggleStatusWarning.className = 'text-success';
+                    toggleStatusBtn.className = 'btn btn-success';
+                    toggleStatusBtnText.textContent = 'Attiva';
+                    toggleStatusIcon.className = 'fas fa-user-check mr-1';
+                }
+                
+                $('#toggleStatusModal').modal('show');
+            });
+        });
+
+        // Gestione filtri
+        const applyFiltersBtn = document.getElementById('apply-filters');
+        const filterRole = document.getElementById('filter-role');
+        const filterSearch = document.getElementById('filter-search');
+        const userRows = document.querySelectorAll('.user-row');
+
+        applyFiltersBtn.addEventListener('click', function() {
+            const roleFilter = filterRole.value.toLowerCase();
+            const searchFilter = filterSearch.value.toLowerCase();
+
+            userRows.forEach(row => {
+                const rowRole = row.dataset.role;
+                const rowSearch = row.dataset.search;
+                const rowStatus = row.dataset.status;
+
+                const matchRole = !roleFilter || rowRole === roleFilter;
+                const matchSearch = !searchFilter || rowSearch.includes(searchFilter);
+
+                if (matchRole && matchSearch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Gestione sidebar su mobile e responsive
+        const sidebarToggleBtn = document.getElementById('sidebar-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        // Crea un overlay per la sidebar mobile
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+
+        // Verifica se c'è una preferenza salvata
+        const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+
+        // Applica stato iniziale
+        if (isSidebarCollapsed) {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('sidebar-collapsed');
+            sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+            sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+        }
+
+        sidebarToggleBtn.addEventListener('click', function () {
+            if (window.innerWidth <= 768) {
+                // Comportamento per dispositivi mobili (toggle active/non-active)
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+
+                // Impedisci lo scroll del body quando la sidebar è aperta
+                if (sidebar.classList.contains('active')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            } else {
+                // Comportamento desktop (collapsed/non-collapsed)
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('sidebar-collapsed');
+
+                const isNowCollapsed = sidebar.classList.contains('collapsed');
+
+                // Aggiorna l'icona e il tooltip
+                if (isNowCollapsed) {
+                    sidebarToggleBtn.innerHTML = '<i class="fas fa-expand"></i>';
+                    sidebarToggleBtn.setAttribute('title', 'Espandi menu');
+                } else {
+                    sidebarToggleBtn.innerHTML = '<i class="fas fa-compress"></i>';
+                    sidebarToggleBtn.setAttribute('title', 'Comprimi menu');
+                }
+
+                // Salva la preferenza
+                localStorage.setItem('sidebarCollapsed', isNowCollapsed);
+            }
+
+            // Aggiorna il layout del footer
+            updateFooterLayout();
+        });
+
+        // Chiudi la sidebar quando si clicca sull'overlay
+        overlay.addEventListener('click', function () {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+
+            // Aggiorna il layout del footer quando si chiude la sidebar con l'overlay
+            updateFooterLayout();
+        });
+
+        // Gestisci la responsività quando si ridimensiona la finestra
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                // Passa alla modalità desktop
                 overlay.classList.remove('active');
                 document.body.style.overflow = '';
 
-                // Aggiorna il layout del footer quando si chiude la sidebar con l'overlay
-                updateFooterLayout();
-            });
-
-            // Gestisci la responsività quando si ridimensiona la finestra
-            window.addEventListener('resize', function () {
-                if (window.innerWidth > 768) {
-                    // Passa alla modalità desktop
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-
-                    if (sidebar.classList.contains('active')) {
-                        sidebar.classList.remove('active');
-                    }
-                }
-
-                // Aggiorna il layout del footer quando si ridimensiona la finestra
-                updateFooterLayout();
-            });
-
-            // Funzione per aggiornare il layout del footer
-            function updateFooterLayout() {
-                const footer = document.querySelector('.modern-footer');
-
-                if (!footer) return; // Se il footer non è presente, esci dalla funzione
-
-                // Gestisci la posizione del footer in base allo stato della sidebar
-                if (window.innerWidth > 768) {
-                    // Su desktop
-                    if (sidebar.classList.contains('collapsed')) {
-                        // Sidebar compressa
-                        footer.style.marginLeft = '60px';
-                        footer.style.width = 'calc(100% - 60px)';
-                    } else {
-                        // Sidebar espansa
-                        footer.style.marginLeft = '250px';
-                        footer.style.width = 'calc(100% - 250px)';
-                    }
-                } else {
-                    // Su mobile
-                    footer.style.marginLeft = '0';
-                    footer.style.width = '100%';
+                if (sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
                 }
             }
 
-            // Imposta il layout iniziale del footer se è già presente
-            setTimeout(updateFooterLayout, 100);
+            // Aggiorna il layout del footer quando si ridimensiona la finestra
+            updateFooterLayout();
+        });
 
-            // Gestione dei modali per mobile
-            const modals = document.querySelectorAll('.modal');
+        // Funzione per aggiornare il layout del footer in base allo stato della sidebar
+function updateFooterLayout() {
+    const sidebar = document.querySelector('.sidebar');
+    const footer = document.querySelector('.modern-footer');
+    
+    if (!footer) return; // Se il footer non è presente, esci dalla funzione
+    
+    // Gestisci la posizione del footer in base allo stato della sidebar
+    if (window.innerWidth > 768) {
+        // Su desktop
+        if (sidebar.classList.contains('collapsed')) {
+            // Sidebar chiusa (compressa) → footer allargato
+            footer.style.marginLeft = '60px';
+            footer.style.width = 'calc(100% - 60px)';
+        } else {
+            // Sidebar aperta (espansa) → footer ristretto
+            footer.style.marginLeft = '250px';
+            footer.style.width = 'calc(100% - 250px)';
+        }
+    } else {
+        // Su mobile: footer sempre alla massima larghezza
+        footer.style.marginLeft = '0';
+        footer.style.width = '100%';
+    }
+}
 
-            function adjustModalForMobile() {
-                if (window.innerWidth <= 576) {
-                    modals.forEach(modal => {
-                        modal.querySelector('.modal-dialog').classList.add('modal-fullscreen-sm-down');
-                    });
-                } else {
-                    modals.forEach(modal => {
-                        modal.querySelector('.modal-dialog').classList.remove('modal-fullscreen-sm-down');
-                    });
-                }
+document.addEventListener('DOMContentLoaded', function() {
+    // Chiamiamo subito updateFooterLayout per impostare il layout iniziale
+    updateFooterLayout();
+    
+    // Richiama la funzione anche quando la finestra viene ridimensionata
+    window.addEventListener('resize', updateFooterLayout);
+});
+
+        // Gestione del selettore di icone
+        const iconPicker = document.getElementById('icon-picker');
+        const openIconPickerBtn = document.getElementById('open-icon-picker');
+        const iconItems = document.querySelectorAll('.icon-item');
+        const iconSearch = document.getElementById('icon-search');
+        const categoryButtons = document.querySelectorAll('.icon-picker-categories button');
+
+        // Apertura e chiusura del selettore
+        openIconPickerBtn.addEventListener('click', function () {
+            iconPicker.classList.toggle('d-none');
+        });
+
+        // Chiusura del selettore quando si clicca fuori
+        document.addEventListener('click', function (event) {
+            if (!event.target.closest('#icon-picker') &&
+                !event.target.closest('#open-icon-picker') &&
+                !iconPicker.classList.contains('d-none')) {
+                iconPicker.classList.add('d-none');
             }
+        });
 
-            // Esegui al caricamento e quando la finestra cambia dimensione
-            adjustModalForMobile();
-            window.addEventListener('resize', adjustModalForMobile);
+        // Selezione dell'icona
+        iconItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const iconClass = this.dataset.icon;
 
-            // Imposta focus sul primo campo quando si apre un modale
-            $('#userModal').on('shown.bs.modal', function () {
-                document.getElementById('nome').focus();
-            });
-
-            // Migliora la visualizzazione delle tabelle su mobile
-            function setupResponsiveTables() {
-                if (window.innerWidth <= 767) {
-                    const tables = document.querySelectorAll('#users-table');
-                    tables.forEach(table => {
-                        const headerCells = table.querySelectorAll('thead th');
-                        const headerTexts = Array.from(headerCells).map(cell => cell.textContent.trim());
-                        
-                        const bodyCells = table.querySelectorAll('tbody td');
-                        
-                        bodyCells.forEach((cell, index) => {
-                            const headerIndex = index % headerTexts.length;
-                            cell.setAttribute('data-label', headerTexts[headerIndex]);
-                        });
-                    });
-                }
-            }
-
-            // Esegui all'avvio e quando si ridimensiona la finestra
-            setupResponsiveTables();
-            window.addEventListener('resize', setupResponsiveTables);
-
-            // Migliora l'accessibilità dei pulsanti nei gruppi
-            const actionButtons = document.querySelectorAll('.btn-group .btn');
-            actionButtons.forEach(button => {
-                // Aggiungi aria-label per migliorare l'accessibilità
-                const icon = button.querySelector('i');
-                if (icon && icon.classList.contains('fa-edit')) {
-                    button.setAttribute('aria-label', 'Modifica utente');
-                } else if (icon && (icon.classList.contains('fa-user-slash') || icon.classList.contains('fa-user-check'))) {
-                    button.setAttribute('aria-label', 'Cambia stato utente');
-                } else if (icon && icon.classList.contains('fa-trash-alt')) {
-                    button.setAttribute('aria-label', 'Elimina utente');
-                }
-            });
-
-            // Aggiungi feedback tattile sui dispositivi mobili
-            if ('ontouchstart' in document.documentElement) {
-                const allButtons = document.querySelectorAll('.btn');
-                allButtons.forEach(button => {
-                    button.addEventListener('touchstart', function() {
-                        this.classList.add('btn-touch-active');
-                    });
-                    button.addEventListener('touchend', function() {
-                        this.classList.remove('btn-touch-active');
-                        // Piccolo ritardo prima di rimuovere la classe per un feedback visivo migliore
-                        setTimeout(() => this.classList.remove('btn-touch-active'), 150);
-                    });
+                // Rimuovi la selezione precedente
+                document.querySelectorAll('.icon-item.selected').forEach(el => {
+                    el.classList.remove('selected');
                 });
-            }
 
-            // Gestione dei design pattern per tabelle responsive su mobile
-            function enhanceTableAccessibility() {
-                // Aggiungi tab-index per migliorare la navigazione con tastiera
-                const tableCells = document.querySelectorAll('#users-table td[data-label="Azioni"]');
-                tableCells.forEach(cell => {
-                    cell.setAttribute('tabindex', '0');
-                    
-                    // Aggiungi la gestione della navigazione con tastiera
-                    cell.addEventListener('keydown', function(e) {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            const firstButton = this.querySelector('.btn');
-                            if (firstButton) firstButton.click();
+                // Aggiungi la classe selected all'icona selezionata
+                this.classList.add('selected');
+
+                // Aggiorna l'input e l'anteprima
+                iconInput.value = iconClass;
+                iconPreview.className = 'fas ' + iconClass;
+
+                // Chiudi il selettore
+                iconPicker.classList.add('d-none');
+            });
+        });
+
+        // Ricerca icone
+        iconSearch.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase();
+
+            iconItems.forEach(item => {
+                const iconName = item.dataset.icon.toLowerCase();
+
+                if (iconName.includes(searchTerm) || searchTerm === '') {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Filtro per categorie
+        categoryButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const category = this.dataset.category;
+
+                // Aggiorna i pulsanti attivi
+                categoryButtons.forEach(b => {
+                    b.classList.remove('btn-primary');
+                    b.classList.add('btn-outline-primary');
+                    b.classList.remove('active');
+                });
+                this.classList.remove('btn-outline-primary');
+                this.classList.add('btn-primary');
+                this.classList.add('active');
+
+                // Mostra/nascondi gruppi in base alla categoria
+                if (category === 'all') {
+                    document.querySelectorAll('.icon-group').forEach(group => {
+                        group.style.display = 'block';
+                    });
+                } else {
+                    document.querySelectorAll('.icon-group').forEach(group => {
+                        if (group.dataset.category === category) {
+                            group.style.display = 'block';
+                        } else {
+                            group.style.display = 'none';
                         }
                     });
+                }
+            });
+        });
+
+        // Migliora la visualizzazione delle tabelle su mobile
+        function setupResponsiveTables() {
+            if (window.innerWidth <= 767) {
+                const tables = document.querySelectorAll('#users-table');
+                tables.forEach(table => {
+                    const headerCells = table.querySelectorAll('thead th');
+                    const headerTexts = Array.from(headerCells).map(cell => cell.textContent.trim());
+                    
+                    const bodyCells = table.querySelectorAll('tbody td');
+                    
+                    bodyCells.forEach((cell, index) => {
+                        const headerIndex = index % headerTexts.length;
+                        cell.setAttribute('data-label', headerTexts[headerIndex]);
+                    });
                 });
             }
+        }
 
-            // Esegui quando il DOM è completamente caricato
-            enhanceTableAccessibility();
+        // Esegui all'avvio e quando si ridimensiona la finestra
+        setupResponsiveTables();
+        window.addEventListener('resize', setupResponsiveTables);
+
+        // Migliora l'accessibilità dei pulsanti nei gruppi
+        const actionButtons = document.querySelectorAll('.btn-group .btn');
+        actionButtons.forEach(button => {
+            // Aggiungi aria-label per migliorare l'accessibilità
+            const icon = button.querySelector('i');
+            if (icon && icon.classList.contains('fa-edit')) {
+                button.setAttribute('aria-label', 'Modifica utente');
+            } else if (icon && (icon.classList.contains('fa-user-slash') || icon.classList.contains('fa-user-check'))) {
+                button.setAttribute('aria-label', 'Cambia stato utente');
+            } else if (icon && icon.classList.contains('fa-trash-alt')) {
+                button.setAttribute('aria-label', 'Elimina utente');
+            }
         });
+
+        // Aggiungi feedback tattile sui dispositivi mobili
+        if ('ontouchstart' in document.documentElement) {
+            const allButtons = document.querySelectorAll('.btn');
+            allButtons.forEach(button => {
+                button.addEventListener('touchstart', function() {
+                    this.classList.add('btn-touch-active');
+                });
+                button.addEventListener('touchend', function() {
+                    this.classList.remove('btn-touch-active');
+                    // Piccolo ritardo prima di rimuovere la classe per un feedback visivo migliore
+                    setTimeout(() => this.classList.remove('btn-touch-active'), 150);
+                });
+            });
+        }
+
+        // Gestione dei design pattern per tabelle responsive su mobile
+        function enhanceTableAccessibility() {
+            // Aggiungi tab-index per migliorare la navigazione con tastiera
+            const tableCells = document.querySelectorAll('#users-table td[data-label="Azioni"]');
+            tableCells.forEach(cell => {
+                cell.setAttribute('tabindex', '0');
+                
+                // Aggiungi la gestione della navigazione con tastiera
+                cell.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        const firstButton = this.querySelector('.btn');
+                        if (firstButton) firstButton.click();
+                    }
+                });
+            });
+        }
+
+        // Esegui quando il DOM è completamente caricato
+        enhanceTableAccessibility();
     </script>
 </body>
 
