@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Imposta il meta tag viewport per impedire lo zoom sui dispositivi mobili
     const viewportMeta = document.querySelector('meta[name="viewport"]');
     if (viewportMeta) {
@@ -11,15 +11,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Rileva se il dispositivo utilizza Tizen
-    const isTizenDevice = (function() {
-        return navigator.userAgent.indexOf('Tizen') > -1 || 
-               navigator.appVersion.indexOf('Tizen') > -1 ||
-               (typeof window.tizen !== 'undefined');
+    const isTizenDevice = (function () {
+        return navigator.userAgent.indexOf('Tizen') > -1 ||
+            navigator.appVersion.indexOf('Tizen') > -1 ||
+            (typeof window.tizen !== 'undefined');
     })();
 
     // Verifica se l'utente è autenticato (controlla se esiste un cookie di autenticazione)
     const isAuthenticated = document.cookie.split(';').some((item) => item.trim().startsWith('token='));
-    
+
     // Variabile per memorizzare le impostazioni dell'utente
     let userSettings = {
         theme: 'light',
@@ -30,16 +30,16 @@ document.addEventListener('DOMContentLoaded', function() {
         primaryColor: 'default',
         layout: 'default'
     };
-    
+
     // Funzione per applicare le impostazioni utente
     function applyUserSettings(settings) {
         if (!settings) return;
-        
+
         console.log('Applicazione impostazioni utente:', settings);
-        
+
         // Applica il tema con effetto di transizione
         document.body.classList.add('theme-transition');
-        
+
         // TEMA
         if (settings.theme === 'dark') {
             document.body.classList.add('dark-theme');
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.documentElement.setAttribute('data-theme', 'light');
             updateElementsForLightTheme();
         }
-        
+
         // DIMENSIONE FONT
         // Prima rimuovi tutte le classi di dimensione del font
         document.body.classList.remove('font-size-1', 'font-size-2', 'font-size-3');
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Valore predefinito se non specificato
             document.body.classList.add('font-size-1');
         }
-        
+
         // CONTRASTO ELEVATO
         if (settings.highContrast) {
             document.body.classList.add('high-contrast');
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             document.body.classList.remove('high-contrast');
         }
-        
+
         // RIDUZIONE ANIMAZIONI
         if (settings.reduceAnimations) {
             document.body.classList.add('reduce-animations');
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         }
-        
+
         // MODALITÀ DALTONICO
         // Rimuovi prima tutte le classi di daltonismo
         document.body.classList.remove('colorblind-deuteranopia', 'colorblind-protanopia', 'colorblind-tritanopia');
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.add('colorblind-' + settings.colorBlindMode);
             console.log('Modalità daltonico attivata:', settings.colorBlindMode);
         }
-        
+
         // COLORE PRIMARIO
         // Rimuovi prima tutte le classi di colore
         document.body.classList.remove('color-blue', 'color-green', 'color-purple', 'color-orange', 'color-red');
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             document.documentElement.style.setProperty('--primary-color', getColorValue('default'));
         }
-        
+
         // LAYOUT
         // Rimuovi prima tutte le classi di layout
         document.body.classList.remove('layout-compact', 'layout-comfortable', 'layout-spacious');
@@ -117,20 +117,20 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.classList.add('layout-' + settings.layout);
             console.log('Layout impostato:', settings.layout);
         }
-        
+
         // Rimuovi la classe di transizione dopo che l'animazione è completata
         setTimeout(() => {
             document.body.classList.remove('theme-transition');
         }, 300);
-        
+
         // Forza il ridisegno di componenti specifici che potrebbero richiedere aggiornamenti
         updateComponentsForTheme(settings.theme);
     }
-    
+
     // Funzione principale per aggiornare tutti gli elementi in base al tema
     function applyThemeToAllElements(theme) {
         const isDark = theme === 'dark';
-        
+
         // Imposta gli attributi data-* sul body per il CSS
         document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
         if (isDark) {
@@ -138,53 +138,53 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             document.body.classList.remove('dark-theme');
         }
-        
+
         // Aggiorna le icone
         updateIconsForTheme(isDark);
-        
+
         // Aggiorna i colori dei testi
         updateTextColors(isDark);
-        
+
         // Aggiorna i componenti di navigazione
         updateNavigationElements(isDark);
-        
+
         // Aggiorna i componenti di contenuto
         updateContentElements(isDark);
-        
+
         // Aggiorna i componenti di form e input
         updateFormElements(isDark);
-        
+
         // Aggiorna i componenti interattivi
         updateInteractiveElements(isDark);
-        
+
         // Aggiorna tabelle e dati
         updateTableElements(isDark);
-        
+
         // Aggiorna grafici e visualizzazioni
         updateChartElements(isDark);
-        
+
         // Aggiorna immagini in base al tema
         updateImages(isDark);
-        
+
         // Aggiorna gli elementi di stile
         updateStylingElements(isDark);
-        
+
         // Aggiorna componenti specifici del progetto
         updateProjectSpecificElements(isDark);
-        
+
         // Emetti un evento per far sapere ad altri script che il tema è cambiato
-        document.dispatchEvent(new CustomEvent('themeChanged', { 
+        document.dispatchEvent(new CustomEvent('themeChanged', {
             detail: { theme: isDark ? 'dark' : 'light' }
         }));
     }
-    
+
     // Aggiorna le icone in base al tema
     function updateIconsForTheme(isDark) {
         // Icone Font Awesome
         document.querySelectorAll('.fa, .fas, .far, .fab, .fal').forEach(icon => {
             if (isDark) {
                 // Aumenta la luminosità per alcune icone nel tema scuro
-                if (icon.classList.contains('text-muted') || 
+                if (icon.classList.contains('text-muted') ||
                     icon.classList.contains('text-secondary')) {
                     icon.style.color = '#a0a0a0';
                 }
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon.style.color = '';
             }
         });
-        
+
         // Icone con classi tema-specifiche
         document.querySelectorAll('.theme-icon').forEach(icon => {
             if (isDark) {
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 icon.classList.add('theme-icon-light');
             }
         });
-        
+
         // Icone nei servizi
         document.querySelectorAll('.service-card .rounded-circle, .card i.text-primary').forEach(icon => {
             if (isDark) {
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Aggiorna i colori dei testi
     function updateTextColors(isDark) {
         // Titoli e sottotitoli
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         // Testo primario e muted
         document.querySelectorAll('.text-primary, .text-muted, .lead').forEach(text => {
             if (isDark && text.classList.contains('text-muted')) {
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 delete text.dataset.originalColor;
             }
         });
-        
+
         // Link non-bottoni
         document.querySelectorAll('a:not(.btn):not(.nav-link)').forEach(link => {
             if (isDark) {
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Aggiorna i componenti di navigazione
     function updateNavigationElements(isDark) {
         // Navbar
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         }
-        
+
         // Breadcrumbs
         document.querySelectorAll('.breadcrumb').forEach(breadcrumb => {
             if (isDark) {
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 breadcrumb.classList.remove('breadcrumb-dark');
             }
         });
-        
+
         // Tabs e pills
         document.querySelectorAll('.nav-tabs, .nav-pills').forEach(nav => {
             if (isDark) {
@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Aggiorna i componenti di contenuto
     function updateContentElements(isDark) {
         // Card
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         // Card headers e footers
         document.querySelectorAll('.card-header, .card-footer').forEach(element => {
             if (isDark) {
@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 element.style.borderColor = '';
             }
         });
-        
+
         // List groups
         document.querySelectorAll('.list-group-item').forEach(item => {
             if (isDark) {
@@ -321,27 +321,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 item.classList.remove('list-group-item-dark');
             }
         });
-        
+
         // Jumbotron e alert
         document.querySelectorAll('.jumbotron, .alert').forEach(element => {
-            if (isDark && !element.classList.contains('alert-success') && 
-                !element.classList.contains('alert-danger') && 
-                !element.classList.contains('alert-warning') && 
+            if (isDark && !element.classList.contains('alert-success') &&
+                !element.classList.contains('alert-danger') &&
+                !element.classList.contains('alert-warning') &&
                 !element.classList.contains('alert-info')) {
                 element.classList.add('bg-dark-subtle');
             } else if (!isDark) {
                 element.classList.remove('bg-dark-subtle');
             }
         });
-        
+
         // Badge
         document.querySelectorAll('.badge').forEach(badge => {
             // Non modificare badge con classi di colore specifiche
-            if (!badge.classList.contains('badge-primary') && 
-                !badge.classList.contains('badge-secondary') && 
-                !badge.classList.contains('badge-success') && 
-                !badge.classList.contains('badge-danger') && 
-                !badge.classList.contains('badge-warning') && 
+            if (!badge.classList.contains('badge-primary') &&
+                !badge.classList.contains('badge-secondary') &&
+                !badge.classList.contains('badge-success') &&
+                !badge.classList.contains('badge-danger') &&
+                !badge.classList.contains('badge-warning') &&
                 !badge.classList.contains('badge-info')) {
                 if (isDark) {
                     badge.classList.add('badge-dark-theme');
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         // Timeline (visto in service-detail.ejs)
         document.querySelectorAll('.timeline-content').forEach(item => {
             if (isDark) {
@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Aggiorna i componenti di form e input
     function updateFormElements(isDark) {
         // Form controls
@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 input.classList.remove('form-control-dark');
             }
         });
-        
+
         // Input groups
         document.querySelectorAll('.input-group-text').forEach(text => {
             if (isDark) {
@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 text.classList.remove('input-group-text-dark');
             }
         });
-        
+
         // Custom controls (checkboxes, radios)
         document.querySelectorAll('.custom-control-label').forEach(label => {
             if (isDark) {
@@ -390,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Aggiorna i componenti interattivi
     function updateInteractiveElements(isDark) {
         // Modali
@@ -401,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 modal.classList.remove('modal-dark');
             }
         });
-        
+
         // Dropdowns
         document.querySelectorAll('.dropdown-menu').forEach(menu => {
             if (isDark) {
@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 menu.classList.remove('dropdown-menu-dark');
             }
         });
-        
+
         // Tooltips e popovers
         if (window.bootstrap) {
             if (window.bootstrap.Tooltip) {
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         }
-        
+
         // Accordion/collapse
         document.querySelectorAll('.accordion, .collapse').forEach(item => {
             if (isDark) {
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Aggiorna tabelle e dati
     function updateTableElements(isDark) {
         // Tabelle
@@ -455,10 +455,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-        
+
         // DataTables (se presente)
         if ($.fn.dataTable) {
-            $('.dataTable').each(function() {
+            $('.dataTable').each(function () {
                 const dataTable = $(this).DataTable();
                 if (dataTable) {
                     dataTable.draw();
@@ -466,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-    
+
     // Aggiorna grafici e visualizzazioni
     function updateChartElements(isDark) {
         // Chart.js charts
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         options.scales.y.ticks.color = '#212529';
                     }
                 }
-                
+
                 // Aggiorna colori per grafici a torta/ciambella
                 if (chart.config.type === 'pie' || chart.config.type === 'doughnut') {
                     if (isDark) {
@@ -495,12 +495,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         options.plugins.legend.labels.color = '#212529';
                     }
                 }
-                
+
                 chart.update();
             });
         }
     }
-    
+
     // Aggiorna immagini in base al tema
     function updateImages(isDark) {
         // Immagini con versioni per tema scuro
@@ -520,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         // Immagini che necessitano di inversione nel tema scuro
         document.querySelectorAll('img.invert-on-dark').forEach(img => {
             if (isDark) {
@@ -530,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Aggiorna gli elementi di stile
     function updateStylingElements(isDark) {
         // Elementi pre e code per la sintassi
@@ -541,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 block.classList.remove('dark-code');
             }
         });
-        
+
         // Backgrounds con classi comuni
         document.querySelectorAll('.bg-light, .bg-white, .bg-dark').forEach(el => {
             // Non modificare elementi con background scuro esplicito
@@ -561,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         // Bordi
         document.querySelectorAll('.border, [class*="border-"]').forEach(el => {
             if (isDark) {
@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 el.classList.remove('border-dark-theme');
             }
         });
-        
+
         // Ombre
         document.querySelectorAll('.shadow, .shadow-sm, .shadow-lg').forEach(el => {
             if (isDark) {
@@ -580,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Aggiorna componenti specifici del progetto
     function updateProjectSpecificElements(isDark) {
         // Timeline marker (in service-detail.ejs)
@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 marker.style.backgroundColor = ''; // Ripristina al valore default da CSS
             }
         });
-        
+
         // Color swatches nelle impostazioni (in settings.ejs)
         document.querySelectorAll('.color-swatch').forEach(swatch => {
             if (isDark) {
@@ -600,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 swatch.style.border = '2px solid rgba(0, 0, 0, 0.1)';
             }
         });
-        
+
         // Service cards (in index.ejs e services.ejs)
         document.querySelectorAll('.service-card, [data-aos]').forEach(card => {
             if (isDark) {
@@ -609,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.classList.remove('service-card-dark');
             }
         });
-        
+
         // FAQ items (in faq.ejs)
         document.querySelectorAll('.faq-section .card').forEach(card => {
             if (isDark) {
@@ -618,7 +618,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 card.classList.remove('faq-card-dark');
             }
         });
-        
+
         // Dashboard cards (in dashboard.ejs)
         document.querySelectorAll('.status-badge').forEach(badge => {
             if (isDark) {
@@ -628,20 +628,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
+
     // Sostituisci le funzioni esistenti con questa nuova implementazione completa
     function updateElementsForDarkTheme() {
         applyThemeToAllElements('dark');
     }
-    
+
     function updateElementsForLightTheme() {
         applyThemeToAllElements('light');
     }
-    
+
     function updateComponentsForTheme(theme) {
         applyThemeToAllElements(theme);
     }
-    
+
     function getColorValue(colorName) {
         const colors = {
             'blue': '#143D80',
@@ -663,29 +663,29 @@ document.addEventListener('DOMContentLoaded', function() {
             // Cancella eventuali impostazioni salvate in localStorage
             localStorage.removeItem('userSettings');
             localStorage.removeItem('userSettingsTimestamp');
-            
+
             // Applica le impostazioni predefinite e procedi con la creazione dell'interfaccia
             applyUserSettings(userSettings);
             buildInterface();
             return;
         }
-        
+
         // Il resto del codice per gli utenti autenticati rimane invariato
         // Prima verifica se abbiamo impostazioni recenti in localStorage
         const cachedSettings = localStorage.getItem('userSettings');
         const cachedTimestamp = localStorage.getItem('userSettingsTimestamp');
         const now = new Date().getTime();
-        
+
         // Se abbiamo impostazioni in cache e sono recenti (meno di 5 minuti), usale
         if (cachedSettings && cachedTimestamp && (now - parseInt(cachedTimestamp)) < 5 * 60 * 1000) {
             try {
                 userSettings = { ...userSettings, ...JSON.parse(cachedSettings) };
                 applyUserSettings(userSettings);
                 console.log('Impostazioni caricate dalla cache locale');
-                
+
                 // Continua con la creazione dell'interfaccia
                 buildInterface();
-                
+
                 // Carica comunque dal server in background per aggiornare la cache
                 fetchSettingsFromServer(false);
                 return;
@@ -694,7 +694,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Se c'è un errore nella cache, continua con il caricamento dal server
             }
         }
-        
+
         // Altrimenti carica dal server
         fetchSettingsFromServer(true);
     }
@@ -709,47 +709,47 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 credentials: 'include'
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Errore nel recupero delle impostazioni');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data && data.settings) {
-                    // Aggiorna le impostazioni
-                    userSettings = { ...userSettings, ...data.settings };
-                    
-                    // Salva in localStorage per le future visite
-                    localStorage.setItem('userSettings', JSON.stringify(data.settings));
-                    localStorage.setItem('userSettingsTimestamp', new Date().getTime().toString());
-                    
-                    // Applica le impostazioni
-                    applyUserSettings(userSettings);
-                    console.log('Impostazioni caricate dal server');
-                }
-            })
-            .catch(error => {
-                console.error('Errore nel caricamento delle impostazioni dal server:', error);
-                
-                // Prova a recuperare dalla cache anche se è vecchia
-                const cachedSettings = localStorage.getItem('userSettings');
-                if (cachedSettings) {
-                    try {
-                        userSettings = { ...userSettings, ...JSON.parse(cachedSettings) };
-                        applyUserSettings(userSettings);
-                        console.log('Usate impostazioni in cache perché il server non risponde');
-                    } catch (e) {
-                        console.error('Errore nel recupero della cache di backup:', e);
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore nel recupero delle impostazioni');
                     }
-                }
-            })
-            .finally(() => {
-                // Se stiamo aspettando la risposta prima di costruire l'interfaccia
-                if (waitForResponse) {
-                    buildInterface();
-                }
-            });
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.settings) {
+                        // Aggiorna le impostazioni
+                        userSettings = { ...userSettings, ...data.settings };
+
+                        // Salva in localStorage per le future visite
+                        localStorage.setItem('userSettings', JSON.stringify(data.settings));
+                        localStorage.setItem('userSettingsTimestamp', new Date().getTime().toString());
+
+                        // Applica le impostazioni
+                        applyUserSettings(userSettings);
+                        console.log('Impostazioni caricate dal server');
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore nel caricamento delle impostazioni dal server:', error);
+
+                    // Prova a recuperare dalla cache anche se è vecchia
+                    const cachedSettings = localStorage.getItem('userSettings');
+                    if (cachedSettings) {
+                        try {
+                            userSettings = { ...userSettings, ...JSON.parse(cachedSettings) };
+                            applyUserSettings(userSettings);
+                            console.log('Usate impostazioni in cache perché il server non risponde');
+                        } catch (e) {
+                            console.error('Errore nel recupero della cache di backup:', e);
+                        }
+                    }
+                })
+                .finally(() => {
+                    // Se stiamo aspettando la risposta prima di costruire l'interfaccia
+                    if (waitForResponse) {
+                        buildInterface();
+                    }
+                });
         } else {
             // Se non autenticato, continua con la creazione dell'interfaccia
             if (waitForResponse) {
@@ -766,7 +766,7 @@ document.addEventListener('DOMContentLoaded', function() {
             acc[key] = value;
             return acc;
         }, {});
-        
+
         // Se c'è un token nel cookie, prova a decodificarlo
         if (cookies.token) {
             try {
@@ -774,15 +774,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 const base64Url = cookies.token.split('.')[1];
                 const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                 const payload = JSON.parse(window.atob(base64));
-                
+
                 // Restituisci il valore di isAdmin
                 return !!payload.isAdmin;
             } catch (error) {
                 console.error('Errore nella decodifica del token:', error);
             }
         }
-        
+
         return false; // Default: non admin
+    }
+
+    // Funzione per ottenere il conteggio delle notifiche non lette
+    function getUnreadNotificationCount() {
+        // Se non siamo admin, non facciamo nulla
+        if (!isUserAdmin()) return Promise.resolve(0);
+
+        return fetch('/api/notifications/unread-count')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                return data.count || 0;
+            })
+            .catch(error => {
+                console.error('Error fetching notification count:', error);
+                return 0;
+            });
     }
 
     // Modifica la funzione buildInterface per supportare Tizen
@@ -799,7 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Crea la barra di navigazione
         let navbarLinks;
         const isAdminUser = isUserAdmin();
-        
+
         if (isAuthenticated) {
             // Links per utenti autenticati
             navbarLinks = `
@@ -808,6 +829,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li class="nav-item"><a class="nav-link animated-link" href="/services"><i class="fas fa-cogs"></i> Servizi</a></li>
                  <li class="nav-item"><a class="nav-link animated-link" href="/contact"><i class="fas fa-envelope"></i> Contatti</a></li>
                 ${isAdminUser ? `<li class="nav-item"><a class="nav-link animated-link" href="/admin/orders"><i class="fas fa-clipboard-list"></i> Admin Dashboard</a></li>` : ''}
+                ${isAdminUser ? `<li class="nav-item notification-nav-item"><a class="nav-link animated-link" href="/admin/notifications"><i class="fas fa-bell"></i> Notifiche <span id="unread-notification-badge" class="badge badge-danger badge-pill d-none">0</span></a></li>` : ''}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <div class="user-avatar-mini d-none d-sm-inline-block">
@@ -846,6 +868,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </li>
             `;
+
+            // Se siamo admin, recuperiamo il conteggio delle notifiche non lette
+            if (isAdminUser) {
+                getUnreadNotificationCount().then(count => {
+                    const badge = document.getElementById('unread-notification-badge');
+                    if (badge) {
+                        if (count > 0) {
+                            badge.textContent = count;
+                            badge.classList.remove('d-none');
+                        } else {
+                            badge.classList.add('d-none');
+                        }
+                    }
+                });
+            }
         } else {
             // Links per utenti non autenticati
             navbarLinks = `
@@ -857,14 +894,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 <li class="nav-item"><a class="nav-link btn btn-glow btn-primary btn-sm ml-2" href="/auth/register"><i class="fas fa-user-plus"></i> Registrati</a></li>
             `;
         }
-        
+
         // Determina la classe del tema in base alle impostazioni
         const themeClass = userSettings.theme === 'dark' ? 'navbar-dark dark-theme' : 'navbar-dark';
-        
+
         // Determina il colore principale in base alle impostazioni
-        const primaryColor = userSettings.primaryColor !== 'default' ? 
+        const primaryColor = userSettings.primaryColor !== 'default' ?
             `style="--primary-color: ${getColorValue(userSettings.primaryColor)}"` : '';
-        
+
         // Determina la visualizzazione iniziale dell'indicatore daltonismo
         const colorBlindMode = userSettings.colorBlindMode;
         const indicatorVisibility = (colorBlindMode && colorBlindMode !== 'none') ? '' : 'd-none';
@@ -902,8 +939,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div style="padding-top: 76px;"></div>
         `;
 
-// Sostituisci il footer esistente con questo nuovo footer moderno
-const footer = `
+        // Sostituisci il footer esistente con questo nuovo footer moderno
+        const footer = `
     <footer class="modern-footer">
         <div class="footer-top">
             <div class="container">
@@ -1605,13 +1642,13 @@ const footer = `
         // Inserisci gli stili personalizzati nella head
         document.head.insertAdjacentHTML('beforeend', linkAnimationStyles);
         document.head.insertAdjacentHTML('beforeend', customStyles);
-        
+
         // Inserisci la barra di navigazione all'inizio del body
         document.body.insertAdjacentHTML('afterbegin', navbar);
-        
+
         // Inserisci il footer alla fine del body
         document.body.insertAdjacentHTML('beforeend', footer);
-        
+
         // Aggiungi Font Awesome per le icone
         if (!document.querySelector('link[href*="font-awesome"]')) {
             const fontAwesome = document.createElement('link');
@@ -1619,7 +1656,7 @@ const footer = `
             fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
             document.head.appendChild(fontAwesome);
         }
-        
+
         // Aggiungi Google Fonts per i caratteri
         if (!document.querySelector('link[href*="fonts.googleapis"]')) {
             const googleFonts = document.createElement('link');
@@ -1627,37 +1664,37 @@ const footer = `
             googleFonts.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap';
             document.head.appendChild(googleFonts);
         }
-        
+
         // Aggiungi libreria AOS per animazioni allo scroll
         if (!document.querySelector('link[href*="aos"]')) {
             const aosCSS = document.createElement('link');
             aosCSS.rel = 'stylesheet';
             aosCSS.href = 'https://unpkg.com/aos@next/dist/aos.css';
             document.head.appendChild(aosCSS);
-            
+
             const aosJS = document.createElement('script');
             aosJS.src = 'https://unpkg.com/aos@next/dist/aos.js';
             document.body.appendChild(aosJS);
         }
-        
+
         // Gestione migliorata dello scroll per la navbar intelligente
         let lastScrollTop = 0;
         const navbarHeight = 76;
         let scrollTimer = null;
-        
-        window.addEventListener('scroll', function() {
+
+        window.addEventListener('scroll', function () {
             const navbar = document.querySelector('.smart-navbar');
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
+
             // Cancella il timer precedente se esistente
             if (scrollTimer !== null) {
                 clearTimeout(scrollTimer);
             }
-            
+
             // Gestione della visibilità durante lo scorrimento
             if (scrollTop > 10) {
                 navbar.classList.add('scrolled');
-                
+
                 // Nascondi la navbar solo durante lo scroll verso il basso dopo una certa distanza
                 if (scrollTop > lastScrollTop + 50 && scrollTop > navbarHeight * 2) {
                     navbar.classList.add('navbar-hidden');
@@ -1667,12 +1704,12 @@ const footer = `
             } else {
                 navbar.classList.remove('scrolled');
             }
-            
+
             // Imposta un timer per rimostrare la navbar dopo un po' di inattività
-            scrollTimer = setTimeout(function() {
+            scrollTimer = setTimeout(function () {
                 navbar.classList.remove('navbar-hidden');
             }, 1000);
-            
+
             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // Previene valori negativi su alcuni browser
         });
 
@@ -1690,7 +1727,7 @@ const footer = `
                     }, 100 * (index + 1));
                 });
             }, 100);
-            
+
             // Inizializza AOS quando il documento è caricato
             setTimeout(() => {
                 if (typeof AOS !== 'undefined') {
@@ -1703,7 +1740,7 @@ const footer = `
                 }
             }, 500);
         }
-        
+
         // Nascondi il preloader dopo il caricamento completo
         window.addEventListener('load', () => {
             setTimeout(() => {
@@ -1718,7 +1755,7 @@ const footer = `
         });
 
         // Gestisci i cambi di tema in tempo reale (per esempio quando l'utente clicca su un toggle tema)
-        document.addEventListener('themeToggle', function(e) {
+        document.addEventListener('themeToggle', function (e) {
             const newTheme = e.detail.theme || (document.body.classList.contains('dark-theme') ? 'light' : 'dark');
             window.changeTheme(newTheme);
         });
@@ -1726,14 +1763,14 @@ const footer = `
         // Supporta anche il rilevamento automatico del tema di sistema
         if (window.matchMedia) {
             const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-            
+
             // Gestisci il cambio di tema di sistema se l'utente ha impostato il tema su "auto"
             prefersDarkScheme.addEventListener('change', e => {
                 if (userSettings.theme === 'auto') {
                     window.changeTheme(e.matches ? 'dark' : 'light');
                 }
             });
-            
+
             // Applica il tema di sistema se l'utente ha impostato il tema su "auto"
             if (userSettings.theme === 'auto') {
                 window.changeTheme(prefersDarkScheme.matches ? 'dark' : 'light');
@@ -1745,7 +1782,7 @@ const footer = `
     function buildTizenInterface() {
         // Determina i link in base allo stato di autenticazione
         let buttonLinks;
-        
+
         if (isAuthenticated) {
             // Links per utenti autenticati
             buttonLinks = `
@@ -1973,26 +2010,26 @@ const footer = `
 
         // Inserisci gli stili Tizen nella head
         document.head.insertAdjacentHTML('beforeend', tizenStyles);
-        
+
         // Inserisci l'header Tizen all'inizio del body
         document.body.insertAdjacentHTML('afterbegin', tizenHeader);
-        
+
         // Usa il resto del codice standard per footer e altre funzionalità
         // (ma con pulsanti legacy invece della navbar moderna)
         // ...
-        
+
         console.log('Interfaccia Tizen attivata');
     }
 
     // Aggiungi una funzione helper per forzare la modalità Tizen (per test)
-    window.toggleTizenMode = function() {
+    window.toggleTizenMode = function () {
         // Rimuovi tutti gli elementi dell'interfaccia esistenti
         const header = document.querySelector('header');
         if (header) header.remove();
-        
+
         // Aggiorna lo stato Tizen
         window.isTizenOverride = !window.isTizenOverride;
-        
+
         // Ricrea l'interfaccia
         if (window.isTizenOverride) {
             buildTizenInterface();
@@ -2541,10 +2578,10 @@ const footer = `
             }
         </style>
     `;
-    
+
     // Aggiungi gli stili di accessibilità alla head
     document.head.insertAdjacentHTML('beforeend', accessibilityStyles);
-    
+
     // Avvia il processo di caricamento delle impostazioni e creazione dell'interfaccia
     loadUserSettings();
 
@@ -2682,24 +2719,24 @@ const footer = `
             }
         </style>
     `;
-    
+
     // Aggiungi funzione per gestire l'effetto ripple del Material Design
     const addMaterialRippleEffect = () => {
         // Aggiungi il container per le ripple a ogni card interattiva
         document.querySelectorAll('.card').forEach(card => {
-            if (!card.querySelector('.ripple-container') && 
+            if (!card.querySelector('.ripple-container') &&
                 (card.onclick || card.querySelector('a, button'))) {
-                
+
                 const rippleContainer = document.createElement('div');
                 rippleContainer.className = 'ripple-container';
                 card.appendChild(rippleContainer);
-                
-                card.addEventListener('mousedown', function(e) {
+
+                card.addEventListener('mousedown', function (e) {
                     // Calcola la posizione relativa del click
                     const rect = this.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-                    
+
                     // Crea l'elemento ripple
                     const ripple = document.createElement('span');
                     ripple.className = 'ripple';
@@ -2715,10 +2752,10 @@ const footer = `
                         height: 100px;
                         animation: ripple-animation 0.8s ease-out forwards;
                     `;
-                    
+
                     // Aggiungi l'elemento al container
                     rippleContainer.appendChild(ripple);
-                    
+
                     // Rimuovi l'elemento dopo l'animazione
                     setTimeout(() => {
                         ripple.remove();
@@ -2727,7 +2764,7 @@ const footer = `
             }
         });
     };
-    
+
     // Aggiungi una keyframe animation per l'effetto ripple
     const rippleAnimation = `
         <style>
@@ -2739,26 +2776,26 @@ const footer = `
             }
         </style>
     `;
-    
+
     // Funzione per aggiungere variabili CSS dei colori primari come RGB
     const addColorVariables = () => {
         // Funzione di supporto per convertire i colori HEX in valori RGB
         function hexToRgb(hex) {
             // Elimina il carattere # se presente
             hex = hex.replace(/^#/, '');
-            
+
             // Parsa il codice esadecimale
             const r = parseInt(hex.substring(0, 2), 16);
             const g = parseInt(hex.substring(2, 4), 16);
             const b = parseInt(hex.substring(4, 6), 16);
-            
+
             // Restituisce i valori RGB come array
             return [r, g, b];
         }
-        
+
         // Ottieni i colori primari da :root
         const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
-        
+
         if (primaryColor && primaryColor.startsWith('#')) {
             // Converti in RGB e imposta come variabile CSS
             const [r, g, b] = hexToRgb(primaryColor);
@@ -2768,22 +2805,22 @@ const footer = `
             document.documentElement.style.setProperty('--primary-color-rgb', '20, 61, 128');
         }
     };
-    
+
     // Inserisci gli stili Material Design nel documento
     document.head.insertAdjacentHTML('beforeend', materialCardStyles);
     document.head.insertAdjacentHTML('beforeend', rippleAnimation);
-    
+
     // Aggiungi un hook per applicare gli effetti Material dopo il caricamento dell'interfaccia
     const originalBuildInterface = buildInterface;
-    buildInterface = function() {
+    buildInterface = function () {
         originalBuildInterface();
-        
+
         // Aggiungi le variabili RGB dei colori
         addColorVariables();
-        
+
         // Aggiungi gli effetti ripple alle card
         setTimeout(addMaterialRippleEffect, 500);
-        
+
         // Monitora i cambiamenti dinamici nel DOM
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
@@ -2792,23 +2829,23 @@ const footer = `
                 }
             });
         });
-        
+
         observer.observe(document.body, {
             childList: true,
             subtree: true
         });
     };
-    
+
     // ...existing code...
 });
 
 
 
 // Aggiungi questa funzione al tuo file build.js
-window.changeTheme = function(theme) {
+window.changeTheme = function (theme) {
     userSettings.theme = theme;
     applyUserSettings(userSettings);
-    
+
     // Salva le impostazioni sul server solo se l'utente è autenticato
     if (isAuthenticated) {
         // Salva in localStorage
@@ -2817,7 +2854,7 @@ window.changeTheme = function(theme) {
         settings.theme = theme;
         localStorage.setItem('userSettings', JSON.stringify(settings));
         localStorage.setItem('userSettingsTimestamp', new Date().getTime().toString());
-        
+
         // Invia al server
         fetch('/api/user/settings', {
             method: 'POST',
@@ -2834,25 +2871,25 @@ window.changeTheme = function(theme) {
 };
 
 // Funzione per impostare la modalità daltonico
-window.setColorblindMode = function(mode) {
+window.setColorblindMode = function (mode) {
     // Rimuovi tutte le classi daltonismo esistenti
     document.body.classList.remove('colorblind-deuteranopia', 'colorblind-protanopia', 'colorblind-tritanopia');
-    
+
     // Gestione dell'indicatore nel navbar
     const navbarIndicator = document.getElementById('colorblind-indicator');
-    
+
     // Aggiungi la classe corretta se richiesta
     if (mode && mode !== 'none') {
         document.body.classList.add('colorblind-' + mode);
         console.log('Modalità daltonico attivata:', mode);
-        
+
         // Mostra l'indicatore nella navbar
         if (navbarIndicator) {
             navbarIndicator.classList.remove('d-none');
             navbarIndicator.setAttribute('title', 'Modalità daltonismo: ' + mode);
             navbarIndicator.setAttribute('data-mode', mode);
         }
-        
+
         // Mostra una notifica all'utente
         const notification = document.createElement('div');
         notification.className = 'color-mode-notification';
@@ -2863,7 +2900,7 @@ window.setColorblindMode = function(mode) {
             </div>
         `;
         document.body.appendChild(notification);
-        
+
         // Nascondi la notifica dopo alcuni secondi
         setTimeout(() => {
             notification.style.opacity = '0';
@@ -2875,11 +2912,11 @@ window.setColorblindMode = function(mode) {
             navbarIndicator.classList.add('d-none');
         }
     }
-    
+
     // Aggiorna le impostazioni utente
     if (window.userSettings) {
         window.userSettings.colorBlindMode = mode;
-        
+
         // Salva solo se autenticato
         if (isAuthenticated) {
             const cachedSettings = localStorage.getItem('userSettings');
@@ -2887,7 +2924,7 @@ window.setColorblindMode = function(mode) {
             settings.colorBlindMode = mode;
             localStorage.setItem('userSettings', JSON.stringify(settings));
             localStorage.setItem('userSettingsTimestamp', new Date().getTime().toString());
-            
+
             fetch('/api/user/settings', {
                 method: 'POST',
                 headers: {
@@ -2905,7 +2942,7 @@ window.setColorblindMode = function(mode) {
 // Funzione per costruire l'interfaccia Tizen (aggiungere dopo la funzione buildInterface)
 function buildTizenInterface() {
     console.log('Dispositivo Tizen rilevato, caricamento interfaccia semplificata');
-    
+
     // CSS specifico per Tizen - ottimizzato per TV e telecomandi
     const tizenCSS = `
         <style id="tizen-styles">
@@ -3070,10 +3107,10 @@ function buildTizenInterface() {
             }
         </style>
     `;
-    
+
     // Inserisci CSS nel documento
     document.head.insertAdjacentHTML('beforeend', tizenCSS);
-    
+
     // Carica Font Awesome se non è già presente
     if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesome = document.createElement('link');
@@ -3081,10 +3118,10 @@ function buildTizenInterface() {
         fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
         document.head.appendChild(fontAwesome);
     }
-    
+
     // Crea l'header con navigazione ottimizzata per TV
     const createHeader = () => {
-        const links = isAuthenticated ? 
+        const links = isAuthenticated ?
             `
                 <button class="tv-button" tabindex="1" data-href="/dashboard">
                     <i class="fas fa-tachometer-alt"></i>Dashboard
@@ -3101,7 +3138,7 @@ function buildTizenInterface() {
                 <button class="tv-button" tabindex="5" data-href="/auth/logout" style="background-color: #CC0000;">
                     <i class="fas fa-sign-out-alt"></i>Logout
                 </button>
-            ` : 
+            ` :
             `
                 <button class="tv-button" tabindex="1" data-href="/">
                     <i class="fas fa-home"></i>Home
@@ -3122,7 +3159,7 @@ function buildTizenInterface() {
                     <i class="fas fa-user-plus"></i>Registrati
                 </button>
             `;
-            
+
         return `
             <header class="tv-header">
                 <div class="tv-logo">
@@ -3135,7 +3172,7 @@ function buildTizenInterface() {
             </header>
         `;
     };
-    
+
     // Crea guide per la navigazione con telecomando
     const createNavigationGuide = () => {
         return `
@@ -3148,7 +3185,7 @@ function buildTizenInterface() {
             </div>
         `;
     };
-    
+
     // Crea footer semplificato
     const createFooter = () => {
         return `
@@ -3157,49 +3194,49 @@ function buildTizenInterface() {
             </footer>
         `;
     };
-    
+
     // Inserisci HTML nel documento
     document.body.insertAdjacentHTML('afterbegin', createHeader());
     document.body.insertAdjacentHTML('beforeend', createNavigationGuide());
     document.body.insertAdjacentHTML('beforeend', createFooter());
-    
+
     // Aggiungi pulsante indietro
     document.body.insertAdjacentHTML('afterbegin', `
         <button class="tv-back-button" id="tvBackButton">
             <i class="fas fa-arrow-left"></i> Indietro
         </button>
     `);
-    
+
     // Avvolgi il contenuto principale in un wrapper
     const main = document.querySelector('main');
     if (main) {
         const wrapper = document.createElement('div');
         wrapper.className = 'tv-content';
-        
+
         // Sposta tutto il contenuto dell'elemento main nel nuovo wrapper
         wrapper.innerHTML = main.innerHTML;
         main.innerHTML = '';
         main.appendChild(wrapper);
     }
-    
+
     // Gestione eventi per supporto navigazione telecomando
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         console.log('Tasto premuto:', e.key);
-        
+
         // Navigazione con frecce
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
             const focusableElements = Array.from(document.querySelectorAll('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])'));
             const currentIndex = focusableElements.indexOf(document.activeElement);
-            
+
             if (currentIndex > -1) {
                 let nextIndex;
-                
+
                 if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
                     nextIndex = (currentIndex + 1) % focusableElements.length;
                 } else {
                     nextIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
                 }
-                
+
                 focusableElements[nextIndex].focus();
                 e.preventDefault();
             } else if (focusableElements.length > 0) {
@@ -3207,7 +3244,7 @@ function buildTizenInterface() {
                 focusableElements[0].focus();
             }
         }
-        
+
         // Gestione del tasto Enter
         if (e.key === 'Enter' && document.activeElement) {
             const href = document.activeElement.getAttribute('data-href');
@@ -3217,14 +3254,14 @@ function buildTizenInterface() {
                 document.activeElement.click();
             }
         }
-        
+
         // Gestione del tasto Back/Return del telecomando
         if (e.key === 'Backspace' || e.key === 'Back' || e.key === 'Escape') {
             window.history.back();
             e.preventDefault();
         }
     });
-    
+
     // Collega gli eventi click sui pulsanti TV
     document.querySelectorAll('.tv-button').forEach(button => {
         button.addEventListener('click', () => {
@@ -3232,23 +3269,23 @@ function buildTizenInterface() {
             if (href) window.location.href = href;
         });
     });
-    
+
     // Collega il pulsante "Indietro"
     document.getElementById('tvBackButton').addEventListener('click', () => {
         window.history.back();
     });
-    
+
     // Quando la pagina è caricata, imposta il focus sul primo elemento
     window.addEventListener('load', () => {
         const firstFocusable = document.querySelector('[tabindex="1"]');
         if (firstFocusable) firstFocusable.focus();
     });
-    
+
     // Ottimizza le prestazioni disabilitando animazioni pesanti
     const disableHeavyAnimations = () => {
         // Rimuovi animazioni AOS
         if (window.AOS) window.AOS.init({ disable: true });
-        
+
         // Rimuovi altre animazioni pesanti
         document.querySelectorAll('[data-aos], .animate__animated, .animated').forEach(el => {
             el.style.animation = 'none';
@@ -3256,7 +3293,7 @@ function buildTizenInterface() {
             el.classList.remove('animated');
             el.removeAttribute('data-aos');
         });
-        
+
         // Carica le immagini con lazy loading
         document.querySelectorAll('img').forEach(img => {
             img.loading = 'lazy';
@@ -3266,7 +3303,7 @@ function buildTizenInterface() {
             }
         });
     };
-    
+
     disableHeavyAnimations();
     applyUserSettings(userSettings);
 }
@@ -3275,7 +3312,7 @@ function buildTizenInterface() {
 
 function buildTizenInterface() {
     console.log('Interfaccia Tizen attivata per dispositivi TV Samsung');
-    
+
     // CSS ottimizzato per TV
     const tizenCSS = `
         <style id="tizen-styles">
@@ -3441,10 +3478,10 @@ function buildTizenInterface() {
             }
         </style>
     `;
-    
+
     // Inserisci CSS nel documento
     document.head.insertAdjacentHTML('beforeend', tizenCSS);
-    
+
     // Carica Font Awesome se non è già presente
     if (!document.querySelector('link[href*="font-awesome"]')) {
         const fontAwesome = document.createElement('link');
@@ -3452,10 +3489,10 @@ function buildTizenInterface() {
         fontAwesome.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css';
         document.head.appendChild(fontAwesome);
     }
-    
+
     // Crea l'header con navigazione ottimizzata per TV
     const createHeader = () => {
-        const links = isAuthenticated ? 
+        const links = isAuthenticated ?
             `
                 <button class="tv-button" tabindex="1" data-href="/dashboard">
                     <i class="fas fa-tachometer-alt"></i>Dashboard
@@ -3472,7 +3509,7 @@ function buildTizenInterface() {
                 <button class="tv-button" tabindex="5" data-href="/auth/logout" style="background-color: #CC0000;">
                     <i class="fas fa-sign-out-alt"></i>Logout
                 </button>
-            ` : 
+            ` :
             `
                 <button class="tv-button" tabindex="1" data-href="/">
                     <i class="fas fa-home"></i>Home
@@ -3493,7 +3530,7 @@ function buildTizenInterface() {
                     <i class="fas fa-user-plus"></i>Registrati
                 </button>
             `;
-            
+
         return `
             <header class="tv-header">
                 <div class="tv-logo">
@@ -3506,7 +3543,7 @@ function buildTizenInterface() {
             </header>
         `;
     };
-    
+
     // Crea guide per la navigazione con telecomando
     const createNavigationGuide = () => {
         return `
@@ -3519,7 +3556,7 @@ function buildTizenInterface() {
             </div>
         `;
     };
-    
+
     // Crea footer semplificato
     const createFooter = () => {
         return `
@@ -3528,49 +3565,49 @@ function buildTizenInterface() {
             </footer>
         `;
     };
-    
+
     // Inserisci HTML nel documento
     document.body.insertAdjacentHTML('afterbegin', createHeader());
     document.body.insertAdjacentHTML('beforeend', createNavigationGuide());
     document.body.insertAdjacentHTML('beforeend', createFooter());
-    
+
     // Aggiungi pulsante indietro
     document.body.insertAdjacentHTML('afterbegin', `
         <button class="tv-back-button" id="tvBackButton">
             <i class="fas fa-arrow-left"></i> Indietro
         </button>
     `);
-    
+
     // Avvolgi il contenuto principale in un wrapper
     const main = document.querySelector('main');
     if (main) {
         const wrapper = document.createElement('div');
         wrapper.className = 'tv-content';
-        
+
         // Sposta tutto il contenuto dell'elemento main nel nuovo wrapper
         wrapper.innerHTML = main.innerHTML;
         main.innerHTML = '';
         main.appendChild(wrapper);
     }
-    
+
     // Gestione eventi per supporto navigazione telecomando
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         console.log('Tasto premuto:', e.key);
-        
+
         // Navigazione con frecce
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
             const focusableElements = Array.from(document.querySelectorAll('button, a, input, select, textarea, [tabindex]:not([tabindex="-1"])'));
             const currentIndex = focusableElements.indexOf(document.activeElement);
-            
+
             if (currentIndex > -1) {
                 let nextIndex;
-                
+
                 if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
                     nextIndex = (currentIndex + 1) % focusableElements.length;
                 } else {
                     nextIndex = (currentIndex - 1 + focusableElements.length) % focusableElements.length;
                 }
-                
+
                 focusableElements[nextIndex].focus();
                 e.preventDefault();
             } else if (focusableElements.length > 0) {
@@ -3578,7 +3615,7 @@ function buildTizenInterface() {
                 focusableElements[0].focus();
             }
         }
-        
+
         // Gestione del tasto Enter
         if (e.key === 'Enter' && document.activeElement) {
             const href = document.activeElement.getAttribute('data-href');
@@ -3588,14 +3625,14 @@ function buildTizenInterface() {
                 document.activeElement.click();
             }
         }
-        
+
         // Gestione del tasto Back/Return del telecomando
         if (e.key === 'Backspace' || e.key === 'Back' || e.key === 'Escape') {
             window.history.back();
             e.preventDefault();
         }
     });
-    
+
     // Collega gli eventi click sui pulsanti TV
     document.querySelectorAll('.tv-button').forEach(button => {
         button.addEventListener('click', () => {
@@ -3603,23 +3640,23 @@ function buildTizenInterface() {
             if (href) window.location.href = href;
         });
     });
-    
+
     // Collega il pulsante "Indietro"
     document.getElementById('tvBackButton').addEventListener('click', () => {
         window.history.back();
     });
-    
+
     // Quando la pagina è caricata, imposta il focus sul primo elemento
     window.addEventListener('load', () => {
         const firstFocusable = document.querySelector('[tabindex="1"]');
         if (firstFocusable) firstFocusable.focus();
     });
-    
+
     // Ottimizza le prestazioni disabilitando animazioni pesanti
     const disableHeavyAnimations = () => {
         // Rimuovi animazioni AOS
         if (window.AOS) window.AOS.init({ disable: true });
-        
+
         // Rimuovi altre animazioni pesanti
         document.querySelectorAll('[data-aos], .animate__animated, .animated').forEach(el => {
             el.style.animation = 'none';
@@ -3627,7 +3664,7 @@ function buildTizenInterface() {
             el.classList.remove('animated');
             el.removeAttribute('data-aos');
         });
-        
+
         // Carica le immagini con lazy loading
         document.querySelectorAll('img').forEach(img => {
             img.loading = 'lazy';
@@ -3637,14 +3674,48 @@ function buildTizenInterface() {
             }
         });
     };
-    
+
     disableHeavyAnimations();
     applyUserSettings(userSettings);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // ...existing code...
+
+    // Aggiungi negli stili esistenti
+
+    const notificationStyles = `
+<style id="notification-styles">
+    .notification-nav-item {
+        position: relative;
+    }
     
+    #unread-notification-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        font-size: 0.7rem;
+        transform: translate(25%, -25%);
+        min-width: 18px;
+        height: 18px;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .dark-theme #unread-notification-badge {
+        background-color: #e74c3c;
+    }
+</style>
+`;
+
+    // Aggiungi gli stili al documento
+    document.head.insertAdjacentHTML('beforeend', notificationStyles);
+
     // Aggiungi il CSS Material Design 3 per i pulsanti dopo gli stili delle card
     const materialButtonStyles = `
         <style id="material-design-buttons">
@@ -3793,14 +3864,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const addMaterialRippleEffect = () => {
         // Per le card
         document.querySelectorAll('.card').forEach(card => {
-            if (!card.querySelector('.ripple-container') && 
+            if (!card.querySelector('.ripple-container') &&
                 (card.onclick || card.querySelector('a, button'))) {
-                
+
                 const rippleContainer = document.createElement('div');
                 rippleContainer.className = 'ripple-container';
                 card.appendChild(rippleContainer);
-                
-                card.addEventListener('mousedown', function(e) {
+
+                card.addEventListener('mousedown', function (e) {
                     createRipple(e, rippleContainer);
                 });
             }
@@ -3812,8 +3883,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const rippleContainer = document.createElement('div');
                 rippleContainer.className = 'ripple-container';
                 btn.appendChild(rippleContainer);
-                
-                btn.addEventListener('mousedown', function(e) {
+
+                btn.addEventListener('mousedown', function (e) {
                     createRipple(e, rippleContainer);
                 });
             }
@@ -3825,47 +3896,47 @@ document.addEventListener('DOMContentLoaded', function() {
         const rect = container.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        
+
         const ripple = document.createElement('span');
         ripple.className = 'ripple';
-        
+
         // Calcola il diametro in base alla dimensione dell'elemento
         const diameter = Math.max(rect.width, rect.height) * 2;
-        
+
         ripple.style.cssText = `
             position: absolute;
             background-color: rgba(255, 255, 255, 0.4);
             border-radius: 50%;
             pointer-events: none;
             transform: scale(0);
-            top: ${y - diameter/2}px;
-            left: ${x - diameter/2}px;
+            top: ${y - diameter / 2}px;
+            left: ${x - diameter / 2}px;
             width: ${diameter}px;
             height: ${diameter}px;
             animation: ripple-animation 0.8s ease-out forwards;
         `;
-        
+
         container.appendChild(ripple);
-        
+
         setTimeout(() => {
             ripple.remove();
         }, 800);
     };
-    
+
     // Inserisci gli stili Material Design per i pulsanti nel documento
     document.head.insertAdjacentHTML('beforeend', materialButtonStyles);
-    
+
     // Aggiungi un hook per applicare gli effetti Material dopo il caricamento dell'interfaccia
     const originalBuildInterface = buildInterface;
-    buildInterface = function() {
+    buildInterface = function () {
         originalBuildInterface();
-        
+
         // Aggiungi le variabili RGB dei colori
         addColorVariables();
-        
+
         // Aggiungi gli effetti ripple alle card e pulsanti
         setTimeout(addMaterialRippleEffect, 500);
-        
+
         // Monitora i cambiamenti dinamici nel DOM
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
@@ -3874,13 +3945,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
-        
+
         observer.observe(document.body, {
             childList: true,
             subtree: true
         });
     };
-    
+
     // ...existing code...
 });
 

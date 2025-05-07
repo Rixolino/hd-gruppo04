@@ -22,6 +22,9 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { sequelize } from './config/db';
 import { isAdmin } from './middleware/adminMiddleware';
+import http from 'http';
+import { initSocketServer } from './utils/notificheHelper';
+import { notificaAdmin } from './utils/notificheHelper'; // Importa il notificatore
 
 // Sincronizza il modello con il database (aggiunge le colonne mancanti)
 SettingsModel.sync({ alter: true }).then(() => {
@@ -30,9 +33,49 @@ SettingsModel.sync({ alter: true }).then(() => {
   console.error('Errore nella sincronizzazione della tabella settings:', error);
 });
 
+// Aggiungi subito dopo le altre sincronizzazioni (dopo SettingsModel.sync)
+
+// Verifica che la tabella notifiche esista
+async function checkNotificheTable() {
+  try {
+    await sequelize.query(`
+      CREATE TABLE IF NOT EXISTS notifiche (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        utenteId INT NOT NULL,
+        tipo VARCHAR(50) NOT NULL,
+        messaggio TEXT NOT NULL,
+        letto TINYINT(1) NOT NULL DEFAULT 0,
+        data DATETIME NOT NULL,
+        entityId VARCHAR(50) DEFAULT NULL,
+        entityType VARCHAR(50) DEFAULT NULL,
+        FOREIGN KEY (utenteId) REFERENCES utenti(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('Tabella notifiche verificata');
+  } catch (error) {
+    console.error('Errore nella verifica della tabella notifiche:', error);
+  }
+}
+
+// Esegui la verifica all'avvio dell'app
+checkNotificheTable();
+
+// Sincronizza anche il modello NotificaModel se è disponibile
+import NotificaModel from './models/notificaModel';
+NotificaModel.sync({ alter: true }).then(() => {
+  console.log('Tabella notifiche sincronizzata con il database');
+}).catch(error => {
+  console.error('Errore nella sincronizzazione della tabella notifiche:', error);
+});
+
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+
+// Inizializza Socket.IO
+const io = initSocketServer(server);
+
 const port = process.env.PORT || 3000;
 
 // Middleware
@@ -41,6 +84,7 @@ app.use(bodyParser.json());
 // Rimuovi la duplicazione
 // app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
+app.use('/sounds', express.static(path.join(__dirname, '../public/sounds')));
 app.use(cookieParser());
 
 // Sostituisci o aggiungi questa parte dopo la definizione di express
@@ -819,15 +863,29 @@ app.post('/services/request/:id', authenticate, upload.array('attachments', 5), 
       prezzo: service.price,
       progressoLavoro: 0
     });
-    
-    // Notifica agli admin (implementazione base)
+
     const user = await UserModel.findByPk(userId);
     if (user) {
-        console.log(`Nuova richiesta di servizio: ${requestTitle} da ${user.nome} ${user.cognome}`);
-    } else {
-        console.log(`Nuova richiesta di servizio: ${requestTitle} da un utente sconosciuto`);
+      const messaggio = `Nuovo ordine #${order.id} - "${requestTitle}" richiesto da ${user.nome} ${user.cognome}`;
+      await notificaAdmin('nuovo-ordine', messaggio, order.id, 'ordine');
     }
-    // Qui si potrebbe implementare l'invio di email o altre notifiche
+
+    // Aggiungi una notifica per l'utente
+    await sequelize.query(
+      `INSERT INTO notifiche 
+       (utenteId, tipo, messaggio, letto, data, entityId, entityType) 
+       VALUES (?, ?, ?, 0, NOW(), ?, ?)`,
+      { 
+        replacements: [
+          userId, // ID dell'utente che ha fatto l'ordine
+          'nuovo-ordine', // Tipo di notifica
+          `Il tuo ordine #${order.id} per "${requestTitle}" è stato ricevuto e in attesa di pagamento`, // Messaggio
+          order.id, // ID dell'ordine
+          'ordine' // Tipo di entità
+        ],
+        type: QueryTypes.INSERT 
+      }
+    );
     
     // Reindirizza alla pagina di conferma
     res.redirect(`/order-confirmation/${order.id}`);
@@ -1358,14 +1416,36 @@ app.post('/process-payment', authenticate, async (req: Request, res: Response): 
       dataConsegna: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     });
     
-    // Aggiorna i punti fedeltà se necessario
+    // Aggiungi il codice suggerito per gestire i punti fedeltà e notifiche admin
     const user = await UserModel.findByPk(req.user.userId);
     if (user) {
       const puntiGuadagnati = Math.floor(Number(order.prezzo));
       await user.update({
         puntifedelta: (user.puntifedelta || 0) + puntiGuadagnati
       });
+      
+      // Notifica admin per il pagamento
+      const { notificaAdmin } = require('./utils/notificheHelper');
+      const messaggio = `Pagamento ricevuto per l'ordine #${order.id} - €${order.prezzo} da ${user.nome} ${user.cognome}`;
+      await notificaAdmin('pagamento-ordine', messaggio, order.id, 'ordine');
     }
+
+    // Aggiungi notifica per l'utente
+    await sequelize.query(
+      `INSERT INTO notifiche 
+       (utenteId, tipo, messaggio, letto, data, entityId, entityType) 
+       VALUES (?, ?, ?, 0, NOW(), ?, ?)`,
+      { 
+        replacements: [
+          req.user.userId, // ID dell'utente che ha effettuato il pagamento
+          'pagamento-completato', // Tipo di notifica
+          `Il tuo pagamento di €${order.prezzo} per l'ordine #${order.id} è stato ricevuto. Il tuo progetto è ora in lavorazione.`, // Messaggio
+          order.id, // ID dell'ordine
+          'pagamento' // Tipo di entità
+        ],
+        type: QueryTypes.INSERT 
+      }
+    );
     
     // Reindirizza alla pagina di conferma pagamento
     res.redirect(`/payment-confirmation/${paymentId}`);
@@ -1920,6 +2000,156 @@ app.delete('/admin/users/:id/delete', authenticate, isAdmin, async (req: Request
   }
 });
 
+// Aggiungi dopo le altre route admin, prima di app.use((req: Request, res: Response) => {...})
+
+// Pagina delle notifiche admin - solo per admin
+app.get('/admin/notifications', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user.userId;
+    
+    // Recupera tutte le notifiche per l'admin corrente
+    const notifiche = await sequelize.query(
+      `SELECT * FROM notifiche WHERE utenteId = ? ORDER BY data DESC, letto ASC`,
+      { 
+        replacements: [userId],
+        type: QueryTypes.SELECT 
+      }
+    );
+    
+    // Conta le notifiche non lette
+    const [result] = await sequelize.query(
+      `SELECT COUNT(*) as count FROM notifiche WHERE utenteId = ? AND letto = 0`,
+      { 
+        replacements: [userId],
+        type: QueryTypes.SELECT 
+      }
+    );
+    
+    const totalNonLette = result ? (result as any).count : 0;
+    
+    res.render('admin/notifications', {
+      user: req.user,
+      notifiche: Array.isArray(notifiche) ? notifiche : [],
+      totalNonLette,
+      title: 'Notifiche Admin'
+    });
+  } catch (error) {
+    console.error('Errore nel recupero delle notifiche:', error);
+    res.status(500).render('error', {
+      user: req.user,
+      title: 'Errore',
+      errorMessage: 'Si è verificato un errore nel caricamento delle notifiche',
+      showLogout: true
+    });
+  }
+});
+
+// API per segnare una notifica come letta
+app.post('/api/notifications/:id/read', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const notificaId = req.params.id;
+    const userId = req.user.userId;
+    
+    // Aggiorna lo stato della notifica
+    await sequelize.query(
+      `UPDATE notifiche SET letto = 1 WHERE id = ? AND utenteId = ?`,
+      { 
+        replacements: [notificaId, userId],
+        type: QueryTypes.UPDATE 
+      }
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Errore nell\'aggiornamento della notifica:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Si è verificato un errore nell\'aggiornamento della notifica' 
+    });
+  }
+});
+
+// API per segnare tutte le notifiche come lette
+app.post('/api/notifications/read-all', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user.userId;
+    
+    // Aggiorna lo stato di tutte le notifiche dell'utente
+    await sequelize.query(
+      `UPDATE notifiche SET letto = 1 WHERE utenteId = ?`,
+      { 
+        replacements: [userId],
+        type: QueryTypes.UPDATE 
+      }
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Errore nell\'aggiornamento delle notifiche:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Si è verificato un errore nell\'aggiornamento delle notifiche' 
+    });
+  }
+});
+
+// API per eliminare una notifica
+app.delete('/api/notifications/:id', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const notificaId = req.params.id;
+    const userId = req.user.userId;
+    
+    // Elimina la notifica
+    await sequelize.query(
+      `DELETE FROM notifiche WHERE id = ? AND utenteId = ?`,
+      { 
+        replacements: [notificaId, userId],
+        type: QueryTypes.DELETE 
+      }
+    );
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Errore nell\'eliminazione della notifica:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Si è verificato un errore nell\'eliminazione della notifica' 
+    });
+  }
+});
+
+// Aggiungi dopo le altre route API
+
+// Endpoint per ottenere il conteggio delle notifiche non lette
+app.get('/api/notifications/unread-count', authenticate, isAdmin, async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.user.userId;
+    
+    // Verifica se esiste la tabella notifiche
+    try {
+      const [result] = await sequelize.query(
+        `SELECT COUNT(*) as count FROM notifiche WHERE utenteId = ? AND letto = 0`,
+        { 
+          replacements: [userId],
+          type: QueryTypes.SELECT 
+        }
+      );
+      
+      const count = result ? (result as any).count : 0;
+      res.json({ count });
+    } catch (error) {
+      // Se la tabella non esiste, restituisci 0
+      console.error('Errore nel conteggio delle notifiche:', error);
+      res.json({ count: 0 });
+    }
+  } catch (error) {
+    console.error('Errore nell\'API di conteggio delle notifiche:', error);
+    res.status(500).json({ 
+      error: 'Si è verificato un errore nel recupero del conteggio delle notifiche' 
+    });
+  }
+});
+
 // Gestione pagina 404 - deve essere sempre DOPO tutte le route ma PRIMA dei middleware di gestione errori
 app.use((req: Request, res: Response) => {
   res.status(404).render('error', {
@@ -1999,7 +2229,7 @@ const generalErrorHandler: ErrorRequestHandler = (err: Error, req: Request, res:
 app.use(dbErrorHandler);
 app.use(generalErrorHandler);
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
 

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifiche Admin</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .notification-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+        }
+        
+        .notification-item {
+            transition: background-color 0.3s;
+        }
+        
+        .notification-item.fade-out {
+            background-color: #f8f9fa;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .notification-actions {
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            
+            .notification-actions .btn {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="mb-0">
+                        <i class="fas fa-bell text-accent"></i> Notifiche
+                        <% if (totalNonLette > 0) { %>
+                            <span class="badge badge-accent badge-pill ml-2"><%= totalNonLette %></span>
+                        <% } %>
+                    </h1>
+                    <% if (notifiche.length > 0) { %>
+                        <button id="markAllRead" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-check-double"></i> Segna tutte come lette
+                        </button>
+                    <% } %>
+                </div>
+                <p class="text-muted">Gestisci le notifiche della piattaforma</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">Notifiche recenti</h5>
+            </div>
+            <div class="card-body p-0">
+                <% if (notifiche.length === 0) { %>
+                    <div class="text-center py-5">
+                        <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                        <h4>Non hai nuove notifiche</h4>
+                        <p class="text-muted">Tutte le notifiche sono state lette</p>
+                    </div>
+                <% } else { %>
+                    <div class="list-group list-group-flush notification-list">
+                        <% notifiche.forEach(notifica => { %>
+                            <div class="list-group-item notification-item" data-id="<%= notifica.id %>">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div class="notification-content">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <% if (notifica.tipo === 'nuovo-ordine') { %>
+                                                <span class="notification-icon bg-primary">
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                </span>
+                                            <% } else if (notifica.tipo === 'pagamento-ordine') { %>
+                                                <span class="notification-icon bg-success">
+                                                    <i class="fas fa-money-bill-wave"></i>
+                                                </span>
+                                            <% } else { %>
+                                                <span class="notification-icon bg-info">
+                                                    <i class="fas fa-bell"></i>
+                                                </span>
+                                            <% } %>
+                                            <h6 class="mb-0 ml-2"><%= notifica.tipo.replace('-', ' ').toUpperCase() %></h6>
+                                        </div>
+                                        <p class="mb-1"><%= notifica.messaggio %></p>
+                                        <small class="text-muted">
+                                            <%= new Date(notifica.data).toLocaleString('it-IT', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            }) %>
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="notification-actions">
+                                        <% if (notifica.entityType === 'ordine' && notifica.entityId) { %>
+                                            <a href="/admin/orders?id=<%= notifica.entityId %>" class="btn btn-sm btn-outline-secondary mr-2">
+                                                <i class="fas fa-eye"></i> Visualizza
+                                            </a>
+                                        <% } %>
+                                        <button class="btn btn-sm btn-outline-success mark-read-btn" data-id="<%= notifica.id %>">
+                                            <i class="fas fa-check"></i> Segna come letta
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Connessione a Socket.IO
+        const socket = io();
+        
+        // Recupera il token dai cookie
+        function getToken() {
+            const cookies = document.cookie.split(';');
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith('token=')) {
+                    return cookie.substring(6);
+                }
+            }
+            return null;
+        }
+        
+        // Autentica il socket
+        const token = getToken();
+        if (token) {
+            socket.emit('authenticate', { token });
+            
+            socket.on('authenticated', () => {
+                console.log('Socket.IO autenticato con successo');
+                
+                // Ascolta nuove notifiche
+                socket.on('nuova_notifica', (data) => {
+                    console.log('Nuova notifica ricevuta:', data);
+                    
+                    // Aggiunge la notifica alla lista
+                    addNotificationToList(data.notifica);
+                    
+                    // Riproduce suono di notifica
+                    playNotificationSound();
+                    
+                    // Aggiorna contatore
+                    updateCounter();
+                });
+            });
+            
+            socket.on('authentication_error', (error) => {
+                console.error('Errore autenticazione Socket.IO:', error);
+            });
+        }
+        
+        // Completa la funzione per aggiungere una nuova notifica alla lista
+
+        function addNotificationToList(notifica) {
+            // Seleziona la lista delle notifiche
+            const notificationList = document.querySelector('.notification-list');
+            
+            // Se non ci sono notifiche, rimuovi il messaggio "non hai nuove notifiche"
+            const emptyMessage = document.querySelector('.text-center.py-5');
+            if (emptyMessage) {
+                emptyMessage.remove();
+                
+                // Crea un container per la lista se non esiste
+                if (!notificationList) {
+                    const cardBody = document.querySelector('.card-body');
+                    const newList = document.createElement('div');
+                    newList.className = 'list-group list-group-flush notification-list';
+                    cardBody.appendChild(newList);
+                }
+            }
+            
+            // Determina l'icona e il colore in base al tipo
+            let iconClass = 'fa-bell';
+            let bgClass = 'bg-info';
+            
+            if (notifica.tipo === 'nuovo-ordine') {
+                iconClass = 'fa-shopping-cart';
+                bgClass = 'bg-primary';
+            } else if (notifica.tipo === 'pagamento-ordine') {
+                iconClass = 'fa-money-bill-wave';
+                bgClass = 'bg-success';
+            }
+            
+            // Formatta la data
+            const data = new Date(notifica.data);
+            const dataFormattata = data.toLocaleString('it-IT', {
+                day: 'numeric',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            // Crea l'elemento HTML per la nuova notifica
+            const notificationItem = document.createElement('div');
+            notificationItem.className = 'list-group-item notification-item';
+            notificationItem.setAttribute('data-id', notifica.id);
+            
+            // Costruisci l'HTML interno
+            notificationItem.innerHTML = `
+                <div class="d-flex w-100 justify-content-between align-items-center">
+                    <div class="notification-content">
+                        <div class="d-flex align-items-center mb-1">
+                            <span class="notification-icon ${bgClass}">
+                                <i class="fas ${iconClass}"></i>
+                            </span>
+                            <h6 class="mb-0 ml-2">${notifica.tipo.replace('-', ' ').toUpperCase()}</h6>
+                        </div>
+                        <p class="mb-1">${notifica.messaggio}</p>
+                        <small class="text-muted">${dataFormattata}</small>
+                    </div>
+                    
+                    <div class="notification-actions">
+                        ${notifica.entityType === 'ordine' && notifica.entityId ? 
+                            `<a href="/admin/orders?id=${notifica.entityId}" class="btn btn-sm btn-outline-secondary mr-2">
+                                <i class="fas fa-eye"></i> Visualizza
+                            </a>` : ''
+                        }
+                        <button class="btn btn-sm btn-outline-success mark-read-btn" data-id="${notifica.id}">
+                            <i class="fas fa-check"></i> Segna come letta
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Aggiungi la notifica in cima alla lista
+            if (notificationList) {
+                notificationList.insertBefore(notificationItem, notificationList.firstChild);
+            }
+
+            // Aggiorna i contatori di notifiche
+            updateCounter();
+        }
+
+        // Funzione per riprodurre il suono di notifica
+        function playNotificationSound() {
+            const audio = new Audio('/sounds/notification.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log('Impossibile riprodurre audio:', e));
+        }
+
+        // Funzione per aggiornare i contatori di notifiche
+        function updateCounter() {
+            const items = document.querySelectorAll('.notification-item');
+            const badgeInHeader = document.querySelector('.nav-item.active .badge');
+            const badgeInTitle = document.querySelector('h1 .badge');
+            
+            if (badgeInHeader) {
+                badgeInHeader.textContent = items.length;
+            }
+            
+            if (badgeInTitle) {
+                badgeInTitle.textContent = items.length;
+            }
+            
+            // Se non ci sono notifiche, mostra il messaggio
+            if (items.length === 0) {
+                const cardBody = document.querySelector('.card-body');
+                cardBody.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                        <h4>Non hai nuove notifiche</h4>
+                        <p class="text-muted">Tutte le notifiche sono state lette</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Aggiungi event listener per il pulsante "Segna tutte come lette"
+        document.addEventListener('DOMContentLoaded', function() {
+            const markAllReadBtn = document.getElementById('markAllRead');
+            if (markAllReadBtn) {
+                markAllReadBtn.addEventListener('click', function() {
+                    fetch('/api/notifications/read-all', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Aggiorna visivamente le notifiche
+                            document.querySelectorAll('.notification-item').forEach(item => {
+                                item.classList.add('fade-out');
+                            });
+                            
+                            // Dopo l'animazione, ricarica la pagina
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 500);
+                        }
+                    })
+                    .catch(error => console.error('Errore:', error));
+                });
+            }
+            
+            // Delegate event listener per i pulsanti "Segna come letta"
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.closest('.mark-read-btn')) {
+                    const btn = e.target.closest('.mark-read-btn');
+                    const notificationId = btn.getAttribute('data-id');
+                    
+                    fetch(`/api/notifications/${notificationId}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Trova la notifica e aggiunge classe per l'animazione
+                            const notificationItem = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+                            if (notificationItem) {
+                                notificationItem.classList.add('fade-out');
+                                
+                                // Dopo l'animazione, rimuove l'elemento
+                                setTimeout(() => {
+                                    notificationItem.remove();
+                                    updateCounter();
+                                }, 500);
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Errore:', error));
+                }
+            });
+        });
+    });
+    </script>
+
+    <!-- Aggiungi prima degli altri script -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <!-- Gli script richiesti -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="/js/build.js"></script>
+</body>
+</html>
