@@ -71,10 +71,18 @@ NotificaModel.sync({ alter: true }).then(() => {
 dotenv.config();
 
 const app = express();
+
+// Inizializza Socket.IO solo se non siamo su Vercel
+const isVercel = process.env.VERCEL === '1';
 const server = http.createServer(app);
 
-// Inizializza Socket.IO
-const io = initSocketServer(server);
+// Inizializza Socket.IO solo se non siamo su Vercel
+let io;
+if (!isVercel) {
+  io = initSocketServer(server);
+} else {
+  console.log('Ambiente Vercel rilevato: Socket.IO disabilitato');
+}
 
 const port = process.env.PORT || 3000;
 
