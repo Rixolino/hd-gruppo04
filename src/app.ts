@@ -25,6 +25,7 @@ import { isAdmin } from './middleware/adminMiddleware';
 import http from 'http';
 import { initSocketServer } from './utils/notificheHelper';
 import { notificaAdmin } from './utils/notificheHelper'; // Importa il notificatore
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 // Sincronizza il modello con il database (aggiunge le colonne mancanti)
 SettingsModel.sync({ alter: true }).then(() => {
