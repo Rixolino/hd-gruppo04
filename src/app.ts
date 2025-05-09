@@ -2158,8 +2158,18 @@ app.get('/api/notifications/unread-count', authenticate, isAdmin, async (req: Re
   }
 });
 
+// Route per servire il sitemap.xml
+app.get('/sitemap.xml', (req: Request, res: Response) => {
+  res.sendFile(path.join(process.cwd(), 'sitemap.xml'));
+});
+
 // Gestione pagina 404 - deve essere sempre DOPO tutte le route ma PRIMA dei middleware di gestione errori
-app.use((req: Request, res: Response) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // Escludi sitemap.xml dalla gestione degli errori
+  if (req.path === '/sitemap.xml') {
+    return next();
+  }
+  
   res.status(404).render('error', {
     user: req.user,
     title: 'Pagina non trovata',
