@@ -6,7 +6,10 @@ const router = express.Router();
 
 // Route per servire il sitemap.xml
 router.get('/sitemap.xml', (req, res) => {
-    const sitemapPath = path.join(__dirname, '../../public/sitemap.xml');
+    // Utilizza il percorso assoluto basato su process.cwd()
+    const sitemapPath = path.join(process.cwd(), 'public/sitemap.xml');
+    
+    console.log('Tentativo di lettura del sitemap dal percorso:', sitemapPath);
     
     fs.readFile(sitemapPath, (err, data) => {
         if (err) {
