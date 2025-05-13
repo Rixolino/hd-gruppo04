@@ -26,6 +26,7 @@ import http from 'http';
 import { initSocketServer } from './utils/notificheHelper';
 import { notificaAdmin } from './utils/notificheHelper'; // Importa il notificatore
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import seoRoutes from './routes/seoRoutes';
 
 // Sincronizza il modello con il database (aggiunge le colonne mancanti)
 SettingsModel.sync({ alter: true }).then(() => {
@@ -145,6 +146,9 @@ app.use(settingsMiddleware.loadUserSettings);
 
 // Applica il middleware dopo l'inizializzazione della sessione e di passport
 app.use(settingsMiddleware.loadUserSettings);
+
+// Aggiungi questa linea con gli altri router
+app.use('/', seoRoutes);
 
 // Database connection
 initializeDatabase()
